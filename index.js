@@ -12,7 +12,6 @@ async function getData(url, Path) {
   let URL = await fetch(url).then(res => res.json());
   URL.length = URL.length - 1;
   
-  fs.writeFileSync(`config.json`, JSON.stringify(URL, true, 4), 'UTF-8')
   for (let i = 0; i < URL.length; i++){
     if(!fs.existsSync(`${Path}/${URL[i].path.replace("files/", "")}`)){
       fs.mkdirSync(`${Path}/${URL[i].path.replace("files/", "")}`, { recursive: true })
