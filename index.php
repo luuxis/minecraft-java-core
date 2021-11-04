@@ -15,9 +15,10 @@ function dirToArray($dir) {
          {
             $hash = hash_file('MD5', $dir . "/" . $value);
             $size = filesize($dir . "/" . $value);
+            $path = str_replace("files/", "", $dir);
             echo "
             {
-               \"path\": \"$dir\",
+               \"path\": \"$path\",
                \"FilesName\": \"$value\",
                \"size\" :\"$size\",
                \"hash\" :\"$hash\"
