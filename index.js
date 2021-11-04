@@ -15,6 +15,8 @@ async function getData(url, Path) {
   for (let i = 0; i < URL.length; i++){
     if(!fs.existsSync(`${Path}/${URL[i].path}`)){
       fs.mkdirSync(`${Path}/${URL[i].path}`, { recursive: true })
+    } else {
+      console.log('Directory already exists', i);
     }
   }
 }
