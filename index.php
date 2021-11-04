@@ -14,12 +14,19 @@ function dirToArray($dir) {
          else
          {
             $hash = hash_file('MD5', $dir . "/" . $value);
-            echo "{ \"path\": \"$dir\", \"FilesName\": \"$value\", \"hash\": \"$hash\"},";
+            $size = filesize($dir . "/" . $value);
+            echo "
+            {
+               \"path\": \"$dir\",
+               \"FilesName\": \"$value\",
+               \"size\" :\"$size\",
+               \"hash\" :\"$hash\"
+            },";
          }
       }
    }
 }
 
 header("Content-Type: application/json; charset=UTF-8");
-echo '[', dirToArray("files"), ' ""]';
+echo "[", dirToArray("files"), "\n\"\"]";
 ?>
