@@ -13,8 +13,8 @@ async function getData(url, Path) {
   URL.length = URL.length - 1;
   
   for (let i = 0; i < URL.length; i++){
-    if(!fs.existsSync(`${Path}/${URL[i].path.replace("files/", "")}`)){
-      fs.mkdirSync(`${Path}/${URL[i].path.replace("files/", "")}`, { recursive: true })
+    if(!fs.existsSync(`${Path}/${URL[i].path}`)){
+      fs.mkdirSync(`${Path}/${URL[i].path}`, { recursive: true })
     }
   }
 }
