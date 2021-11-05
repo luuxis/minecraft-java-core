@@ -16,12 +16,14 @@ function dirToArray($dir) {
             $hash = hash_file('MD5', $dir . "/" . $value);
             $size = filesize($dir . "/" . $value);
             $path = str_replace("files/", "", $dir);
+            $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
             echo "
             {
                \"path\": \"$path\",
                \"FilesName\": \"$value\",
                \"size\" :\"$size\",
-               \"MD5\" :\"$hash\"
+               \"MD5\" :\"$hash\",
+               \"url\" :\"$url\"
             },";
          }
       }
