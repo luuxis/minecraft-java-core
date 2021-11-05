@@ -21,9 +21,9 @@ function dirToArray($dir) {
             {
                \"path\": \"$path\",
                \"FilesName\": \"$value\",
-               \"size\" :\"$size\",
-               \"MD5\" :\"$hash\",
-               \"url\" :\"$url\"
+               \"size\": $size,
+               \"MD5\": \"$hash\",
+               \"url\": \"$url\"
             },";
          }
       }
