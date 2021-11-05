@@ -8,6 +8,19 @@ function hashFile(filePath) {
   return hex
 }
 
+const request = require('request');
+/**
+ * download file from url, and save to folder
+ * @param {string} url
+ * @param {string} path
+ * @param {string} filename
+ */
+function download(url, path, filename) {
+  request.get(url).on('error', function (err) {
+    console.log(err);
+  }).pipe(fs.createWriteStream(path + filename));
+}
+
 async function getData(url, Path) {
   let URL = await fetch(url).then(res => res.json());
   URL.length = URL.length - 1;
@@ -15,9 +28,9 @@ async function getData(url, Path) {
   for (let i = 0; i < URL.length; i++){
     if(!fs.existsSync(`${Path}/${URL[i].path}`)){
       fs.mkdirSync(`${Path}/${URL[i].path}`, { recursive: true })
-    } else {
-      console.log('Directory already exists', i);
-    }
+    } 
+      download(URL[i].url, `${Path}/${URL[i].path}/`, URL[i].FilesName);
+    
   }
 }
 
