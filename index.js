@@ -2,37 +2,68 @@ const fetch = require('node-fetch');
 const crypto = require('crypto');
 const fs = require('fs');
 
+let total_size = 0;
+let current_size = 0;
+
 
 function hashFile(filePath) {
   const hex = crypto.createHash('MD5').update(fs.readFileSync(filePath)).digest('hex')
   return hex
 }
 
-const request = require('request');
 /**
- * download file from url, and save to folder
- * @param {string} url
- * @param {string} path
- * @param {string} filename
+ * create function to download multiple files, create a folder if it doesn't exist and download the files
+ * @param {any} url
+ * @param {string} save_folder
  */
-function download(url, path, filename) {
-  request.get(url).on('error', function (err) {
-    console.log(err);
-  }).pipe(fs.createWriteStream(path + filename));
-}
+ const download = async (url, save_folder) => {
+  if (!fs.existsSync(save_folder)) {
+      fs.mkdirSync(save_folder, { recursive: true });
+  }
+  
+  try {
+      const resp = await fetch(url.url);
+  
+      const size = url.size;
+      let downloadedsize = 0;
+  
+      resp.body.on("data", chunk => {
+          downloadedsize += chunk.length
+          const percent_file = Math.round(downloadedsize / size * 100)
+          const percent_total = Math.round((current_size + downloadedsize) / total_size * 100)
+          process.stdout.cursorTo(0);
+          process.stdout.clearLine();
+          process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%`);
+      });
+      resp.body.on("end", () => {
+        current_size += url.size;
+        process.stdout.cursorTo(0);
+        process.stdout.clearLine();
+        console.log(`Downloading ${url.FilesName}`);
+      })
+
+      const buffer = await resp.buffer();
+      const file = fs.createWriteStream(`${save_folder}/${url.FilesName}`);
+      file.write(buffer);
+  }
+  catch (err) {
+      console.log(err);
+  }
+};
+
 
 async function getData(url, Path) {
   let URL = await fetch(url).then(res => res.json());
   URL.length = URL.length - 1;
+
+  total_size = 0
+  current_size = 0
+  URL.forEach(url => total_size += url.size);
+  URL.forEach(async url => await download(url, `${Path}/${url.path}`));
   
-  for (let i = 0; i < URL.length; i++){
-    if(!fs.existsSync(`${Path}/${URL[i].path}`)){
-      fs.mkdirSync(`${Path}/${URL[i].path}`, { recursive: true })
-    } 
-      download(URL[i].url, `${Path}/${URL[i].path}/`, URL[i].FilesName);
-    
-  }
 }
+
+
 
 getData('http://127.0.0.1', './minecraft');
 
