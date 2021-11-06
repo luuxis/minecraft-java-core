@@ -33,7 +33,7 @@ function hashFile(filePath) {
           const percent_total = Math.round((current_size + downloadedsize) / total_size * 100)
           process.stdout.cursorTo(0);
           process.stdout.clearLine();
-          process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%`);
+          process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%)`);
       });
       resp.body.on("end", () => {
         current_size += url.size;
@@ -59,11 +59,13 @@ async function getData(url, Path) {
   total_size = 0
   current_size = 0
   URL.forEach(url => total_size += url.size);
+
+  console.log(`Total size: ${total_size}\n current size ${current_size}`);
   URL.forEach(async url => await download(url, `${Path}/${url.path}`));
   
 }
 
 
 
-getData('http://uzurion.luuxis.fr/test', './minecraft');
+getData('http://uzurion.luuxis.fr/files/test', './minecraft');
 
