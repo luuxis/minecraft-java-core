@@ -16,56 +16,55 @@ function hashFile(filePath) {
  * @param {any} url
  * @param {string} save_folder
  */
- const download = async (url, save_folder) => {
+
+
+const download = async (url, save_folder) => {
   if (!fs.existsSync(save_folder)) {
-      fs.mkdirSync(save_folder, { recursive: true });
+    fs.mkdirSync(save_folder, { recursive: true });
+  
   }
   
   try {
-      const resp = await fetch(url.url);
-  
-      const size = url.size;
-      let downloadedsize = 0;
-  
-      resp.body.on("data", chunk => {
-          downloadedsize += chunk.length
-          const percent_file = Math.round(downloadedsize / size * 100)
-          const percent_total = Math.round((current_size + downloadedsize) / total_size * 100)
-          process.stdout.cursorTo(0);
-          process.stdout.clearLine();
-          process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%)`);
-      });
-      resp.body.on("end", () => {
-        current_size += url.size;
-        process.stdout.cursorTo(0);
-        process.stdout.clearLine();
-        console.log(`Downloading ${url.FilesName}`);
-      })
-
-      const buffer = await resp.buffer();
-      const file = fs.createWriteStream(`${save_folder}/${url.FilesName}`);
-      file.write(buffer);
+    const resp = await fetch(url.url);
+    
+    const size = url.size;
+    let downloadedsize = 0;
+    
+    resp.body.on("data", chunk => {
+      downloadedsize += chunk.length
+      const percent_file = Math.round(downloadedsize / size * 100)
+      const percent_total = Math.round((current_size + downloadedsize) / total_size * 100)
+      process.stdout.cursorTo(0);
+      process.stdout.clearLine();
+      process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%)`);
+    });
+    
+    resp.body.on("end", () => {
+      current_size += url.size;
+      process.stdout.cursorTo(0);
+      process.stdout.clearLine();
+      console.log(`Downloading ${url.FilesName}`);
+    })
+    
+    const buffer = await resp.buffer();
+    const file = fs.createWriteStream(`${save_folder}/${url.FilesName}`);
+    file.write(buffer);
   }
+  
   catch (err) {
-      console.log(err);
+    console.log(err);
   }
-};
-
+}
 
 async function getData(url, Path) {
   let URL = await fetch(url).then(res => res.json());
   URL.length = URL.length - 1;
-
+  
   total_size = 0
   current_size = 0
   URL.forEach(url => total_size += url.size);
-
-  console.log(`Total size: ${total_size}\n current size ${current_size}`);
   URL.forEach(async url => await download(url, `${Path}/${url.path}`));
-  
 }
-
-
 
 getData('http://uzurion.luuxis.fr/files/test', './minecraft');
 
