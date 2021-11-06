@@ -65,5 +65,5 @@ async function getData(url, Path) {
 
 
 
-getData('http://127.0.0.1', './minecraft');
+getData('http://uzurion.luuxis.fr/test', './minecraft');
 
