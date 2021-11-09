@@ -13,7 +13,7 @@ function dirToArray($dir) {
          }
          else
          {
-            $hash = hash_file('MD5', $dir . "/" . $value);
+            $hash = hash_file('sha1', $dir . "/" . $value);
             $size = filesize($dir . "/" . $value);
             $path = str_replace("files/", "", $dir);
             $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
@@ -22,7 +22,7 @@ function dirToArray($dir) {
                \"path\": \"$path\",
                \"FilesName\": \"$value\",
                \"size\": $size,
-               \"MD5\": \"$hash\",
+               \"sha1\": \"$hash\",
                \"url\": \"$url\"
             },";
          }

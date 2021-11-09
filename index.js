@@ -1,13 +1,15 @@
 const fetch = require('node-fetch');
 const crypto = require('crypto');
 const fs = require('fs');
+const minecraft_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
+const minecraft_java = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
 
 let total_size = 0;
 let current_size = 0;
 
 
 function hashFile(filePath) {
-  const hex = crypto.createHash('MD5').update(fs.readFileSync(filePath)).digest('hex')
+  const hex = crypto.createHash('sha1').update(fs.readFileSync(filePath)).digest('hex')
   return hex
 }
 
