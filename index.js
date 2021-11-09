@@ -25,7 +25,7 @@ const download = async (url, save_folder) => {
   }
   
   try {
-    const resp = await fetch(url.url);
+    const resp = await fetch(url.url, {keepalive: false});
     
     const size = url.size;
     let downloadedsize = 0;
@@ -62,8 +62,10 @@ async function getData(url, Path) {
   
   total_size = 0
   current_size = 0
-  URL.forEach(url => total_size += url.size);
-  URL.forEach(async url => await download(url, `${Path}/${url.path}`));
+  for (let i = 0; i < URL.length; i++) {
+    total_size += URL[i].size;
+    await download(URL[i], `${Path}/${URL[i].path}`);
+  }
 }
 
 getData('http://uzurion.luuxis.fr/files/test', './minecraft');
