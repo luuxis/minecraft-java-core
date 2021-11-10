@@ -1,2 +1,2 @@
-# Uzurion-Launcher-core
+# minecraft-java-core
  
