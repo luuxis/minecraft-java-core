@@ -4,11 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ."
+    "test": "echo No command is set. && echo Aucune commande n'est definie."
   },
-  "author": "",
+  "keywords": [
+    "minecraft",
+    "minecraft-launcher-node",
+    "minecraft-launcher",
+    "launcher",
+    "minecraft-forge"
+  ],
+  "author": "Luuxis",
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.6.6"
+  },
+  "bugs": {
+    "url": "https://github.com/luuxis/Uzurion-Launcher-core/issues"
+  },
+  "homepage": "https://github.com/luuxis/Uzurion-Launcher-core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luuxis/Uzurion-Launcher-core.git"
   }
 }
