@@ -1,11 +1,17 @@
 {
   "name": "minecraft-java-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo No command is set. && echo Aucune commande n'est definie."
   },
+  "files": [
+    "index.js",
+    "utils/authenticator.js",
+    "utils/handler.js",
+    "utils/launch.js"
+  ],
   "keywords": [
     "minecraft",
     "minecraft-launcher-node",
