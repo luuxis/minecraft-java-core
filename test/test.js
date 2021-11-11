@@ -11,7 +11,7 @@ async function getManifestJSON(){
     return await fetch(platformjson[`windows-${Arch[os.arch()]}`][`${ver[8]}`][0].manifest.url).then(res => res.json());
 }
 
-async function cc(){
+async function test(){
     let manifest = Object.entries((await getManifestJSON()).files);
 
     let java = manifest.find(file => file[0].endsWith(process.platform == "win32" ? "bin/javaw.exe" : "bin/java"))[0];
@@ -21,7 +21,7 @@ async function cc(){
     for(let [path, info] of manifest){
         if(info.type == "directory") continue;
         let file = {};
-        file.path = `runtime/java/${path.replace(toDelete, "").replace("", "")}`;
+        file.path = `runtime/java/${path.replace(toDelete, "").replace("/" + path.split("/")[path.split("/").length-1], "")}`;
         file.FilesName = path.split("/")[path.split("/").length-1]
         file.size = info.downloads.raw.size;
         file.sha1 = info.downloads.raw.sha1;
@@ -34,7 +34,7 @@ async function cc(){
 
 // console.log(process.platform)
 // console.log(os.arch())
-cc()
+test()
 
 
 
