@@ -8,7 +8,7 @@ let ver = {8: "jre-legacy", 16: "java-runtime-alpha"};
 
 async function getManifestJSON(){
     let platformjson = await fetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
-    return await fetch(platformjson[`windows-${Arch[os.arch()]}`][`jre-legacy`][0].manifest.url).then(res => res.json());
+    return await fetch(platformjson[`windows-${Arch[os.arch()]}`][`${ver[8]}`][0].manifest.url).then(res => res.json());
 }
 
 async function cc(){
