@@ -57,4 +57,4 @@ test()
 
 // const { handler } = require('../index.js');
 
-// handler.getData("http://localhost", "./mc")
+// handler.getData("http://uzurion.luuxis.fr/files/test", "./mc")
