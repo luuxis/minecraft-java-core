@@ -22,7 +22,7 @@ async function cc(){
         if(info.type == "directory") continue;
         let file = {};
         file.path = `runtime/java/${path.replace(toDelete, "").replace("", "")}`;
-        file.FilesName = path.length
+        file.FilesName = path.split("/")[path.split("/").length-1]
         file.size = info.downloads.raw.size;
         file.sha1 = info.downloads.raw.sha1;
         file.url = info.downloads.raw.url;
