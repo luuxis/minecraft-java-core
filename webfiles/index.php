@@ -17,14 +17,7 @@ function dirToArray($dir) {
             $size = filesize($dir . "/" . $value);
             $path = str_replace("files/", "", $dir);
             $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
-            echo "
-            {
-               \"path\": \"$path\",
-               \"FilesName\": \"$value\",
-               \"size\": $size,
-               \"sha1\": \"$hash\",
-               \"url\": \"$url\"
-            },";
+            echo "{\"path\":\"$path\",\"FilesName\":\"$value\",\"size\":$size,\"sha1\":\"$hash\",\"url\":\"$url\"},";
          }
       }
    }
