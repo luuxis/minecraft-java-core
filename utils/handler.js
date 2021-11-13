@@ -43,8 +43,6 @@ async function download(url, save_folder){
     resp.body.on("end", () => {
       current_size += url.size;
       process.stdout.cursorTo(0);
-      process.stdout.clearLine();
-      console.log(`Downloading ${url.FilesName}`);
     })
     
     const buffer = await resp.buffer();
@@ -64,18 +62,15 @@ module.exports.getData = async function (url, Path) {
   total_size = 0
   current_size = 0
   
-  
+  URL.forEach(url => total_size += url.size);
 
   for (let i = 0; i < URL.length; i++) {
     if (fs.existsSync(`${Path}/${URL[i].path}/${URL[i].FilesName}`)){
       if(hashFile(`${Path}/${URL[i].path}/${URL[i].FilesName}`) === URL[i].sha1){
-        
       } else {
-      total_size += URL[i].size;
       await download(URL[i], `${Path}/${URL[i].path}`);
       }
     } else {
-      total_size += URL[i].size;
       await download(URL[i], `${Path}/${URL[i].path}`);
     }
   }
