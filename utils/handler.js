@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const crypto = require('crypto');
 const fs = require('fs');
-const minecraft_url = "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json";
+const minecraft_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 
 let total_size = 0;
 let current_size = 0;
