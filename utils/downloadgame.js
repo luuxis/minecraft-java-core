@@ -6,40 +6,43 @@ let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
 let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
 
 async function getJSONVersion(version_id){
-    let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest.json").then(res => res.json())).versions.find(ver => ver.id == version_id);
-    if (!jsonversion) {
-        return console.log(`version ${version_id} not found`);
-    }
-    let Version = await fetch(jsonversion.url).then(res => res.json());
-    
-    let libraries = await getAllLibrairies(Version);
-    let assets = await getAllAssets(Version);
-    let assetsjson = {
-        path: `assets/indexes/${version_id}.json`,
-        type: "CFILE",
-        content: JSON.stringify(assets.json)
-    }
-    assets = assets.assets;
-    
-    let clientjar = Version.downloads.client;
-    assets.push({
-        sha1: clientjar.sha1,
-        size: clientjar.size,
-        path: `versions/${version_id}/${version_id}.jar`,
-        type: "LIBRARY",
-        url: clientjar.url
-    });
-    
-    
+  let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == version_id);
+  if (!jsonversion) {
+    return console.log(`version ${version_id} not found`);
+  }
+  let Version = await fetch(jsonversion.url).then(res => res.json());
+  
+  let libraries = await getAllLibrairies(Version);
+  let assets = await getAllAssets(Version);
+  let assetsjson = {
+    path: `assets/indexes/${version_id}.json`,
+    type: "CFILE",
+    content: JSON.stringify(assets.json)
+  }
+  assets = assets.assets;
+  
+  
+  let clientjar = Version.downloads.client;
+  assets.push({
+    sha1: clientjar.sha1,
+    size: clientjar.size,
+    path: `versions/${version_id}/${version_id}.jar`,
+    type: "LIBRARY",
+    url: clientjar.url
+  });
+  
+  
+  if(Version.logging){
     let logging = Version.logging.client.file;
     assets.push({
-        sha1: logging.sha1,
-        size: logging.size,
-        path: `assets/log_configs/${logging.id}`,
-        type: "LOG",
-        url: logging.url
+      sha1: logging.sha1,
+      size: logging.size,
+      path: `assets/log_configs/${logging.id}`,
+      type: "LOG",
+      url: logging.url
     });
-    return [assetsjson].concat(libraries).concat(assets);
+  }
+  return [assetsjson].concat(libraries).concat(assets);
 }
 
 
@@ -119,8 +122,8 @@ async function launch(bundle){
 
 
 
-async function getJSONAsset(){
-    fs.writeFileSync(`config.json`, JSON.stringify(await getJSONVersion("1.14.2"), true, 4), 'UTF-8')
-    console.log(await getJSONVersion("1.14.2"));
+async function getJSONAsset(ver){
+    fs.writeFileSync(`config.json`, JSON.stringify(await getJSONVersion(ver), true, 4), 'UTF-8')
+    console.log(await getJSONVersion(ver));
 }
-getJSONAsset();
+getJSONAsset("1.18");
