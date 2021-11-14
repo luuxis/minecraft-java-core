@@ -1,78 +1,150 @@
 const fetch = require('node-fetch');
+const os = require('os');
 const crypto = require('crypto');
 const fs = require('fs');
-const minecraft_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 
-let total_size = 0;
-let current_size = 0;
+let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
+let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
 
-
-function hashFile(filePath) {
-  const hex = crypto.createHash('sha1').update(fs.readFileSync(filePath)).digest('hex')
-  return hex
-}
-
-/**
- * create function to download multiple files, create a folder if it doesn't exist and download the files
- * @param {any} url
- * @param {string} save_folder
- */
-
-
-async function download(url, save_folder){
-  if (!fs.existsSync(save_folder)) {
-    fs.mkdirSync(save_folder, { recursive: true });
-  
+async function getJSONVersion(version_id){
+  let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == version_id);
+  if (!jsonversion) {
+    console.log(`version ${version_id} not found`);
+    return;
   }
+  let Version = await fetch(jsonversion.url).then(res => res.json());
+  Version.custom = await fetch("http://localhost/").then(res => res.json());
   
-  try {
-    const resp = await fetch(url.url, {keepalive: false});
-    
-    const size = url.size;
-    let downloadedsize = 0;
-    
-    resp.body.on("data", chunk => {
-      downloadedsize += chunk.length
-      const percent_file = Math.round(downloadedsize / size * 100)
-      const percent_total = Math.round((current_size + downloadedsize) / total_size * 100)
-      process.stdout.cursorTo(0);
-      process.stdout.clearLine();
-      process.stdout.write(`Downloading ${url.FilesName} ${percent_file}% (${percent_total}%)`);
+  let libraries = await getAllLibrairies(Version);
+  let assets = await getAllAssets(Version);
+  let assetsjson = {
+    path: `assets/indexes/${version_id}.json`,
+    type: "CFILE",
+    content: JSON.stringify(assets.json)
+  }
+  assets = assets.assets;
+  
+  
+  let clientjar = Version.downloads.client;
+  assets.push({
+    sha1: clientjar.sha1,
+    size: clientjar.size,
+    path: `versions/${version_id}/${version_id}.jar`,
+    type: "LIBRARY",
+    url: clientjar.url
+  })
+  
+  
+  if(Version.logging){
+    let logging = Version.logging.client.file;
+    assets.push({
+      sha1: logging.sha1,
+      size: logging.size,
+      path: `assets/log_configs/${logging.id}`,
+      type: "LOG",
+      url: logging.url
+    })
+  }
+
+  if(Version.custom){
+    let custom = Version.custom;
+    custom.forEach(url => {
+      assets.push({
+        sha1: url.sha1,
+        size: url.size,
+        path: url.path,
+        type: "CUSTOM",
+        url: url.url
+      })
     });
     
-    resp.body.on("end", () => {
-      current_size += url.size;
-      process.stdout.cursorTo(0);
-    })
     
-    const buffer = await resp.buffer();
-    const file = fs.createWriteStream(`${save_folder}/${url.FilesName}`);
-    file.write(buffer);
   }
-  
-  catch (err) {
-    console.log(err);
-  }
+  return [assetsjson].concat(libraries).concat(assets);
 }
 
-module.exports.getData = async function (url, Path) {
-  let URL = await fetch(url).then(res => res.json());
-  URL.length = URL.length - 1;
 
-  total_size = 0
-  current_size = 0
-  
-  URL.forEach(url => total_size += url.size);
 
-  for (let i = 0; i < URL.length; i++) {
-    if (fs.existsSync(`${Path}/${URL[i].path}/${URL[i].FilesName}`)){
-      if(hashFile(`${Path}/${URL[i].path}/${URL[i].FilesName}`) === URL[i].sha1){
+
+
+
+
+async function getAllLibrairies(jsonversion){
+    let libraries = [];
+    for(let lib of jsonversion.libraries){
+      let artifact;
+      let type = "LIBRARY"
+      if(lib.natives){
+        let classifiers = lib.downloads.classifiers;
+        let native = lib.natives[MojangLib[process.platform]];
+        if(!native) native = lib.natives[process.platform];
+        type = "NATIVE";
+        if(native) artifact = classifiers[native.replace("${arch}", Arch[os.arch()])];
+        else continue;
       } else {
-      await download(URL[i], `${Path}/${URL[i].path}`);
+        artifact = lib.downloads.artifact;
       }
-    } else {
-      await download(URL[i], `${Path}/${URL[i].path}`);
+      if(!artifact) continue;
+      libraries.push({
+        sha1: artifact.sha1,
+        size: artifact.size,
+        path: `libraries/${artifact.path}`,
+        type: type,
+        url: artifact.url
+      });
     }
+    return libraries;
   }
+
+  async function getAllAssets(jsonversion){
+    let assetsjson = await fetch(jsonversion.assetIndex.url).then(res => res.json());
+    let assets = [];
+    for(let asset of Object.values(assetsjson.objects)){
+      assets.push({
+        sha1: asset.hash,
+        size: asset.size,
+        type: "FILE",
+        path: `assets/objects/${asset.hash.substring(0, 2)}/${asset.hash}`,
+        url: `https://resources.download.minecraft.net/${asset.hash.substring(0, 2)}/${asset.hash}`
+      });
+    }
+    return {json: assetsjson, assets};
+  }
+
+
+async function launch(bundle){
+
+    let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => mod.path);
+    let nativeFolder = `versions/1.7.10/natives`;
+    if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
+
+    for(let native of natives){
+      console.log(`Extracting native ${native}`);
+      let zip = new AdmZip(native);
+      let entries = zip.getEntries();
+      for(let entry of entries){
+        if(entry.entryName.startsWith("META-INF")) continue;
+        fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o755 });
+        if(process.platform == "darwin" && (`${nativeFolder}/${entry.entryName}`.endsWith(".dylib") || `${nativeFolder}/${entry.entryName}`.endsWith(".jnilib"))){
+          console.log(`Whitelisting from Apple Quarantine ${`${nativeFolder}/${entry.entryName}`}`);
+          let id = String.fromCharCode.apply(null, execSync(`xattr -p com.apple.quarantine "${`${nativeFolder}/${entry.entryName}`}"`));
+          execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${`${nativeFolder}/${entry.entryName}`}"`);
+        }
+      }
+    }    
 }
+
+
+
+
+
+
+
+async function getJSONAsset(ver){
+    fs.writeFileSync(`config.json`, JSON.stringify(await getJSONVersion(ver), true, 4), 'UTF-8')
+    console.log(await getJSONVersion(ver));
+}
+getJSONAsset("1.12.2");
+
+
 
