@@ -13,7 +13,7 @@ async function getJSONVersion(version_id){
     return;
   }
   let Version = await fetch(jsonversion.url).then(res => res.json());
-  Version.custom = await fetch("http://localhost/").then(res => res.json());
+  //Version.custom = await fetch("http://localhost/").then(res => res.json());
   
   let libraries = await getAllLibrairies(Version);
   let assets = await getAllAssets(Version);
@@ -62,8 +62,6 @@ async function getJSONVersion(version_id){
   }
   return [assetsjson].concat(libraries).concat(assets);
 }
-
-
 
 
 
