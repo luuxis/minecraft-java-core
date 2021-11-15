@@ -1,0 +1,666 @@
+[
+    {
+        "sha1": "7707204c9ffa5d91662de95f0a224e2f721b22af",
+        "size": 1045632,
+        "path": "libraries/org/lwjgl/lwjgl/lwjgl/2.9.2-nightly-20140822/lwjgl-2.9.2-nightly-20140822.jar",
+        "type": "LIBRARY",
+        "url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/lwjgl/2.9.2-nightly-20140822/lwjgl-2.9.2-nightly-20140822.jar",
+        "folder": "libraries/org/lwjgl/lwjgl/lwjgl/2.9.2-nightly-20140822"
+    },
+    {
+        "sha1": "f0e612c840a7639c1f77f68d72a28dae2f0c8490",
+        "size": 173887,
+        "path": "libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.2-nightly-20140822/lwjgl_util-2.9.2-nightly-20140822.jar",
+        "type": "LIBRARY",
+        "url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/lwjgl_util/2.9.2-nightly-20140822/lwjgl_util-2.9.2-nightly-20140822.jar",
+        "folder": "libraries/org/lwjgl/lwjgl/lwjgl_util/2.9.2-nightly-20140822"
+    },
+    {
+        "sha1": "78b2a55ce4dc29c6b3ec4df8ca165eba05f9b341",
+        "size": 613680,
+        "path": "libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.2-nightly-20140822/lwjgl-platform-2.9.2-nightly-20140822-natives-windows.jar",
+        "type": "NATIVE",
+        "url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/lwjgl-platform/2.9.2-nightly-20140822/lwjgl-platform-2.9.2-nightly-20140822-natives-windows.jar",
+        "folder": "libraries/org/lwjgl/lwjgl/lwjgl-platform/2.9.2-nightly-20140822"
+    },
+    {
+        "sha1": "5ba3ac691cb18ce29b53c3284bb9cbcce3ee59e1",
+        "size": 167548,
+        "type": "FILE",
+        "path": "assets/objects/5b/5ba3ac691cb18ce29b53c3284bb9cbcce3ee59e1",
+        "url": "https://resources.download.minecraft.net/5b/5ba3ac691cb18ce29b53c3284bb9cbcce3ee59e1",
+        "folder": "assets/objects/5b"
+    },
+    {
+        "sha1": "6178c811d97a93c4900c503994a1ad5bf2a94d51",
+        "size": 158713,
+        "type": "FILE",
+        "path": "assets/objects/61/6178c811d97a93c4900c503994a1ad5bf2a94d51",
+        "url": "https://resources.download.minecraft.net/61/6178c811d97a93c4900c503994a1ad5bf2a94d51",
+        "folder": "assets/objects/61"
+    },
+    {
+        "sha1": "5cfbc47f1fc90524fbfd66b05ace7778a97d15d7",
+        "size": 168894,
+        "type": "FILE",
+        "path": "assets/objects/5c/5cfbc47f1fc90524fbfd66b05ace7778a97d15d7",
+        "url": "https://resources.download.minecraft.net/5c/5cfbc47f1fc90524fbfd66b05ace7778a97d15d7",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "63bbe3921abd75b9f6cd1e20330360d164da169b",
+        "size": 29512,
+        "type": "FILE",
+        "path": "assets/objects/63/63bbe3921abd75b9f6cd1e20330360d164da169b",
+        "url": "https://resources.download.minecraft.net/63/63bbe3921abd75b9f6cd1e20330360d164da169b",
+        "folder": "assets/objects/63"
+    },
+    {
+        "sha1": "5680749048457f5772ec95a73d856ad792fa1717",
+        "size": 48741,
+        "type": "FILE",
+        "path": "assets/objects/56/5680749048457f5772ec95a73d856ad792fa1717",
+        "url": "https://resources.download.minecraft.net/56/5680749048457f5772ec95a73d856ad792fa1717",
+        "folder": "assets/objects/56"
+    },
+    {
+        "sha1": "61dba25ce75a25e7920bcb210408fc6b6a2c92f0",
+        "size": 23967,
+        "type": "FILE",
+        "path": "assets/objects/61/61dba25ce75a25e7920bcb210408fc6b6a2c92f0",
+        "url": "https://resources.download.minecraft.net/61/61dba25ce75a25e7920bcb210408fc6b6a2c92f0",
+        "folder": "assets/objects/61"
+    },
+    {
+        "sha1": "5f3412ca2fe0141a412dfd66567aa13a26e89ec1",
+        "size": 7840,
+        "type": "FILE",
+        "path": "assets/objects/5f/5f3412ca2fe0141a412dfd66567aa13a26e89ec1",
+        "url": "https://resources.download.minecraft.net/5f/5f3412ca2fe0141a412dfd66567aa13a26e89ec1",
+        "folder": "assets/objects/5f"
+    },
+    {
+        "sha1": "58d63232621aaa03e4d09598700561214e7c2477",
+        "size": 6649,
+        "type": "FILE",
+        "path": "assets/objects/58/58d63232621aaa03e4d09598700561214e7c2477",
+        "url": "https://resources.download.minecraft.net/58/58d63232621aaa03e4d09598700561214e7c2477",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "5c44e7a8da8afddd9220121ba76ec1badebb56c3",
+        "size": 7320,
+        "type": "FILE",
+        "path": "assets/objects/5c/5c44e7a8da8afddd9220121ba76ec1badebb56c3",
+        "url": "https://resources.download.minecraft.net/5c/5c44e7a8da8afddd9220121ba76ec1badebb56c3",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "5e49444266bf88c2006233a811561272ad8f157f",
+        "size": 5280,
+        "type": "FILE",
+        "path": "assets/objects/5e/5e49444266bf88c2006233a811561272ad8f157f",
+        "url": "https://resources.download.minecraft.net/5e/5e49444266bf88c2006233a811561272ad8f157f",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "size": 4832,
+        "type": "FILE",
+        "path": "assets/objects/5f/5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "url": "https://resources.download.minecraft.net/5f/5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "folder": "assets/objects/5f"
+    },
+    {
+        "sha1": "5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "size": 6567,
+        "type": "FILE",
+        "path": "assets/objects/58/5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "url": "https://resources.download.minecraft.net/58/5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "57596c7d8cf8d99cc06ed333fad846be58ec2fe3",
+        "size": 7729,
+        "type": "FILE",
+        "path": "assets/objects/57/57596c7d8cf8d99cc06ed333fad846be58ec2fe3",
+        "url": "https://resources.download.minecraft.net/57/57596c7d8cf8d99cc06ed333fad846be58ec2fe3",
+        "folder": "assets/objects/57"
+    },
+    {
+        "sha1": "629db7d90d2a8555adafa8fc057303eb92f7081b",
+        "size": 4784,
+        "type": "FILE",
+        "path": "assets/objects/62/629db7d90d2a8555adafa8fc057303eb92f7081b",
+        "url": "https://resources.download.minecraft.net/62/629db7d90d2a8555adafa8fc057303eb92f7081b",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "5ebe9a655de4ff8510a2c58e74d25a65ce6c8ad1",
+        "size": 4004,
+        "type": "FILE",
+        "path": "assets/objects/5e/5ebe9a655de4ff8510a2c58e74d25a65ce6c8ad1",
+        "url": "https://resources.download.minecraft.net/5e/5ebe9a655de4ff8510a2c58e74d25a65ce6c8ad1",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "5cd1caeb2b7c35e58c57a90eed97be8cd893e499",
+        "size": 4075,
+        "type": "FILE",
+        "path": "assets/objects/5c/5cd1caeb2b7c35e58c57a90eed97be8cd893e499",
+        "url": "https://resources.download.minecraft.net/5c/5cd1caeb2b7c35e58c57a90eed97be8cd893e499",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "63c22eb984e3406f33bd3fc474b1d76f2c395f1a",
+        "size": 6632,
+        "type": "FILE",
+        "path": "assets/objects/63/63c22eb984e3406f33bd3fc474b1d76f2c395f1a",
+        "url": "https://resources.download.minecraft.net/63/63c22eb984e3406f33bd3fc474b1d76f2c395f1a",
+        "folder": "assets/objects/63"
+    },
+    {
+        "sha1": "56afe99ff911f7c56fb923cd85427a719c2a1424",
+        "size": 5782,
+        "type": "FILE",
+        "path": "assets/objects/56/56afe99ff911f7c56fb923cd85427a719c2a1424",
+        "url": "https://resources.download.minecraft.net/56/56afe99ff911f7c56fb923cd85427a719c2a1424",
+        "folder": "assets/objects/56"
+    },
+    {
+        "sha1": "5d78e883f8bf8123261a5b05cf90cb5cc020fa6e",
+        "size": 4463,
+        "type": "FILE",
+        "path": "assets/objects/5d/5d78e883f8bf8123261a5b05cf90cb5cc020fa6e",
+        "url": "https://resources.download.minecraft.net/5d/5d78e883f8bf8123261a5b05cf90cb5cc020fa6e",
+        "folder": "assets/objects/5d"
+    },
+    {
+        "sha1": "5fa52f2e49e446e466b721937cc168bba734ef33",
+        "size": 4525,
+        "type": "FILE",
+        "path": "assets/objects/5f/5fa52f2e49e446e466b721937cc168bba734ef33",
+        "url": "https://resources.download.minecraft.net/5f/5fa52f2e49e446e466b721937cc168bba734ef33",
+        "folder": "assets/objects/5f"
+    },
+    {
+        "sha1": "5c4cbba7fe4bc8214708f93f4db54102660a281d",
+        "size": 7371,
+        "type": "FILE",
+        "path": "assets/objects/5c/5c4cbba7fe4bc8214708f93f4db54102660a281d",
+        "url": "https://resources.download.minecraft.net/5c/5c4cbba7fe4bc8214708f93f4db54102660a281d",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "5cc7da22ff9cdea9175c8496c3e683d0ce97c9e2",
+        "size": 7554,
+        "type": "FILE",
+        "path": "assets/objects/5c/5cc7da22ff9cdea9175c8496c3e683d0ce97c9e2",
+        "url": "https://resources.download.minecraft.net/5c/5cc7da22ff9cdea9175c8496c3e683d0ce97c9e2",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "627c939e2aa48a5e3f516848e66a76acb992c2a8",
+        "size": 10591,
+        "type": "FILE",
+        "path": "assets/objects/62/627c939e2aa48a5e3f516848e66a76acb992c2a8",
+        "url": "https://resources.download.minecraft.net/62/627c939e2aa48a5e3f516848e66a76acb992c2a8",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "608ce4dc409ef39df6b0409647b89f2f1a2d9ded",
+        "size": 6869,
+        "type": "FILE",
+        "path": "assets/objects/60/608ce4dc409ef39df6b0409647b89f2f1a2d9ded",
+        "url": "https://resources.download.minecraft.net/60/608ce4dc409ef39df6b0409647b89f2f1a2d9ded",
+        "folder": "assets/objects/60"
+    },
+    {
+        "sha1": "591bb8451ac56723d2b689d9bc95c8020bb4809b",
+        "size": 6834,
+        "type": "FILE",
+        "path": "assets/objects/59/591bb8451ac56723d2b689d9bc95c8020bb4809b",
+        "url": "https://resources.download.minecraft.net/59/591bb8451ac56723d2b689d9bc95c8020bb4809b",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "573e565b7fda2c34fc972edd21a82fd2e09200f8",
+        "size": 5530,
+        "type": "FILE",
+        "path": "assets/objects/57/573e565b7fda2c34fc972edd21a82fd2e09200f8",
+        "url": "https://resources.download.minecraft.net/57/573e565b7fda2c34fc972edd21a82fd2e09200f8",
+        "folder": "assets/objects/57"
+    },
+    {
+        "sha1": "5fdf1bd80b204245af760042d2e546d87666e288",
+        "size": 9820,
+        "type": "FILE",
+        "path": "assets/objects/5f/5fdf1bd80b204245af760042d2e546d87666e288",
+        "url": "https://resources.download.minecraft.net/5f/5fdf1bd80b204245af760042d2e546d87666e288",
+        "folder": "assets/objects/5f"
+    },
+    {
+        "sha1": "5a368ed32b3357e31629451ace57eb30d90e8874",
+        "size": 10617,
+        "type": "FILE",
+        "path": "assets/objects/5a/5a368ed32b3357e31629451ace57eb30d90e8874",
+        "url": "https://resources.download.minecraft.net/5a/5a368ed32b3357e31629451ace57eb30d90e8874",
+        "folder": "assets/objects/5a"
+    },
+    {
+        "sha1": "5738d7f49ef30adcfc4f2ab13e0b1d74f09a1289",
+        "size": 127738,
+        "type": "FILE",
+        "path": "assets/objects/57/5738d7f49ef30adcfc4f2ab13e0b1d74f09a1289",
+        "url": "https://resources.download.minecraft.net/57/5738d7f49ef30adcfc4f2ab13e0b1d74f09a1289",
+        "folder": "assets/objects/57"
+    },
+    {
+        "sha1": "60f96185109232213115f5d872bb255e8c7a0c81",
+        "size": 8336,
+        "type": "FILE",
+        "path": "assets/objects/60/60f96185109232213115f5d872bb255e8c7a0c81",
+        "url": "https://resources.download.minecraft.net/60/60f96185109232213115f5d872bb255e8c7a0c81",
+        "folder": "assets/objects/60"
+    },
+    {
+        "sha1": "57008a7f564443d563968fd040fc13ab226fc8d1",
+        "size": 11455,
+        "type": "FILE",
+        "path": "assets/objects/57/57008a7f564443d563968fd040fc13ab226fc8d1",
+        "url": "https://resources.download.minecraft.net/57/57008a7f564443d563968fd040fc13ab226fc8d1",
+        "folder": "assets/objects/57"
+    },
+    {
+        "sha1": "5c5c046607c1694ef1af630729921e3551e4b5e8",
+        "size": 11255,
+        "type": "FILE",
+        "path": "assets/objects/5c/5c5c046607c1694ef1af630729921e3551e4b5e8",
+        "url": "https://resources.download.minecraft.net/5c/5c5c046607c1694ef1af630729921e3551e4b5e8",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "6054a4933743bbec4fbd6a9980e344dcd62ea374",
+        "size": 5579,
+        "type": "FILE",
+        "path": "assets/objects/60/6054a4933743bbec4fbd6a9980e344dcd62ea374",
+        "url": "https://resources.download.minecraft.net/60/6054a4933743bbec4fbd6a9980e344dcd62ea374",
+        "folder": "assets/objects/60"
+    },
+    {
+        "sha1": "61112837c4cd7174fc0cf1ebc569275c45b089ca",
+        "size": 7988,
+        "type": "FILE",
+        "path": "assets/objects/61/61112837c4cd7174fc0cf1ebc569275c45b089ca",
+        "url": "https://resources.download.minecraft.net/61/61112837c4cd7174fc0cf1ebc569275c45b089ca",
+        "folder": "assets/objects/61"
+    },
+    {
+        "sha1": "603f17073b0ed21701163b2aad1afb02111a8ed3",
+        "size": 10766,
+        "type": "FILE",
+        "path": "assets/objects/60/603f17073b0ed21701163b2aad1afb02111a8ed3",
+        "url": "https://resources.download.minecraft.net/60/603f17073b0ed21701163b2aad1afb02111a8ed3",
+        "folder": "assets/objects/60"
+    },
+    {
+        "sha1": "63baa63d5cbf7fff5421b1dc67973101b3c2b5ba",
+        "size": 21588,
+        "type": "FILE",
+        "path": "assets/objects/63/63baa63d5cbf7fff5421b1dc67973101b3c2b5ba",
+        "url": "https://resources.download.minecraft.net/63/63baa63d5cbf7fff5421b1dc67973101b3c2b5ba",
+        "folder": "assets/objects/63"
+    },
+    {
+        "sha1": "607d51883e137d5d423dde865232ab1ee78f2694",
+        "size": 5316,
+        "type": "FILE",
+        "path": "assets/objects/60/607d51883e137d5d423dde865232ab1ee78f2694",
+        "url": "https://resources.download.minecraft.net/60/607d51883e137d5d423dde865232ab1ee78f2694",
+        "folder": "assets/objects/60"
+    },
+    {
+        "sha1": "5a2449cc3d4a6ad36598847e501f956e5a3528bd",
+        "size": 12258,
+        "type": "FILE",
+        "path": "assets/objects/5a/5a2449cc3d4a6ad36598847e501f956e5a3528bd",
+        "url": "https://resources.download.minecraft.net/5a/5a2449cc3d4a6ad36598847e501f956e5a3528bd",
+        "folder": "assets/objects/5a"
+    },
+    {
+        "sha1": "5c633c345fe4cb87c36ada2fe2b5da1b80601cf3",
+        "size": 6269,
+        "type": "FILE",
+        "path": "assets/objects/5c/5c633c345fe4cb87c36ada2fe2b5da1b80601cf3",
+        "url": "https://resources.download.minecraft.net/5c/5c633c345fe4cb87c36ada2fe2b5da1b80601cf3",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "560dd97e6da8badbc8ac00b28c45312e60a525f2",
+        "size": 4826,
+        "type": "FILE",
+        "path": "assets/objects/56/560dd97e6da8badbc8ac00b28c45312e60a525f2",
+        "url": "https://resources.download.minecraft.net/56/560dd97e6da8badbc8ac00b28c45312e60a525f2",
+        "folder": "assets/objects/56"
+    },
+    {
+        "sha1": "58efedf302e0203a6ff9e59a6535d300286c5594",
+        "size": 5602,
+        "type": "FILE",
+        "path": "assets/objects/58/58efedf302e0203a6ff9e59a6535d300286c5594",
+        "url": "https://resources.download.minecraft.net/58/58efedf302e0203a6ff9e59a6535d300286c5594",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "6226903c5dfd8ac388f9d64a5fa9968680ed3507",
+        "size": 4722,
+        "type": "FILE",
+        "path": "assets/objects/62/6226903c5dfd8ac388f9d64a5fa9968680ed3507",
+        "url": "https://resources.download.minecraft.net/62/6226903c5dfd8ac388f9d64a5fa9968680ed3507",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "580a2de441d8caa949758dfb193ba3e6ab4ee61d",
+        "size": 11975,
+        "type": "FILE",
+        "path": "assets/objects/58/580a2de441d8caa949758dfb193ba3e6ab4ee61d",
+        "url": "https://resources.download.minecraft.net/58/580a2de441d8caa949758dfb193ba3e6ab4ee61d",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "58f044e833493dcc6d8963b56cae23c8e0d2eee3",
+        "size": 10677,
+        "type": "FILE",
+        "path": "assets/objects/58/58f044e833493dcc6d8963b56cae23c8e0d2eee3",
+        "url": "https://resources.download.minecraft.net/58/58f044e833493dcc6d8963b56cae23c8e0d2eee3",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "5d9055cf25f126c47e18637aeef917fa1ef61a42",
+        "size": 6870,
+        "type": "FILE",
+        "path": "assets/objects/5d/5d9055cf25f126c47e18637aeef917fa1ef61a42",
+        "url": "https://resources.download.minecraft.net/5d/5d9055cf25f126c47e18637aeef917fa1ef61a42",
+        "folder": "assets/objects/5d"
+    },
+    {
+        "sha1": "59034eb696e186d973dcea0b162f01e38f1b4f31",
+        "size": 4819,
+        "type": "FILE",
+        "path": "assets/objects/59/59034eb696e186d973dcea0b162f01e38f1b4f31",
+        "url": "https://resources.download.minecraft.net/59/59034eb696e186d973dcea0b162f01e38f1b4f31",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "5b1675279bbc245fc6bbb705de8ea09fb3f32b53",
+        "size": 7205,
+        "type": "FILE",
+        "path": "assets/objects/5b/5b1675279bbc245fc6bbb705de8ea09fb3f32b53",
+        "url": "https://resources.download.minecraft.net/5b/5b1675279bbc245fc6bbb705de8ea09fb3f32b53",
+        "folder": "assets/objects/5b"
+    },
+    {
+        "sha1": "641e601132b4adb67951e0d49c1004cf1b86eff2",
+        "size": 17073,
+        "type": "FILE",
+        "path": "assets/objects/64/641e601132b4adb67951e0d49c1004cf1b86eff2",
+        "url": "https://resources.download.minecraft.net/64/641e601132b4adb67951e0d49c1004cf1b86eff2",
+        "folder": "assets/objects/64"
+    },
+    {
+        "sha1": "5cde2500773323f7997d75062f8a26afcdf62b2e",
+        "size": 6269,
+        "type": "FILE",
+        "path": "assets/objects/5c/5cde2500773323f7997d75062f8a26afcdf62b2e",
+        "url": "https://resources.download.minecraft.net/5c/5cde2500773323f7997d75062f8a26afcdf62b2e",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "5e2ef521293719bbe22bbb515bbcacf4c233a075",
+        "size": 5518,
+        "type": "FILE",
+        "path": "assets/objects/5e/5e2ef521293719bbe22bbb515bbcacf4c233a075",
+        "url": "https://resources.download.minecraft.net/5e/5e2ef521293719bbe22bbb515bbcacf4c233a075",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "5e64ed082336f118a07fbaa08616c94815546f8a",
+        "size": 8995,
+        "type": "FILE",
+        "path": "assets/objects/5e/5e64ed082336f118a07fbaa08616c94815546f8a",
+        "url": "https://resources.download.minecraft.net/5e/5e64ed082336f118a07fbaa08616c94815546f8a",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "5ae2932c72fe01bb7de76feea2a5c98cc4f01677",
+        "size": 7372,
+        "type": "FILE",
+        "path": "assets/objects/5a/5ae2932c72fe01bb7de76feea2a5c98cc4f01677",
+        "url": "https://resources.download.minecraft.net/5a/5ae2932c72fe01bb7de76feea2a5c98cc4f01677",
+        "folder": "assets/objects/5a"
+    },
+    {
+        "sha1": "57aead4d024109b4ed37dcf4c73ae44ed06f04a8",
+        "size": 7104,
+        "type": "FILE",
+        "path": "assets/objects/57/57aead4d024109b4ed37dcf4c73ae44ed06f04a8",
+        "url": "https://resources.download.minecraft.net/57/57aead4d024109b4ed37dcf4c73ae44ed06f04a8",
+        "folder": "assets/objects/57"
+    },
+    {
+        "sha1": "5df4a02b1ebc550514841fddb7d64b9c497d40b4",
+        "size": 10948,
+        "type": "FILE",
+        "path": "assets/objects/5d/5df4a02b1ebc550514841fddb7d64b9c497d40b4",
+        "url": "https://resources.download.minecraft.net/5d/5df4a02b1ebc550514841fddb7d64b9c497d40b4",
+        "folder": "assets/objects/5d"
+    },
+    {
+        "sha1": "59b72a547ac80457463715a7cc24b03197653f60",
+        "size": 6572,
+        "type": "FILE",
+        "path": "assets/objects/59/59b72a547ac80457463715a7cc24b03197653f60",
+        "url": "https://resources.download.minecraft.net/59/59b72a547ac80457463715a7cc24b03197653f60",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "623296e4e8fc1fa00b769ca5b8bba7e711fc01cb",
+        "size": 12306,
+        "type": "FILE",
+        "path": "assets/objects/62/623296e4e8fc1fa00b769ca5b8bba7e711fc01cb",
+        "url": "https://resources.download.minecraft.net/62/623296e4e8fc1fa00b769ca5b8bba7e711fc01cb",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "5ed98b8375fd787baf19d7d434f0333a189ccb51",
+        "size": 8738,
+        "type": "FILE",
+        "path": "assets/objects/5e/5ed98b8375fd787baf19d7d434f0333a189ccb51",
+        "url": "https://resources.download.minecraft.net/5e/5ed98b8375fd787baf19d7d434f0333a189ccb51",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "50a59a4f56e4046701b758ddbb1c1587efa4cadf",
+        "size": 2530812,
+        "type": "FILE",
+        "path": "assets/objects/50/50a59a4f56e4046701b758ddbb1c1587efa4cadf",
+        "url": "https://resources.download.minecraft.net/50/50a59a4f56e4046701b758ddbb1c1587efa4cadf",
+        "folder": "assets/objects/50"
+    },
+    {
+        "sha1": "591f41a2c5f53bcc60d7ded982fe29e76223a8ca",
+        "size": 3704574,
+        "type": "FILE",
+        "path": "assets/objects/59/591f41a2c5f53bcc60d7ded982fe29e76223a8ca",
+        "url": "https://resources.download.minecraft.net/59/591f41a2c5f53bcc60d7ded982fe29e76223a8ca",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "4f8c3f9b4f290f63c78bf3bbaad16906a3ccff29",
+        "size": 3834148,
+        "type": "FILE",
+        "path": "assets/objects/4f/4f8c3f9b4f290f63c78bf3bbaad16906a3ccff29",
+        "url": "https://resources.download.minecraft.net/4f/4f8c3f9b4f290f63c78bf3bbaad16906a3ccff29",
+        "folder": "assets/objects/4f"
+    },
+    {
+        "sha1": "45cb6cbbff2d7fc1daefbd85b031fd9dcfc70e7b",
+        "size": 5532231,
+        "type": "FILE",
+        "path": "assets/objects/45/45cb6cbbff2d7fc1daefbd85b031fd9dcfc70e7b",
+        "url": "https://resources.download.minecraft.net/45/45cb6cbbff2d7fc1daefbd85b031fd9dcfc70e7b",
+        "folder": "assets/objects/45"
+    },
+    {
+        "sha1": "6254527d626a2c7d80901cc2e62dce3ba4bd81f6",
+        "size": 5468843,
+        "type": "FILE",
+        "path": "assets/objects/62/6254527d626a2c7d80901cc2e62dce3ba4bd81f6",
+        "url": "https://resources.download.minecraft.net/62/6254527d626a2c7d80901cc2e62dce3ba4bd81f6",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "47800737d078e751698df291054adc596ba8195a",
+        "size": 9914930,
+        "type": "FILE",
+        "path": "assets/objects/47/47800737d078e751698df291054adc596ba8195a",
+        "url": "https://resources.download.minecraft.net/47/47800737d078e751698df291054adc596ba8195a",
+        "folder": "assets/objects/47"
+    },
+    {
+        "sha1": "5e7d63e75c6e042f452bc5e151276911ef92fed8",
+        "size": 2558252,
+        "type": "FILE",
+        "path": "assets/objects/5e/5e7d63e75c6e042f452bc5e151276911ef92fed8",
+        "url": "https://resources.download.minecraft.net/5e/5e7d63e75c6e042f452bc5e151276911ef92fed8",
+        "folder": "assets/objects/5e"
+    },
+    {
+        "sha1": "5a7ce2181203dd558cbd55d02081b9e95a07f16f",
+        "size": 2783300,
+        "type": "FILE",
+        "path": "assets/objects/5a/5a7ce2181203dd558cbd55d02081b9e95a07f16f",
+        "url": "https://resources.download.minecraft.net/5a/5a7ce2181203dd558cbd55d02081b9e95a07f16f",
+        "folder": "assets/objects/5a"
+    },
+    {
+        "sha1": "562f63e81572019a66cf795cea914ed6910edb53",
+        "size": 11139,
+        "type": "FILE",
+        "path": "assets/objects/56/562f63e81572019a66cf795cea914ed6910edb53",
+        "url": "https://resources.download.minecraft.net/56/562f63e81572019a66cf795cea914ed6910edb53",
+        "folder": "assets/objects/56"
+    },
+    {
+        "sha1": "5bb5a04e776d69ca12b1d7bc369975f9bf62e741",
+        "size": 7536,
+        "type": "FILE",
+        "path": "assets/objects/5b/5bb5a04e776d69ca12b1d7bc369975f9bf62e741",
+        "url": "https://resources.download.minecraft.net/5b/5bb5a04e776d69ca12b1d7bc369975f9bf62e741",
+        "folder": "assets/objects/5b"
+    },
+    {
+        "sha1": "5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "size": 4832,
+        "type": "FILE",
+        "path": "assets/objects/5f/5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "url": "https://resources.download.minecraft.net/5f/5fd568d724ba7d53911b6cccf5636f859d2662e8",
+        "folder": "assets/objects/5f"
+    },
+    {
+        "sha1": "5c971029d9284676dce1dda2c9d202f8c47163b2",
+        "size": 8131,
+        "type": "FILE",
+        "path": "assets/objects/5c/5c971029d9284676dce1dda2c9d202f8c47163b2",
+        "url": "https://resources.download.minecraft.net/5c/5c971029d9284676dce1dda2c9d202f8c47163b2",
+        "folder": "assets/objects/5c"
+    },
+    {
+        "sha1": "5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "size": 6567,
+        "type": "FILE",
+        "path": "assets/objects/58/5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "url": "https://resources.download.minecraft.net/58/5887d10234c4f244ec5468080412f3e6ef9522f3",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "594be3eaea9a2b92095eeeb3b1e01e755dcb8ce2",
+        "size": 5900,
+        "type": "FILE",
+        "path": "assets/objects/59/594be3eaea9a2b92095eeeb3b1e01e755dcb8ce2",
+        "url": "https://resources.download.minecraft.net/59/594be3eaea9a2b92095eeeb3b1e01e755dcb8ce2",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "61dc00d18e1167f66b117fdc297b13a698c8aa38",
+        "size": 16398,
+        "type": "FILE",
+        "path": "assets/objects/61/61dc00d18e1167f66b117fdc297b13a698c8aa38",
+        "url": "https://resources.download.minecraft.net/61/61dc00d18e1167f66b117fdc297b13a698c8aa38",
+        "folder": "assets/objects/61"
+    },
+    {
+        "sha1": "59dbad0851792bc9d7cbfa41b9afd8dcda598e17",
+        "size": 3149,
+        "type": "FILE",
+        "path": "assets/objects/59/59dbad0851792bc9d7cbfa41b9afd8dcda598e17",
+        "url": "https://resources.download.minecraft.net/59/59dbad0851792bc9d7cbfa41b9afd8dcda598e17",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "58d4aef590d98cdeea191112e423181eab3c7320",
+        "size": 12738,
+        "type": "FILE",
+        "path": "assets/objects/58/58d4aef590d98cdeea191112e423181eab3c7320",
+        "url": "https://resources.download.minecraft.net/58/58d4aef590d98cdeea191112e423181eab3c7320",
+        "folder": "assets/objects/58"
+    },
+    {
+        "sha1": "59f279faa5b94ba75b274d95ac572d03c945c07b",
+        "size": 12067,
+        "type": "FILE",
+        "path": "assets/objects/59/59f279faa5b94ba75b274d95ac572d03c945c07b",
+        "url": "https://resources.download.minecraft.net/59/59f279faa5b94ba75b274d95ac572d03c945c07b",
+        "folder": "assets/objects/59"
+    },
+    {
+        "sha1": "617a84a9a905f311aa22a44a9c30a5957006c51e",
+        "size": 13815,
+        "type": "FILE",
+        "path": "assets/objects/61/617a84a9a905f311aa22a44a9c30a5957006c51e",
+        "url": "https://resources.download.minecraft.net/61/617a84a9a905f311aa22a44a9c30a5957006c51e",
+        "folder": "assets/objects/61"
+    },
+    {
+        "sha1": "62ffbae55a2d1068caef3dae4f4b23069419cfc4",
+        "size": 133,
+        "type": "FILE",
+        "path": "assets/objects/62/62ffbae55a2d1068caef3dae4f4b23069419cfc4",
+        "url": "https://resources.download.minecraft.net/62/62ffbae55a2d1068caef3dae4f4b23069419cfc4",
+        "folder": "assets/objects/62"
+    },
+    {
+        "sha1": "5dc336285c94559161bfbb68b193aacece512730",
+        "size": 924,
+        "type": "FILE",
+        "path": "assets/objects/5d/5dc336285c94559161bfbb68b193aacece512730",
+        "url": "https://resources.download.minecraft.net/5d/5dc336285c94559161bfbb68b193aacece512730",
+        "folder": "assets/objects/5d"
+    },
+    {
+        "sha1": "5ac445460cd93099e1ff32fed3de1b628b97adf3",
+        "size": 12316,
+        "type": "FILE",
+        "path": "assets/objects/5a/5ac445460cd93099e1ff32fed3de1b628b97adf3",
+        "url": "https://resources.download.minecraft.net/5a/5ac445460cd93099e1ff32fed3de1b628b97adf3",
+        "folder": "assets/objects/5a"
+    },
+    {
+        "sha1": "2f6e675657e770e95acfc820012322d19e8b9a92",
+        "size": 9112,
+        "path": "versions/1.12.2-forge-14.23.5.2855/1.12.2-forge-14.23.5.2855.json",
+        "type": "CUSTOM",
+        "url": "http://uzurion.luuxis.fr/files/test/files/versions/1.12.2-forge-14.23.5.2855/1.12.2-forge-14.23.5.2855.json",
+        "folder": "versions/1.12.2-forge-14.23.5.2855"
+    }
+]

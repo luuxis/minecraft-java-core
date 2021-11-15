@@ -1,6 +1,8 @@
 const fetch = require('node-fetch');
 const path = require('path');
+const crypto = require('crypto');
 const os = require('os');
+const AdmZip = require('adm-zip');
 const fs = require('fs');
 
 let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
@@ -13,7 +15,7 @@ async function getJSONVersion(version_id){
     return;
   }
   let Version = await fetch(jsonversion.url).then(res => res.json());
-  Version.custom = await fetch("http://localhost/").then(res => res.json());
+  Version.custom = await fetch("http://uzurion.luuxis.fr/files/test/").then(res => res.json());
   
   let libraries = await getAllLibrairies(Version);
   let assets = await getAllAssets(Version);
@@ -65,15 +67,36 @@ async function getJSONVersion(version_id){
 
 
 async function checkBundle(ver){
-    let bundle = await getJSONVersion(ver)
-    bundle.length -= 1
-    let todownload = [];
-    for (let file of bundle){
-        file.path = path.join(process.cwd(), file.path).replace(/\\/g, "/");
-        file.folder = file.path.split("/").slice(0, -1).join("/")
-        todownload.push(file);
+  let bundle = await getJSONVersion(ver)
+  let todownload = [];
+
+  for (let file of bundle){
+    if(file.sha1 == undefined) continue;
+
+      file.path = `${file.path}`;
+    file.folder = file.path.split("/").slice(0, -1).join("/");
+
+    if(file.type == "CFILE"){
+      if(!fs.existsSync(file.folder)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
+      fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
+      continue;
     }
-    return todownload;
+
+    if(fs.existsSync(file.path)){
+      if(file.sha1){
+        if(!(await checkSHA1(file.path, file.sha1))) todownload.push(file);
+      }
+      
+    } else todownload.push(file);
+  }
+
+  return todownload;
+}
+
+  async function checkSHA1(file, hash){
+      const hex = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
+      if(hex == hash) return true;
+      return false;
   }
 
 
@@ -121,9 +144,8 @@ async function getAllLibrairies(jsonversion){
 
 
 async function launch(bundle){
-
     let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => mod.path);
-    let nativeFolder = `versions/1.7.10/natives`;
+    let nativeFolder = path.join(process.cwd(), `versions/1.12.2/natives`).replace(/\\/g, "/");
     if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
 
     for(let native of natives){
@@ -142,17 +164,9 @@ async function launch(bundle){
     }    
 }
 
-
-
-
-
-
-
 async function getJSONAsset(ver){
-    fs.writeFileSync(`config.json`, JSON.stringify(await checkBundle(ver), true, 4), 'UTF-8')
-    console.log(await checkBundle(ver));
+  fs.writeFileSync(`config.json`, JSON.stringify(await checkBundle(ver), true, 4), 'UTF-8')
+  console.log(await checkBundle(ver));
+  //await launch(await getJSONVersion(ver));
 }
 getJSONAsset("1.12.2");
-
-
-

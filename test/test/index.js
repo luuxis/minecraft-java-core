@@ -1,6 +1,5 @@
-const json = require('./config.json');
-const Downloader = require('./download.js');
-
+const Downloader = require('../../utils/download.js');
+const checkBundle = require("./test.js")
 let downloader = new Downloader();
 
 const totsize = function getTotalSize(bundle){
@@ -22,7 +21,7 @@ downloader.on("speed", (speed) => {
 
 await new Promise((ret) => {
     downloader.on("finish", ret);
-    downloader.multiple(json, totsize(json), 1);
+    downloader.multiple(checkBundle.checkBundle("1.12.2"), totsize(checkBundle.checkBundle("1.12.2")), 10);
 });
 }
 
