@@ -14,6 +14,7 @@ const totsize = function getTotalSize(bundle){
 
 async function test(){
 downloader.on("progress", (DL, totDL) => {
+    console.log(DL, totDL);
 });
 
 downloader.on("speed", (speed) => {
@@ -21,7 +22,7 @@ downloader.on("speed", (speed) => {
 
 await new Promise((ret) => {
     downloader.on("finish", ret);
-    downloader.multiple(json, totsize(json), 10);
+    downloader.multiple(json, totsize(json), 1);
 });
 }
 
