@@ -1,8 +1,5 @@
 const os = require("os");
 const fetch = require("node-fetch");
-const fs = require('fs');
-const crypto = require('crypto');
-
 
 async function getJava(minecraftVersion){
     let files = [];
