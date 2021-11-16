@@ -1,5 +1,6 @@
 const os = require("os");
 const fetch = require("node-fetch");
+const fs = require('fs')
 
 async function getJava(minecraftVersion){
     let files = [];
@@ -24,14 +25,14 @@ async function getJava(minecraftVersion){
         javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`mac-os`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else if(os.platform() == "linux"){
         let arch = {x64: "linux", ia32: "linux-i386"}
-        javaVersionsJson = Object.entries(await fetch((javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+        javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else {
         return console.log("OS not supported");
     }
     
     for(let [path, info] of javaVersionsJson){
         if(info.type == "directory") continue;
-        if(info.downloads.raw.url === undefined) continue;
+        if(info.downloads === undefined) continue;
         let file = {};
         file.path = (`runtime/java/${path}`).split("/").slice(0, -1).join("/")
         if(info.downloads){
