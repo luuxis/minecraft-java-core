@@ -21,18 +21,30 @@ async function getJava(minecraftVersion){
 
     if(os.platform() == "win32"){
         let arch = {x64: "windows-x64", ia32: "windows-x86"}
-        javaVersionsJson = await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())
+        javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else if(os.platform() == "darwin"){
-        javaVersionsJson = await fetch(javaVersionsJson[`mac-os`][jsonversion][0].manifest.url).then(res => res.json())
+        javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`mac-os`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else if(os.platform() == "linux"){
         let arch = {x64: "linux", ia32: "linux-i386"}
-        javaVersionsJson = await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())
+        javaVersionsJson = Object.entries(await fetch((javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else {
         return console.log("OS not supported");
     }
-
     
-    return Object.entries(javaVersionsJson)
+    for(let [path, info] of javaVersionsJson){
+        if(info.type == "directory") continue;
+        if(info.downloads.raw.url === undefined) continue;
+        let file = {};
+        file.path = (`runtime/java/${path}`).split("/").slice(0, -1).join("/")
+        if(info.downloads){
+            file.sha1 = info.downloads.raw.sha1;
+            file.size = info.downloads.raw.size;
+            file.type = "JAVA"
+            file.url = info.downloads.raw.url;
+        }
+        files.push(file);
+    }
+    return files
 }
 
 
@@ -47,10 +59,9 @@ async function checkSHA1(file, hash){
 }
 
 async function test(ver){
-    //console.log(os.arch())
     fs.writeFileSync(`all.json`, JSON.stringify(await getJava(ver), true, 4), 'UTF-8')
     console.log(await getJava(ver))
 
 }
 
-test("1.5")
+test("1.0")
