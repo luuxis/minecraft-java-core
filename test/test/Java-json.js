@@ -8,6 +8,7 @@ async function getJava(minecraftVersion){
     let files = [];
     let javaVersionsJson = await fetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
     let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == minecraftVersion);
+
     if (!jsonversion) {
         return console.log(`version ${minecraftVersion} not found`);
     } else {
@@ -44,24 +45,12 @@ async function getJava(minecraftVersion){
         }
         files.push(file);
     }
+
     return files
 }
 
-
-
-
-
-
-async function checkSHA1(file, hash){
-    const hex = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
-    if(hex == hash) return true;
-    return false;
-}
-
 async function test(ver){
-    fs.writeFileSync(`all.json`, JSON.stringify(await getJava(ver), true, 4), 'UTF-8')
     console.log(await getJava(ver))
-
 }
 
 test("1.0")
