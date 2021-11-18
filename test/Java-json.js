@@ -51,4 +51,4 @@ async function test(ver){
     console.log(await getJava(ver))
 }
 
-test("1.18-pre2")
+test("1.18-pre4")
