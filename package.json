@@ -1,6 +1,6 @@
 {
   "name": "minecraft-java-core",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,9 +8,7 @@
   },
   "files": [
     "index.js",
-    "utils/authenticator.js",
-    "utils/handler.js",
-    "utils/launch.js"
+    "utils/**"
   ],
   "keywords": [
     "minecraft",
@@ -23,7 +21,9 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.9",
-    "node-fetch": "^2.6.6"
+    "node-fetch": "^2.6.6",
+    "request": "^2.88.0",
+    "uuid": "^8.3.2"
   },
   "bugs": {
     "url": "https://github.com/luuxis/minecraft-java-core/issues"
