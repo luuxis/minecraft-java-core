@@ -11,7 +11,12 @@ function dirToArray($dir) {
             $size = filesize($dir . "/" . $value);
             $path = str_replace("files/", "", $dir . "/" . $value);
             $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
-            echo "{\"path\":\"$path\",\"size\":$size,\"sha1\":\"$hash\",\"url\":\"$url\"},";
+            if (strpos($path, "libraries") !== false) {
+               $type = "LIBRARY";
+            } else {
+               $type = "FILE";
+            }
+            echo "{\"path\":\"$path\",\"size\":$size,\"sha1\":\"$hash\",\"url\":\"$url\",\"type\":\"$type\"},";
          }
       }
    }
