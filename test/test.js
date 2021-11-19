@@ -8,14 +8,14 @@ const fs = require('fs');
 let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
 let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
 
-async function getJSONVersion(version_id){
+async function getJSONVersion(version_id, custom = false){
   let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == version_id);
   if (!jsonversion) {
     console.log(`version ${version_id} not found`);
     return;
   }
   let Version = await fetch(jsonversion.url).then(res => res.json());
-  Version.custom = await fetch("http://uzurion.luuxis.fr/files/test/").then(res => res.json());
+  if (custom == true) Version.custom = await fetch("http://uzurion.luuxis.fr/files/test/").then(res => res.json());
   
   let libraries = await getAllLibrairies(Version);
   let assets = await getAllAssets(Version);
@@ -66,8 +66,8 @@ async function getJSONVersion(version_id){
 }
 
 
-async function checkBundle(ver){
-  let bundle = await getJSONVersion(ver)
+async function checkBundle(ver, custom){
+  let bundle = await getJSONVersion(ver, custom)
   let todownload = [];
 
   for (let file of bundle){
