@@ -1,8 +1,7 @@
 const os = require("os");
 const fetch = require("node-fetch");
-const fs = require('fs')
 
-async function getJava(minecraftVersion){
+module.exports.GetJsonJava = async function (minecraftVersion){
     let files = [];
     let javaVersionsJson = await fetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
     let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == minecraftVersion);
@@ -43,12 +42,5 @@ async function getJava(minecraftVersion){
         }
         files.push(file);
     }
-
     return files
 }
-
-async function test(ver){
-    console.log(await getJava(ver))
-}
-
-test("1.18-pre2")
