@@ -7,12 +7,11 @@ const fs = require('fs');
 async function main() {
     let opts = {
         path: "./dev/minecraft",
-        version: "1.18-pre5",
+        version: "1.12.2",
         url: "http://uzurion.luuxis.fr/test/",
         custom: true
     }
     
     minecraft.launch(opts)
-    console.log(await minecraft.checkFiles());
 }
 main()
