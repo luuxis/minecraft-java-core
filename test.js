@@ -9,7 +9,7 @@ async function main() {
         path: "./dev/minecraft",
         version: "1.12.2",
         url: "http://uzurion.luuxis.fr/test/",
-        custom: true
+        custom: false
     }
     
     minecraft.launch(opts)
