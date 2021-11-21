@@ -14,7 +14,7 @@ class MCLCore {
         let totsize = this.jsonversion.getTotalSize(todownload);
         
         this.downloader.on("progress", (DL, totDL) => {
-            console.log(`${(DL / 1024).toFixed(2)} Mb to ${(totDL / 1024).toFixed(2)} Mb`);
+            console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
         });
         
         await new Promise((ret) => {
