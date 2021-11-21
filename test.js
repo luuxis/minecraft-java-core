@@ -13,8 +13,6 @@ async function main() {
     }
     
     minecraft.launch(opts)
-    fs.writeFileSync(`config.json`, JSON.stringify(await minecraft.checkFiles(), true, 4), 'UTF-8')
     console.log(await minecraft.checkFiles());
 }
 main()
-
