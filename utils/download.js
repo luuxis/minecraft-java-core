@@ -78,13 +78,10 @@ module.exports = class Downloader {
 
     queue();
 
-    let finish = this.finish;
-
     function queue(){
       if(complete == files.length){
         clearInterval(interval);
         clearInterval(progressInterval);
-        if(finish) finish();
         return;
       }
 
