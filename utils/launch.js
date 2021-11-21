@@ -10,7 +10,7 @@ class MCLCore {
     }
 
     async checkFiles() {
-       return await this.jsonversion.checkBundle("1.12.2")
+       return await this.jsonversion.checkBundle(this.options.version)
     }
 
 }
