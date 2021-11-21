@@ -66,8 +66,8 @@ class Handler {
         let Version = await fetch(jsonversion.url).then(res => res.json());
         if (this.client.custom) Version.custom = await fetch(this.client.url).then(res => res.json());
         
-        let libraries = await getAllLibrairies(Version);
-        let assets = await getAllAssets(Version);
+        let libraries = await this.getAllLibrairies(Version);
+        let assets = await this.getAllAssets(Version);
         let assetsjson = {
             path: `assets/indexes/${version_id}.json`,
             type: "CFILE",
@@ -110,13 +110,13 @@ class Handler {
         return [assetsjson].concat(libraries).concat(assets);
     }
     
-    async checkBundle(Path, ver, custom){
-        let bundle = await getJSONVersion(ver, custom)
+    async checkBundle(ver, custom){
+        let bundle = await this.getJSONVersion(ver, custom)
         let todownload = [];
         
         for (let file of bundle){
             if(file.sha1 == undefined) continue;
-            file.path = `${path.join(__dirname)}/${Path}/${file.path}`;
+            file.path = (`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/");
             file.folder = file.path.split("/").slice(0, -1).join("/");
             
             if(file.type == "CFILE"){
