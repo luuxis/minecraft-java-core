@@ -1,15 +1,17 @@
-const { authenticator } = require('./index');
+const MCLCore = require('./utils/launch.js');
+const minecraft = new MCLCore();
+const fs = require('fs');
 
 
+
+async function main() {
 let opts = {
-    login: authenticator.getAuth("Luuxis"),
     path: "./minecraft",
-    version: "1.14",
-    forge: "",
-    memory: {
-        max: "6G",
-        min: "4G"
-    }
+    url: "http://uzurion.luuxis.fr/test/",
+    custom: true
 }
-
-console.log(opts)
+minecraft.launch(opts)
+fs.writeFileSync(`config.json`, JSON.stringify(await await minecraft.checkFiles(), true, 4), 'UTF-8')
+console.log(await minecraft.checkFiles());
+}
+main()
