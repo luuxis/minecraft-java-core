@@ -6,8 +6,8 @@ const fs = require('fs');
 
 async function main() {
     let opts = {
-        path: "./minecraft",
-        version: "1.14.4",
+        path: "./dev/minecraft",
+        version: "1.18-pre5",
         url: "http://uzurion.luuxis.fr/test/",
         custom: true
     }

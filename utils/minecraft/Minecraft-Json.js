@@ -14,6 +14,14 @@ class Handler {
         this.client = client
     }
 
+    getTotalSize(bundle) {
+        let size = 0;
+        for(let file of bundle){
+            size += file.size;
+        }
+        return size;
+    }
+
     async getAllLibrairies(jsonversion){
         let libraries = [];
         for(let lib of jsonversion.libraries){
@@ -127,7 +135,7 @@ class Handler {
             
             if(fs.existsSync(file.path)){
                 if(file.sha1){
-                    if(!(await checkSHA1(file.path, file.sha1))) todownload.push(file);
+                    if(!(await this.checkSHA1(file.path, file.sha1))) todownload.push(file);
                 }
             } else todownload.push(file);
         }

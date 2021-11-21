@@ -9,30 +9,19 @@ class MCLCore {
         this.checkFiles();
     }
 
-    getTotalSize(bundle) {
-        let size = 0;
-        for(let file of bundle){
-            size += file.size;
-        }
-        return size;
-    }
-
     async checkFiles() {
+        let todownload = await this.jsonversion.checkBundle(this.options.version)
+        let totsize = this.jsonversion.getTotalSize(todownload);
+        
         this.downloader.on("progress", (DL, totDL) => {
             console.log(DL, totDL);
-          });
-          
-          this.downloader.on("speed", (speed) => {
+        });
         
-          });
-          
-          await new Promise((ret) => {
+        await new Promise((ret) => {
             this.downloader.on("finish", ret);
-            this.downloader.multiple(this.jsonversion.checkBundle(this.options.version), this.getTotalSize(this.jsonversion.checkBundle(this.options.version)), 10);
-          });
+            this.downloader.multiple(todownload, totsize, 10);
+        });
     }
-    
-
-
 }
+
 module.exports = MCLCore;
