@@ -12,17 +12,18 @@ const totsize = function getTotalSize(bundle){
 
 
 async function test(){
-downloader.on("progress", (DL, totDL) => {
+  downloader.on("progress", (DL, totDL) => {
     console.log(DL, totDL);
-});
+  });
+  
+  downloader.on("speed", (speed) => {
 
-downloader.on("speed", (speed) => {
-});
-
-await new Promise((ret) => {
+  });
+  
+  await new Promise((ret) => {
     downloader.on("finish", ret);
     downloader.multiple(checkBundle.checkBundle("1.12.2"), totsize(checkBundle.checkBundle("1.12.2")), 10);
-});
+  });
 }
 
 test();
