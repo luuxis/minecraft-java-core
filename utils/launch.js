@@ -19,7 +19,11 @@ class MCLCore {
 
         if (todownload.length > 0) {
             this.downloader.on("progress", (DL, totDL) => {
-                console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+                this.emit("progress", DL, totDL);
+            });
+
+            this.downloader.on("speed", (speed) => {
+                this.emit("speed", speed);
             });
             
             await new Promise((ret) => {
@@ -34,7 +38,11 @@ class MCLCore {
 
             if (javadownload.length > 0) {
                 this.downloader.on("progress", (DL, totDL) => {
-                    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+                    this.emit("progress", DL, totDL);
+                });
+
+                this.downloader.on("speed", (speed) => {
+                    this.emit("speed", speed);
                 });
                 
                 await new Promise((ret) => {
@@ -43,6 +51,14 @@ class MCLCore {
                 });
             }            
         }
+    }
+
+    on(event, func){
+        this[event] = func;
+    }
+    
+    emit(event, ...args){
+        if(this[event]) this[event](...args);
     }
 }
 
