@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
 const os = require('os');
-const execSync = require("child_process");
 const AdmZip = require('adm-zip');
 const fs = require('fs');
 
@@ -155,19 +154,11 @@ class Handler {
         if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
         
         for(let native of natives){
-            console.log(`Extracting native ${native}`);
             let zip = new AdmZip(native);
             let entries = zip.getEntries();
-            
             for(let entry of entries){
                 if(entry.entryName.startsWith("META-INF")) continue;
                 fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o755 });
-                
-                if(process.platform == "darwin" && (`${nativeFolder}/${entry.entryName}`.endsWith(".dylib") || `${nativeFolder}/${entry.entryName}`.endsWith(".jnilib"))){
-                    console.log(`Whitelisting from Apple Quarantine ${`${nativeFolder}/${entry.entryName}`}`);
-                    let id = String.fromCharCode.apply(null, execSync(`xattr -p com.apple.quarantine "${`${nativeFolder}/${entry.entryName}`}"`));
-                    execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${`${nativeFolder}/${entry.entryName}`}"`);
-                }
             }
         }
     }
