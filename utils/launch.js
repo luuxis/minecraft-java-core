@@ -1,5 +1,6 @@
 'use strict';
 const Handler = require('./minecraft/Minecraft-Json.js');
+const java = require('./java/Java-json.js');
 const downloader = require('./download.js');
 
 class MCLCore {
@@ -7,6 +8,7 @@ class MCLCore {
         this.options = options;
         this.jsonversion = new Handler(options);
         this.downloader = new downloader();
+        this.java = java;
         this.checkFiles();
     }
 
@@ -26,6 +28,21 @@ class MCLCore {
             });
         }
         this.jsonversion.natives(files)
+        if(this.options.java) {
+            let javadownload = await this.java.GetJsonJava(this.options.version, this.options.path)
+            let totsizejava = this.jsonversion.getTotalSize(javadownload);
+
+            if (javadownload.length > 0) {
+                this.downloader.on("progress", (DL, totDL) => {
+                    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+                });
+                
+                await new Promise((ret) => {
+                    this.downloader.on("finish", ret);
+                    this.downloader.multiple(javadownload, totsizejava, 10);
+                });
+            }            
+        }
     }
 }
 
