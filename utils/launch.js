@@ -4,7 +4,7 @@ const java = require('./java/Java-json.js');
 const downloader = require('./download.js');
 
 class MCLCore {
-    async launch(options) {
+    async launch(options){
         this.options = options;
         this.jsonversion = new Handler(options);
         this.downloader = new downloader();
@@ -12,7 +12,7 @@ class MCLCore {
         this.checkFiles();
     }
 
-    async checkFiles() {
+    async checkFiles(){
         let files = await this.jsonversion.getJSONVersion(this.options.version);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
         let totsize = this.jsonversion.getTotalSize(todownload);
@@ -51,6 +51,11 @@ class MCLCore {
                 });
             }            
         }
+        this.startgame();
+    }
+
+    startgame(){
+
     }
 
     on(event, func){
