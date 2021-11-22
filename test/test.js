@@ -4,10 +4,10 @@ const minecraft = new launch.launch();
 
 let opts = {
     path: "./minecraft",
-    version: "rd-132211",
+    version: "1.18-pre5",
     url: "http://uzurion.luuxis.fr/test/",
     custom: false,
-    java: true
+    java: false
 }
 
 minecraft.launch(opts)
