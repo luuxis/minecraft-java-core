@@ -13,6 +13,8 @@ function dirToArray($dir) {
             $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
             if (strpos($path, "libraries") !== false) {
                $type = "LIBRARY";
+            } else if (strpos($path, "mods") !== false) {
+               $type = "MOD";
             } else {
                $type = "FILE";
             }

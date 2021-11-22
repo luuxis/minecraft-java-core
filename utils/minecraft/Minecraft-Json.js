@@ -162,5 +162,24 @@ class Handler {
             }
         }
     }
+    
+    async removeNonIgnoredFiles(bundle){
+        let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/")).filter(file => !file.startsWith((`${path.resolve(this.client.path)}/runtime`).replace(/\\/g, "/")));;
+    }
+    
+    getFiles(path, filesArr = []){
+        if(fs.existsSync(path)){
+            let files = fs.readdirSync(path);
+            if(files.length == 0) filesArr.push(path);
+            for(let i in files){
+                let name = `${path}/${files[i]}`;
+                if(fs.statSync(name).isDirectory())
+                this.getFiles(name, filesArr);
+                else
+                filesArr.push(name);
+            }
+        }
+        return filesArr;
+    }
 }
 module.exports = Handler

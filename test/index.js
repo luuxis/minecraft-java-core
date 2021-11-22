@@ -3,10 +3,20 @@ const launcher = new launch.launch();
 
 
 let opts = {
+    ignored: [
+        {
+            "path": "options.txt",
+            "type": "FILE"
+        },
+        {
+            "path": "config",
+            "type": "FOLDER"
+        },
+    ],
     path: "./minecraft",
-    version: "1.18-pre5",
+    version: "1.12.2",
     url: "http://uzurion.luuxis.fr/test/",
-    custom: false,
+    custom: true,
     java: false
 }
 
