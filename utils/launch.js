@@ -1,3 +1,4 @@
+'use strict';
 const Handler = require('./minecraft/Minecraft-Json.js');
 const downloader = require('./download.js');
 
@@ -10,6 +11,7 @@ class MCLCore {
     }
 
     async checkFiles() {
+        let files = await this.jsonversion.getJSONVersion(this.options.version);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
         let totsize = this.jsonversion.getTotalSize(todownload);
         
@@ -21,6 +23,7 @@ class MCLCore {
             this.downloader.on("finish", ret);
             this.downloader.multiple(todownload, totsize, 10);
         });
+        this.jsonversion.natives(files)
     }
 }
 

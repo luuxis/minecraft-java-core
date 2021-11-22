@@ -1,3 +1,4 @@
+'use strict';
 const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
@@ -149,8 +150,8 @@ class Handler {
     }
     
     async natives(bundle){
-        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => mod.path);
-        let nativeFolder = path.join(process.cwd(), `versions/1.12.2/natives`).replace(/\\/g, "/");
+        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${(`${path.resolve(this.client.path)}/`).replace(/\\/g, "/")}${mod.path}`);
+        let nativeFolder = (`${path.resolve(this.client.path)}/versions/${this.client.version}/natives`).replace(/\\/g, "/");
         if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
         
         for(let native of natives){
@@ -168,7 +169,7 @@ class Handler {
                     execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${`${nativeFolder}/${entry.entryName}`}"`);
                 }
             }
-        }    
+        }
     }
 }
 module.exports = Handler
