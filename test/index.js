@@ -3,7 +3,9 @@ const launcher = new launch.launch();
 
 
 let opts = {
-    ignored: [],
+    ignored: [
+        "runtime"
+    ],
     path: "./minecraft",
     verify: true,
     version: "1.12.2",

@@ -8,6 +8,7 @@ const fs = require('fs');
 
 let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
 let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
+let ignoredfiles = []
 
 class Handler {
     constructor (client){
@@ -165,7 +166,15 @@ class Handler {
     
     async removeNonIgnoredFiles(bundle){
         let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/"));
-        let ignoredfiles = this.client.ignored
+        
+        for(let file of this.client.ignored){
+            file = (`${path.resolve(this.client.path)}/${file}`).replace(/\\/g, "/")
+            if(fs.existsSync(file)){
+                if(fs.statSync(file).isDirectory()){
+                    ignoredfiles.push(...this.getFiles(file));
+                }
+            }
+        }
         ignoredfiles.forEach(file => this.client.ignored.push((`${path.resolve(this.client.path)}/${file}`).replace(/\\/g, "/")));
         bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
         
@@ -185,9 +194,9 @@ class Handler {
                         folder = folder.split("/").slice(0, -1).join("/");
                     }
                 }
-            } catch(e){ }
+            } catch(e){}
         } 
-        return files
+        
     }
     
     getFiles(path, file = []){
