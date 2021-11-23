@@ -33,7 +33,8 @@ class MCLCore {
             });
         }
         this.jsonversion.natives(files)
-        //await this.jsonversion.removeNonIgnoredFiles(files)
+        //console.log(await this.jsonversion.removeNonIgnoredFiles(files));
+        
         if(this.options.java) {
             let javadownload = await this.java.GetJsonJava(this.options.version, this.options.path)
             let totsizejava = this.jsonversion.getTotalSize(javadownload);

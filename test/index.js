@@ -4,19 +4,12 @@ const launcher = new launch.launch();
 
 let opts = {
     ignored: [
-        {
-            "path": "options.txt",
-            "type": "FILE"
-        },
-        {
-            "path": "config",
-            "type": "FOLDER"
-        },
+        "config"
     ],
     path: "./minecraft",
     version: "1.12.2",
     url: "http://uzurion.luuxis.fr/test/",
-    custom: true,
+    custom: false,
     java: false
 }
 
@@ -27,7 +20,7 @@ launcher.on('progress', (DL, totDL) => {
 });
 
 launcher.on('speed', (speed) => {
-    //console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+    console.log(`${(speed / 1067008).toFixed(3)} Mb/s`)
 })
 
 launcher.on('launch', () => {

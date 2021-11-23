@@ -164,22 +164,28 @@ class Handler {
     }
     
     async removeNonIgnoredFiles(bundle){
-        let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/")).filter(file => !file.startsWith((`${path.resolve(this.client.path)}/runtime`).replace(/\\/g, "/")));;
+        let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/")).filter(file => !file.startsWith((`${path.resolve(this.client.path)}/runtime`).replace(/\\/g, "/")));
+        let ignoredfiles = this.client.ignored
+        ignoredfiles.forEach(file => this.client.ignored.push((`${path.resolve(this.client.path)}/${file}`).replace(/\\/g, "/")));
+        bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
+        let aSuppr = files.filter(word => ignoredfiles.indexOf(word) < 0);
+
+        return aSuppr
     }
     
-    getFiles(path, filesArr = []){
+    getFiles(path, file = []){
         if(fs.existsSync(path)){
             let files = fs.readdirSync(path);
-            if(files.length == 0) filesArr.push(path);
+            if(files.length == 0) file.push(path);
             for(let i in files){
                 let name = `${path}/${files[i]}`;
                 if(fs.statSync(name).isDirectory())
-                this.getFiles(name, filesArr);
+                this.getFiles(name, file);
                 else
-                filesArr.push(name);
+                file.push(name);
             }
         }
-        return filesArr;
+        return file;
     }
 }
 module.exports = Handler
