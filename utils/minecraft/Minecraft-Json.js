@@ -164,13 +164,30 @@ class Handler {
     }
     
     async removeNonIgnoredFiles(bundle){
-        let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/")).filter(file => !file.startsWith((`${path.resolve(this.client.path)}/runtime`).replace(/\\/g, "/")));
+        let files = this.getFiles((`${path.resolve(this.client.path)}`).replace(/\\/g, "/"));
         let ignoredfiles = this.client.ignored
         ignoredfiles.forEach(file => this.client.ignored.push((`${path.resolve(this.client.path)}/${file}`).replace(/\\/g, "/")));
         bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
-        let aSuppr = files.filter(word => ignoredfiles.indexOf(word) < 0);
+        
+        files = files.filter(file => ignoredfiles.indexOf(file) < 0);
 
-        return aSuppr
+        for(let file of files){
+            try {
+                if(fs.statSync(file).isDirectory()){
+                    fs.rmdirSync(file);
+                } else {
+                    fs.unlinkSync(file);
+                    let folder = file.split("/").slice(0, -1).join("/");
+                    while(true){
+                        if(folder == (`${path.resolve(this.client.path)}`).replace(/\\/g, "/")) break;
+                        let content = fs.readdirSync(folder);
+                        if(content.length == 0) fs.rmdirSync(folder);
+                        folder = folder.split("/").slice(0, -1).join("/");
+                    }
+                }
+            } catch(e){ }
+        } 
+        return files
     }
     
     getFiles(path, file = []){

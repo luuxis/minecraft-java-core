@@ -3,10 +3,9 @@ const launcher = new launch.launch();
 
 
 let opts = {
-    ignored: [
-        "config"
-    ],
+    ignored: [],
     path: "./minecraft",
+    verify: true,
     version: "1.12.2",
     url: "http://uzurion.luuxis.fr/test/",
     custom: false,

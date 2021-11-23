@@ -32,9 +32,8 @@ class MCLCore {
                 this.downloader.multiple(todownload, totsize, 10);
             });
         }
+        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(files);
         this.jsonversion.natives(files)
-        //console.log(await this.jsonversion.removeNonIgnoredFiles(files));
-        
         if(this.options.java) {
             let javadownload = await this.java.GetJsonJava(this.options.version, this.options.path)
             let totsizejava = this.jsonversion.getTotalSize(javadownload);
