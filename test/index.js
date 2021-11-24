@@ -1,10 +1,11 @@
 const {launch, Authenticator} = require('../index');
+const login = require('./login');
 const launcher = new launch();
 
 
 let opts = {
     url: "http://uzurion.luuxis.fr/test/",
-    authorization: Authenticator.getAuth("username"),
+    authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
     version: "1.12.2",
 
