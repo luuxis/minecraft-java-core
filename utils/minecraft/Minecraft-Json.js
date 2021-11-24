@@ -116,6 +116,13 @@ class Handler {
                 })
             });
         }
+
+        assets.push({
+            sha1: jsonversion.sha1,
+            path: `versions/${version_id}/${version_id}.json`,
+            size: 0,
+            url: jsonversion.url
+        });
         return [assetsjson].concat(libraries).concat(assets);
     }
     

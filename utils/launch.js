@@ -1,7 +1,8 @@
 'use strict';
-const Handler = require('./minecraft/Minecraft-Json.js');
-const java = require('./java/Java-json.js');
 const downloader = require('./download.js');
+const java = require('./java/Java-json.js');
+const Handler = require('./minecraft/Minecraft-Json.js');
+const spawn = require('child_process')
 
 class MCLCore {
     async launch(options){
@@ -53,13 +54,13 @@ class MCLCore {
                 });
             }            
         }
-        
+        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
+        this.jsonversion.natives(this.files);
         this.startgame();
     }
 
     async startgame(){
-        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
-        this.jsonversion.natives(this.files);
+
     }
 
     on(event, func){
