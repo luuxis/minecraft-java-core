@@ -52,7 +52,7 @@ class MCLCore {
                     this.downloader.on("finish", ret);
                     this.downloader.multiple(javadownload, totsizejava, 10);
                 });
-            }            
+            }       
         }
         if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
         this.jsonversion.natives(this.files);
