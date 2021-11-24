@@ -2,7 +2,6 @@
 const Handler = require('./minecraft/Minecraft-Json.js');
 const java = require('./java/Java-json.js');
 const downloader = require('./download.js');
-const fs = require('fs');
 
 class MCLCore {
     async launch(options){
