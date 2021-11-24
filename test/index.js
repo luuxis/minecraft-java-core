@@ -5,14 +5,16 @@ const launcher = new launch();
 let opts = {
     url: "http://uzurion.luuxis.fr/test/",
     authorization: Authenticator.getAuth("username"),
-    path: "./minecraft",
+    path: "./.Minecraft",
     version: "1.12.2",
+
+    java: true,
+    custom: true,
+
+    verify: true,
     ignored: [
         "runtime"
-    ],
-    verify: true,
-    custom: true,
-    java: false
+    ]
 }
 
 launcher.launch(opts)

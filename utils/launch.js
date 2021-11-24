@@ -60,8 +60,6 @@ class MCLCore {
     async startgame(){
         if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
         this.jsonversion.natives(this.files);
-        
-        console.log(this.options.authorization);
     }
 
     on(event, func){
