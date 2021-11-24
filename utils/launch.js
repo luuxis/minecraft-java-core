@@ -7,14 +7,16 @@ const fs = require('fs');
 class MCLCore {
     async launch(options){
         this.options = options;
+        this.options.authorization = await Promise.resolve(this.options.authorization);
         this.jsonversion = new Handler(options);
         this.downloader = new downloader();
         this.java = java;
         this.checkFiles();
     }
-
+    
     async checkFiles(){
-        let files = await this.jsonversion.getJSONVersion(this.options.version);
+        this.files = await this.jsonversion.getJSONVersion(this.options.version);
+        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
         let totsize = this.jsonversion.getTotalSize(todownload);
         
@@ -32,8 +34,7 @@ class MCLCore {
                 this.downloader.multiple(todownload, totsize, 10);
             });
         }
-        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(files);
-        this.jsonversion.natives(files)
+        
         if(this.options.java) {
             let javadownload = await this.java.GetJsonJava(this.options.version, this.options.path)
             let totsizejava = this.jsonversion.getTotalSize(javadownload);
@@ -57,9 +58,11 @@ class MCLCore {
         this.startgame();
     }
 
-    startgame(){
+    async startgame(){
+        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
+        this.jsonversion.natives(this.files);
         
-
+        console.log(this.options.authorization);
     }
 
     on(event, func){

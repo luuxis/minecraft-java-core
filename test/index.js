@@ -1,16 +1,17 @@
-const launch = require('../index');
-const launcher = new launch.launch();
+const {launch, Authenticator} = require('../index');
+const launcher = new launch();
 
 
 let opts = {
+    url: "http://uzurion.luuxis.fr/test/",
+    authorization: Authenticator.getAuth("username"),
+    path: "./minecraft",
+    version: "1.12.2",
     ignored: [
         "runtime"
     ],
-    path: "./minecraft",
     verify: true,
-    version: "1.12.2",
-    url: "http://uzurion.luuxis.fr/test/",
-    custom: false,
+    custom: true,
     java: false
 }
 
@@ -21,7 +22,7 @@ launcher.on('progress', (DL, totDL) => {
 });
 
 launcher.on('speed', (speed) => {
-    console.log(`${(speed / 1067008).toFixed(3)} Mb/s`)
+    console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
 })
 
 launcher.on('launch', () => {
