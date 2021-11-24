@@ -13,9 +13,7 @@ let opts = {
     custom: false,
 
     verify: true,
-    ignored: [
-        "runtime"
-    ]
+    ignored: ["runtime","options.txt"]
 }
 
 launcher.launch(opts)
