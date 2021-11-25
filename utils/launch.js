@@ -2,13 +2,14 @@
 const downloader = require('./download.js');
 const java = require('./java/Java-json.js');
 const Handler = require('./minecraft/Minecraft-Json.js');
-const spawn = require('child_process')
+const start = require('./minecraft/Minecraft-start.js');
 
 class MCLCore {
     async launch(options){
         this.options = options;
         this.options.authorization = await Promise.resolve(this.options.authorization);
         this.jsonversion = new Handler(options);
+        this.start = new start(options);
         this.downloader = new downloader();
         this.java = java;
         this.checkFiles();
@@ -60,7 +61,11 @@ class MCLCore {
     }
 
     async startgame(){
+        this.libraries = `${this.files.filter(mod => mod.type == "LIBRARY").map(mod => mod.path)}`
+        this.natives = `versions/${this.options.version}/natives`
+        this.json = `versions/${this.options.version}/${this.options.version}.json`
 
+        //console.log(this.json)
     }
 
     on(event, func){
