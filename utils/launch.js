@@ -5,6 +5,7 @@ const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
 const path = require('path');
+const spawn = require("child_process").spawn;
 
 class MCLCore {
     async launch(options){
@@ -65,12 +66,23 @@ class MCLCore {
         this.path = (`${path.resolve(this.options.path)}`).replace(/\\/g, "/")
         this.libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => `${this.path}/${mod.path}`);
         this.natives = `${this.path}/versions/${this.options.version}/natives`
+        this.logger = this.files.find(mod => mod.type == "LOG").path;
         this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
 
-        let source = {natives: this.natives, libraries: this.libraries, json: this.json, authorization: this.options.authorization, root: this.path}
+        let source = {
+            natives: this.natives,
+            libraries: this.libraries,
+            json: this.json,
+            authorization: this.options.authorization,
+            root: this.path,
+            logger: this.logger
+            }
         this.start = new start(this.options, source);
 
-        console.log(await this.start.agrs());
+
+        console.log(await this.start.start());
+        //spawn(`${this.path}/runtime/java/bin/java.exe`, await this.start.agrs(), { cwd: this.path, detached: true })
+        
     }
 
     on(event, func){
