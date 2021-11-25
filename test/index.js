@@ -13,7 +13,7 @@ let opts = {
     custom: false,
 
     verify: false,
-    ignored: ["runtime","options.txt"]
+    ignored: ["config", "logs", "runtime", "resourcepacks", "shaderpacks", "options.txt"]
 }
 
 launcher.launch(opts)

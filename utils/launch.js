@@ -70,6 +70,7 @@ class MCLCore {
         let source = {natives: this.natives, libraries: this.libraries, json: this.json, authorization: this.options.authorization}
         this.start = new start(this.options, source);
 
+        console.log(await this.start.agrs());
     }
 
     on(event, func){
