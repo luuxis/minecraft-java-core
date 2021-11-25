@@ -61,11 +61,12 @@ class MCLCore {
     }
 
     async startgame(){
-        this.libraries = `${this.files.filter(mod => mod.type == "LIBRARY").map(mod => mod.path)}`
+        let libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
+        if(process.platform == "win32") libraries = libraries.join(";");
+        else libraries = libraries.join(":");
         this.natives = `versions/${this.options.version}/natives`
         this.json = `versions/${this.options.version}/${this.options.version}.json`
-
-        //console.log(this.json)
+        console.log(libraries)
     }
 
     on(event, func){
