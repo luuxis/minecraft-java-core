@@ -10,7 +10,10 @@ module.exports.getAuth = function (username, password, client_token = null) {
         client_token: client_token || uuid(),
         uuid: uuid(),
         name: username,
-        user_properties: '{}'
+        user_properties: '{}',
+        meta: {
+          type: 'mojang'
+        }
       }
 
       return resolve(user)
@@ -42,7 +45,10 @@ module.exports.getAuth = function (username, password, client_token = null) {
         uuid: body.selectedProfile.id,
         name: body.selectedProfile.name,
         selected_profile: body.selectedProfile,
-        user_properties: parsePropts(body.user.properties)
+        user_properties: parsePropts(body.user.properties),
+        meta: {
+          type: 'mojang'
+        }
       }
 
       resolve(userProfile)

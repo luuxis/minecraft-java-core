@@ -67,7 +67,7 @@ class MCLCore {
         this.natives = `${this.path}/versions/${this.options.version}/natives`
         this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
 
-        let source = {natives: this.natives, libraries: this.libraries, json: this.json, authorization: this.options.authorization}
+        let source = {natives: this.natives, libraries: this.libraries, json: this.json, authorization: this.options.authorization, root: this.path}
         this.start = new start(this.options, source);
 
         console.log(await this.start.agrs());
