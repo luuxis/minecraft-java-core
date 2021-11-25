@@ -179,6 +179,8 @@ class Handler {
             if(fs.existsSync(file)){
                 if(fs.statSync(file).isDirectory()){
                     ignoredfiles.push(...this.getFiles(file));
+                } else if (fs.statSync(file).isFile()) {
+                    ignoredfiles.push(file);
                 }
             }
         }
@@ -202,8 +204,7 @@ class Handler {
                     }
                 }
             } catch(e){}
-        } 
-        
+        }
     }
     
     getFiles(path, file = []){
