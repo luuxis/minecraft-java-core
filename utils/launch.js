@@ -4,12 +4,13 @@ const java = require('./java/Java-json.js');
 const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
+const path = require('path');
+
 class MCLCore {
     async launch(options){
         this.options = options;
         this.options.authorization = await Promise.resolve(this.options.authorization);
         this.jsonversion = new Handler(options);
-        this.start = new start(options);
         this.downloader = new downloader();
         this.java = java;
         this.checkFiles();
@@ -61,12 +62,14 @@ class MCLCore {
     }
 
     async startgame(){
-        let libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
-        if(process.platform == "win32") libraries = libraries.join(";");
-        else libraries = libraries.join(":");
-        this.natives = `versions/${this.options.version}/natives`
-        this.json = `versions/${this.options.version}/${this.options.version}.json`
-        console.log(libraries)
+        this.path = (`${path.resolve(this.options.path)}`).replace(/\\/g, "/")
+        this.libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => `${this.path}/${mod.path}`);
+        this.natives = `${this.path}/versions/${this.options.version}/natives`
+        this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
+
+        let source = {natives: this.natives, libraries: this.libraries, json: this.json, authorization: this.options.authorization}
+        this.start = new start(this.options, source);
+
     }
 
     on(event, func){

@@ -112,6 +112,7 @@ class Handler {
                     sha1: url.sha1,
                     size: url.size,
                     path: url.path,
+                    type: url.type,
                     url: url.url
                 })
             });
