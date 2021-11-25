@@ -12,9 +12,9 @@ class Start {
     }
 
     async agrs() {
-        let args = this.version.minecraftArguments ? this.version.minecraftArguments.split(' ') : this.version.arguments.game
-        args = args.concat(this.version.minecraftArguments ? this.version.minecraftArguments.split(' ') : this.version.arguments.game)
-        
+        let all = []
+        let launchOptions = this.version.minecraftArguments ? this.version.minecraftArguments.split(' ') : this.version.arguments.game
+
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
             '${auth_session}': this.authorization.access_token,
@@ -30,33 +30,37 @@ class Start {
             '${version_type}': this.version.type
         }
         
-        for (let index = 0; index < args.length; index++) {
-            if (typeof args[index] === 'object') args.splice(index, 2)
-            if (Object.keys(fields).includes(args[index])) {
-                args[index] = fields[args[index]]
+        for (let index = 0; index < launchOptions.length; index++) {
+            if (typeof launchOptions[index] === 'object') launchOptions.splice(index, 2)
+            if (Object.keys(fields).includes(launchOptions[index])) {
+                launchOptions[index] = fields[launchOptions[index]]
             }
         }
 
-        
-
-        return args
-    }
-
-    async start() {
         if(process.platform == "win32") this.librarie = this.librarie.join(";");
         else this.librarie = this.librarie.join(":");
-        let args = [
+        let classPaths = [
             "-cp",
             this.librarie,
-            `-Xms1024M`,
-            `-Xmx1024M`,
-            `-Djava.library.path=${this.natives}`,
-            `-Dlog4j.configurationFile=${this.logger}`,
+            this.version.mainClass,
         ]
-        args = args.concat(await this.agrs())
-        
-        return args
-    }
 
+        let jvm = [
+            '-XX:-UseAdaptiveSizePolicy',
+            '-XX:-OmitStackTraceInFastThrow',
+            '-Dfml.ignorePatchDiscrepancies=true',
+            '-Dfml.ignoreInvalidMinecraftCertificates=true',
+            `-Djava.library.path=${this.natives}`,
+            `-Xmx1G`,
+            `-Xms1G`
+          ]
+        
+        all.push({
+            launchOptions: launchOptions,
+            classPaths: classPaths,
+            jvm: jvm
+        })
+        return all[0]
+    }
 }
 module.exports = Start
