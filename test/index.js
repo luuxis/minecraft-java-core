@@ -9,7 +9,7 @@ let opts = {
     path: "./.Minecraft",
     version: "1.12.2",
 
-    java: true,
+    java: false,
     custom: false,
 
     verify: false,
