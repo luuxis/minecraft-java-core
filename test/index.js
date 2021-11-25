@@ -12,7 +12,7 @@ let opts = {
     java: true,
     custom: false,
 
-    verify: true,
+    verify: false,
     ignored: ["runtime","options.txt"]
 }
 
