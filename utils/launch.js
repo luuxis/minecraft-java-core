@@ -66,7 +66,11 @@ class MCLCore {
         this.libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => `${this.path}/${mod.path}`);
         this.natives = `${this.path}/versions/${this.options.version}/natives`
         this.logger = this.files.find(mod => mod.type == "LOG").path;
-        this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
+
+        if(this.options.custom) this.json = this.files.filter(mod => mod.type == "VERIONS").map(mod => `${this.path}/${mod.path}`)[0]
+        else this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
+
+        this.assets_index_name = this.files.filter(mod => mod.type == "CFILE").map(mod => mod.path)[0].split('/').pop().split('.').slice(0, -1).join('.');
 
         let source = {
             natives: this.natives,
@@ -74,7 +78,8 @@ class MCLCore {
             json: this.json,
             authorization: this.options.authorization,
             root: this.path,
-            logger: this.logger
+            logger: this.logger,
+            assets_index_name: this.assets_index_name,
             }
         this.start = new start(this.options, source);
 
@@ -83,6 +88,7 @@ class MCLCore {
         let test2 = []
         let test = test2.concat(args.jvm, args.classPaths, args.launchOptions);
         
+        this.emit('data', `[MCLC]: Launching with arguments ${test.join(' ')}`)
         let game = this.start.start(test)
         game.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         game.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
