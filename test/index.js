@@ -13,7 +13,12 @@ let opts = {
     custom: false,
 
     verify: true,
-    ignored: ["config", "logs", "runtime", "saves", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"]
+    ignored: ["config", "logs", "runtime", "saves", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"],
+
+    memory: {
+        min: `1G`,
+        max: `2G` 
+    }
 }
 
 launcher.launch(opts)
@@ -30,6 +35,6 @@ launcher.on('data', (e) => {
     console.log(e)
 })
 
-launcher.on('close', () => {
-    console.log("[CLOSE]")
-})
+// launcher.on('close', () => {
+//     console.log("[CLOSE]")
+// })

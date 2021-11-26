@@ -8,6 +8,7 @@ class Start {
         this.natives = source.natives
         this.librarie = source.libraries
         this.root = source.root
+        this.assets_index_name = source.assets_index_name
         this.logger = source.logger
         this.version = require(source.json);
         this.authorization = source.authorization
@@ -25,7 +26,7 @@ class Start {
             '${user_properties}': this.authorization.user_properties,
             '${user_type}': this.authorization.meta.type,
             '${version_name}': this.client.version,
-            '${assets_index_name}': this.version.assetIndex.id,
+            '${assets_index_name}': this.assets_index_name,
             '${game_directory}': this.root,
             '${assets_root}': `${this.root}/assets`,
             '${game_assets}': `${this.root}/assets`,
@@ -53,8 +54,8 @@ class Start {
             '-Dfml.ignorePatchDiscrepancies=true',
             '-Dfml.ignoreInvalidMinecraftCertificates=true',
             `-Djava.library.path=${this.natives}`,
-            `-Xmx1G`,
-            `-Xms1G`
+            `-Xms${this.client.memory.min}`,
+            `-Xmx${this.client.memory.max}`,
           ]
         
         all.push({
@@ -66,7 +67,7 @@ class Start {
     }
 
     start(args) {
-        const minecraft = child.spawn(`${this.root}/runtime/java/bin/java`, args, { cwd: this.root, detached: true })
+        const minecraft = child.spawn(`${this.root}/runtime/java/bin/java`, args, { cwd: this.root, detached: false })
         return minecraft
     }
 }
