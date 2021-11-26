@@ -66,7 +66,7 @@ class Start {
     }
 
     start(args) {
-        const minecraft = child.spawn(`${this.root}/runtime/java/bin/javaw.exe`, args, { cwd: this.root, detached: true })
+        const minecraft = child.spawn(`${this.root}/runtime/java/bin/java`, args, { cwd: this.root, detached: true })
         return minecraft
     }
 }
