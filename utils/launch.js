@@ -5,7 +5,6 @@ const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
 const path = require('path');
-const child = require("child_process");
 
 class MCLCore {
     async launch(options){
@@ -78,11 +77,14 @@ class MCLCore {
             logger: this.logger
             }
         this.start = new start(this.options, source);
-        const args = await this.start.agrs();
-        const test2 = []
-        const test = test2.concat(args.jvm, args.classPaths, args.launchOptions);
-        console.log(test);
-        child.spawn(`C:/Program Files/Java/jre1.8.0_311/bin/java.exe`, test)
+
+
+        let args = await this.start.agrs();
+        let test2 = []
+        let test = test2.concat(args.jvm, args.classPaths, args.launchOptions);
+        
+        this.start.start(test)
+
     }
 
     on(event, func){

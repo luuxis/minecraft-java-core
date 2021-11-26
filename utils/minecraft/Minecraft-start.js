@@ -1,5 +1,7 @@
 'use strict';
 
+const child = require("child_process");
+
 class Start {
     constructor(client, source) {
         this.client = client
@@ -61,6 +63,11 @@ class Start {
             jvm: jvm
         })
         return all[0]
+    }
+
+    start(args) {
+        const minecraft = child.spawn(`${this.root}/runtime/java/bin/javaw.exe`, args, { cwd: this.root, detached: true })
+        return minecraft
     }
 }
 module.exports = Start

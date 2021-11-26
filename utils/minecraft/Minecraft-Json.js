@@ -78,7 +78,7 @@ class Handler {
         let libraries = await this.getAllLibrairies(Version);
         let assets = await this.getAllAssets(Version);
         let assetsjson = {
-            path: `assets/indexes/${version_id}.json`,
+            path: `assets/indexes/${Version.assetIndex.id}.json`,
             type: "CFILE",
             content: JSON.stringify(assets.json)
         }
@@ -132,7 +132,7 @@ class Handler {
         let todownload = [];
         
         for (let file of bundle){
-            if(file.sha1 == undefined) continue;
+            if(file.path == undefined) continue;
             file.path = (`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/");
             file.folder = file.path.split("/").slice(0, -1).join("/");
             
@@ -141,7 +141,6 @@ class Handler {
                 fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
                 continue;
             }
-            
             if(fs.existsSync(file.path)){
                 if(file.sha1){
                     if(!(await this.checkSHA1(file.path, file.sha1))) todownload.push(file);
