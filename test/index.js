@@ -13,7 +13,7 @@ let opts = {
     custom: false,
 
     verify: true,
-    ignored: ["config", "logs", "runtime", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"]
+    ignored: ["config", "logs", "runtime", "saves", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"]
 }
 
 launcher.launch(opts)
@@ -26,8 +26,8 @@ launcher.on('speed', (speed) => {
     console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
 })
 
-launcher.on('launch', () => {
-    console.log("[LAUNCH]")
+launcher.on('data', (e) => {
+    console.log(e)
 })
 
 launcher.on('close', () => {

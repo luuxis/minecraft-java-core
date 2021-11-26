@@ -83,8 +83,10 @@ class MCLCore {
         let test2 = []
         let test = test2.concat(args.jvm, args.classPaths, args.launchOptions);
         
-        this.start.start(test)
-
+        let game = this.start.start(test)
+        game.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        game.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        game.on('close', (code) => this.emit('close', code))
     }
 
     on(event, func){
