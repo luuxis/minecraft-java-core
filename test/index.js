@@ -9,10 +9,10 @@ let opts = {
     path: "./.Minecraft",
     version: "1.12.2",
 
-    java: false,
+    java: true,
     custom: false,
 
-    verify: false,
+    verify: true,
     ignored: ["config", "logs", "runtime", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"]
 }
 
