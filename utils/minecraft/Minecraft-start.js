@@ -41,11 +41,9 @@ class Start {
             }
         }
 
-        if(process.platform == "win32") this.librarie = this.librarie.join(";");
-        else this.librarie = this.librarie.join(":");
         let classPaths = [
             "-cp",
-            this.librarie,
+            this.librarie.join(process.platform === 'win32' ? ';' : ':'),
             this.version.mainClass,
         ]
 
