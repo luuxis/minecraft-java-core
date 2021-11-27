@@ -11,7 +11,7 @@ let opts = {
     detached: false,
 
     java: true,
-    custom: false,
+    custom: true,
 
     verify: true,
     ignored: ["config", "logs", "saves", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"],
