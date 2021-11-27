@@ -21,6 +21,7 @@ class Start {
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
             '${auth_session}': this.authorization.access_token,
+            //'${auth_access_token}': this.authorization.accessToken,
             '${auth_player_name}': this.authorization.name,
             '${auth_uuid}': this.authorization.uuid,
             '${user_properties}': this.authorization.user_properties,
@@ -30,7 +31,7 @@ class Start {
             '${game_directory}': this.root,
             '${assets_root}': `${this.root}/assets`,
             '${game_assets}': `${this.root}/assets`,
-            '${version_type}': this.version.type
+            '${version_type}': this.version.type,
         }
         
         for (let index = 0; index < launchOptions.length; index++) {

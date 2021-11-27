@@ -7,18 +7,18 @@ let opts = {
     url: "http://uzurion.luuxis.fr/test/",
     authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
-    version: "1.12.2",
+    version: "1.18-rc3",
     detached: false,
 
     java: true,
-    custom: true,
+    custom: false,
 
     verify: true,
     ignored: ["config", "logs", "saves", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"],
 
     memory: {
-        min: `5G`,
-        max: `7G` 
+        min: `1G`,
+        max: `1G` 
     }
 }
 

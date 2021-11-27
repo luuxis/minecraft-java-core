@@ -68,15 +68,14 @@ class MCLCore {
 
 
         let args = await this.start.agrs();
-        let test2 = []
-        let test = test2.concat(args.jvm, args.classPaths, args.launchOptions);
+        let launchargs = [].concat(args.jvm, args.classPaths, args.launchOptions)
 
         let java;
         if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;
         else java = `${this.path}/runtime/java/jre.bundle/Contents/Home/bin/java`;
         
-        this.emit('data', `Launching with arguments ${test.join(' ')}`)
-        let game = this.start.start(test, java)
+        this.emit('data', `Launching with arguments ${launchargs.join(' ')}`)
+        let game = this.start.start(launchargs, java)
         game.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         game.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
         game.on('close', (code) => this.emit('close', code))
