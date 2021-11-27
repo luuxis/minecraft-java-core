@@ -40,6 +40,10 @@ class Handler {
                 if(native) artifact = classifiers[native.replace("${arch}", Arch[os.arch()])];
                 else continue;
             } else {
+                if (lib.rules && lib.rules[0].os) {
+                    if (lib.rules[0].os.name !== "")
+                        continue;
+                }
                 artifact = lib.downloads.artifact;
             }
             if(!artifact) continue;
