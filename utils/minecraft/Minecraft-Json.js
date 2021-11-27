@@ -3,6 +3,9 @@ const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
 const os = require('os');
+
+const java = require('../java/Java-json.js');
+
 const AdmZip = require('adm-zip');
 const fs = require('fs');
 
@@ -13,6 +16,7 @@ let ignoredfiles = []
 class Handler {
     constructor (client){
         this.client = client
+        this.java = java
     }
 
     getTotalSize(bundle) {
@@ -103,6 +107,19 @@ class Handler {
                 type: "LOG",
                 url: logging.url
             })
+        }
+
+        if(this.client.java){
+            let java = await this.java.GetJsonJava(this.client.version, this.client.path)
+            java.forEach(Java => {
+                assets.push({
+                    path: Java.path,
+                    sha1: Java.sha1,
+                    size: Java.size,
+                    type: Java.type,
+                    url: Java.url
+                })
+            });
         }
         
         if(Version.custom){

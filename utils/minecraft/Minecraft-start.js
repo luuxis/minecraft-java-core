@@ -66,8 +66,8 @@ class Start {
         return all[0]
     }
 
-    start(args) {
-        const minecraft = child.spawn(`${this.root}/runtime/java/bin/java`, args, { cwd: this.root, detached: false })
+    start(args, java) {
+        const minecraft = child.spawn(java, args, { cwd: this.root, detached: this.client.detached })
         return minecraft
     }
 }

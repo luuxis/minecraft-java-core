@@ -37,24 +37,14 @@ module.exports.GetJsonJava = async function (minecraftVersion, pathfolder) {
         if(info.downloads === undefined) continue;
         let file = {};
         if(info.downloads){
-            file.path = (`${path1.resolve(pathfolder)}/runtime/java/${path}`).replace(/\\/g, "/");
-            file.folder = (file.path).split("/").slice(0, -1).join("/");
+            file.path = `runtime/java/${path}`;
             file.sha1 = info.downloads.raw.sha1;
             file.size = info.downloads.raw.size;
             file.type = "JAVA"
             file.url = info.downloads.raw.url;
-            if(fs.existsSync(file.path)){
-                if(file.sha1){
-                    if(!(await checkSHA1(file.path, file.sha1))) files.push(file);
-                }
-            } else files.push(file);
+            files.push(file);
         }
     }
     return files
 }
 
-async function checkSHA1(file, hash){
-    const hex = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
-    if(hex == hash) return true;
-    return false;
-}
