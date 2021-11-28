@@ -8,7 +8,7 @@ class Start {
         this.natives = source.natives
         this.librarie = source.libraries
         this.root = source.root
-        this.version = require(source.json);
+        this.version = source.json;
         this.authorization = source.authorization
     }
 
@@ -19,13 +19,12 @@ class Start {
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
             '${auth_session}': this.authorization.access_token,
-            //'${auth_access_token}': this.authorization.accessToken,
             '${auth_player_name}': this.authorization.name,
             '${auth_uuid}': this.authorization.uuid,
             '${user_properties}': this.authorization.user_properties,
             '${user_type}': this.authorization.meta.type,
             '${version_name}': this.client.version,
-            '${assets_index_name}': this.version.assetIndex.id,
+            '${assets_index_name}': this.version.assetid,
             '${game_directory}': this.root,
             '${assets_root}': `${this.root}/assets`,
             '${game_assets}': `${this.root}/assets`,

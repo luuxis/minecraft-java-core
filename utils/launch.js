@@ -48,9 +48,17 @@ class MCLCore {
         this.path = (`${path.resolve(this.options.path)}`).replace(/\\/g, "/")
         this.libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => `${this.path}/${mod.path}`);
         this.natives = `${this.path}/versions/${this.options.version}/natives`
+        
+        this.vanilla = require(`${this.path}/versions/${this.options.version}/${this.options.version}.json`)
+        if(this.options.custom) this.forge = require(this.files.filter(mod => mod.type == "VERIONS").map(mod => `${this.path}/${mod.path}`)[0])
 
-        if(this.options.custom) this.json = this.files.filter(mod => mod.type == "VERIONS").map(mod => `${this.path}/${mod.path}`)[0]
-        else this.json = `${this.path}/versions/${this.options.version}/${this.options.version}.json`
+        if(this.options.custom){
+            this.json = this.forge
+            this.forge.assetid = this.vanilla.assetIndex.id
+        } else {
+            this.json = this.vanilla
+            this.vanilla.assetid = this.vanilla.assetIndex.id
+        }
 
         let source = {
             natives: this.natives,
@@ -58,10 +66,10 @@ class MCLCore {
             json: this.json,
             authorization: this.options.authorization,
             root: this.path,
-            assets_index_name: this.assets_index_name,
             }
-        this.start = new start(this.options, source);
 
+
+        this.start = new start(this.options, source);
 
         let args = await this.start.agrs();
         let launchargs = [].concat(args.jvm, args.classPaths, args.launchOptions)
