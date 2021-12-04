@@ -8,7 +8,7 @@ let opts = {
     authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
     version: "1.12.2",
-    detached: false,
+    detached: true,
 
     java: true,
     custom: true,
