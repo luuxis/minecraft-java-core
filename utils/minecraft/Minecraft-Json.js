@@ -114,7 +114,7 @@ class Handler {
         }
 
         if(this.client.java){
-            let java = await this.java.GetJsonJava(this.client.version, this.client.path)
+            let java = await this.java.GetJsonJava(this.client.version)
             java.forEach(Java => {
                 assets.push({
                     path: Java.path,

@@ -21,6 +21,7 @@ class Start {
             '${auth_session}': this.authorization.access_token,
             '${auth_player_name}': this.authorization.name,
             '${auth_uuid}': this.authorization.uuid,
+            '${auth_xuid}': this.authorization.meta.xuid || this.authorization.access_token,
             '${user_properties}': this.authorization.user_properties,
             '${user_type}': this.authorization.meta.type,
             '${version_name}': this.client.version,
@@ -29,6 +30,7 @@ class Start {
             '${assets_root}': `${this.root}/assets`,
             '${game_assets}': `${this.root}/assets`,
             '${version_type}': this.version.type,
+            '${clientid}': this.authorization.meta.clientId || (this.authorization.client_token || this.authorization.access_token)
         }
         
         for (let index = 0; index < launchOptions.length; index++) {
