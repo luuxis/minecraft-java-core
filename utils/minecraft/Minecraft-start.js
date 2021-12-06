@@ -2,19 +2,34 @@
 
 const child = require("child_process");
 
+let os = { win32: 'windows', darwin: 'osx', linux: 'linux', sunos: 'linux', openbsd: 'linux', android: 'linux', aix: 'linux' }[process.platform];
+
 class Start {
     constructor(client, source) {
         this.client = client
         this.natives = source.natives
-        this.librarie = source.libraries
         this.root = source.root
-        this.version = source.json;
+        this.json = source.json
         this.authorization = source.authorization
     }
 
     async agrs() {
         let all = []
-        let launchOptions = this.version.minecraftArguments ? this.version.minecraftArguments.split(' ') : this.version.arguments.game
+        this.libraries = [];
+        let libsminecraft = this.json.libraries.map(lib => lib);
+        if(this.client.custom) this.json.custom.libraries.map(lib => this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`));
+        
+        for (let lib of libsminecraft) {
+            if(!lib.downloads.artifact) continue;
+            if (lib.rules && lib.rules[0].os) {
+                if (lib.rules[0].os.name !== os)
+                continue;
+            }
+            this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`);
+        }
+        this.libraries.push(`${this.json.id}`);
+
+        let launchOptions = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game
 
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
@@ -25,11 +40,11 @@ class Start {
             '${user_properties}': this.authorization.user_properties,
             '${user_type}': this.authorization.meta.type,
             '${version_name}': this.client.version,
-            '${assets_index_name}': this.version.assetid,
+            '${assets_index_name}': this.json.assetIndex.id,
             '${game_directory}': this.root,
             '${assets_root}': `${this.root}/assets`,
             '${game_assets}': `${this.root}/assets`,
-            '${version_type}': this.version.type,
+            '${version_type}': this.json.type,
             '${clientid}': this.authorization.meta.clientId || (this.authorization.client_token || this.authorization.access_token)
         }
         
@@ -42,8 +57,8 @@ class Start {
 
         let classPaths = [
             "-cp",
-            this.librarie.join(process.platform === 'win32' ? ';' : ':'),
-            this.version.mainClass,
+            this.libraries.join(process.platform === 'win32' ? ';' : ':'),
+            this.json.mainClass,
         ]
 
         let jvm = [
@@ -62,6 +77,18 @@ class Start {
             jvm: jvm
         })
         return all[0]
+    }
+
+    forge_arguments() {
+        let args = forge.minecraftArguments ? forge.minecraftArguments.split(' ') : forge.arguments
+    
+        args.jvm = args.jvm.map(jvm => {
+            return jvm
+            .replace(/\${version_name}/g, this.client.version)
+            .replace(/\${library_directory}/g, `${this.root}/libraries`)
+            .replace( /\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+        })    
+        return [args.game, args.jvm]
     }
 
     start(args, java) {
