@@ -4,7 +4,7 @@ const launcher = new launch();
 
 
 let opts = {
-    url: "http://uzurion.luuxis.fr/1.18",
+    url: "http://uzurion.luuxis.fr/1.18/",
     authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
     version: "1.18",

@@ -33,7 +33,13 @@ class Start {
 
         let launchOptions = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game
         if(this.client.custom) this.argscustom = this.json.custom.minecraftArguments ? this.json.custom.minecraftArguments.split(' ') : this.json.custom.arguments
-    
+        
+        if(!this.argscustom.game){
+            launchOptions.push(...this.argscustom)
+            launchOptions = [...new Set(launchOptions)]
+        }
+
+        
         if (this.argscustom && this.argscustom.jvm) {
             this.argscustom.jvm = this.argscustom.jvm.map(jvm => {
                 return jvm
