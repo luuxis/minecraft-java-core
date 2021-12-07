@@ -37,7 +37,7 @@ const launcher = new launch();
 ## Launch :rocket:
 ### Options
 ```javascript
-const {launch, Authenticator} = require('../index');
+const {launch, Authenticator} = require('minecraft-java-core');
 const launcher = new launch();
 
 
