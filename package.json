@@ -1,14 +1,15 @@
 {
   "name": "minecraft-java-core",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo No command is set. && echo Aucune commande n'est definie."
   },
   "files": [
+    "utils/**",
     "index.js",
-    "utils/**"
+    "README.md"
   ],
   "keywords": [
     "minecraft",
