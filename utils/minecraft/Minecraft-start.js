@@ -29,7 +29,19 @@ class Start {
         }
         this.libraries.push(`${this.json.id}`);
 
+
+
         let launchOptions = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game
+        if(this.client.custom) this.argscustom = this.json.custom.minecraftArguments ? this.json.custom.minecraftArguments.split(' ') : this.json.custom.arguments
+    
+        if (this.argscustom && this.argscustom.jvm) {
+            this.argscustom.jvm = this.argscustom.jvm.map(jvm => {
+                return jvm
+                .replace(/\${version_name}/g, this.client.version)
+                .replace(/\${library_directory}/g, `${this.root}/libraries`)
+                .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+            })
+        }
 
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
@@ -69,7 +81,13 @@ class Start {
             `-Djava.library.path=${this.natives}`,
             `-Xms${this.client.memory.min}`,
             `-Xmx${this.client.memory.max}`,
-          ]
+        ]
+
+
+        if(this.client.custom){
+            if(this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
+            if(this.argscustom && this.argscustom.game) classPaths.push(...this.argscustom.game)
+        }
         
         all.push({
             launchOptions: launchOptions,
@@ -77,18 +95,6 @@ class Start {
             jvm: jvm
         })
         return all[0]
-    }
-
-    forge_arguments() {
-        let args = forge.minecraftArguments ? forge.minecraftArguments.split(' ') : forge.arguments
-    
-        args.jvm = args.jvm.map(jvm => {
-            return jvm
-            .replace(/\${version_name}/g, this.client.version)
-            .replace(/\${library_directory}/g, `${this.root}/libraries`)
-            .replace( /\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
-        })    
-        return [args.game, args.jvm]
     }
 
     start(args, java) {

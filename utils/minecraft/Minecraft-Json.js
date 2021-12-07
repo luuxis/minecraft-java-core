@@ -98,7 +98,7 @@ class Handler {
             sha1: clientjar.sha1,
             size: clientjar.size,
             path: `versions/${version_id}/${version_id}.jar`,
-            type: "LIBRARY",
+            type: "JARVERSION",
             url: clientjar.url
         })
         
@@ -143,6 +143,7 @@ class Handler {
             sha1: jsonversion.sha1,
             path: `versions/${version_id}/${version_id}.json`,
             size: 0,
+            type: "VERSION",
             url: jsonversion.url
         });
         return [assetsjson].concat(libraries).concat(assets);

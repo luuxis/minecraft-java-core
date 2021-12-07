@@ -3,6 +3,8 @@ const downloader = require('./download.js');
 const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
+
+
 const path = require('path');
 
 class MCLCore {
@@ -46,33 +48,38 @@ class MCLCore {
 
     async startgame(){
         this.path = (`${path.resolve(this.options.path)}`).replace(/\\/g, "/")
-        this.libraries = this.files.filter(mod => mod.type == "LIBRARY").map(mod => `${this.path}/${mod.path}`);
         this.natives = `${this.path}/versions/${this.options.version}/natives`
-        
-        this.vanilla = require(`${this.path}/versions/${this.options.version}/${this.options.version}.json`)
-        if(this.options.custom) this.forge = require(this.files.filter(mod => mod.type == "VERIONS").map(mod => `${this.path}/${mod.path}`)[0])
 
+        this.vanilla = require(this.files.filter(mod => mod.type == "VERSION").map(mod => `${this.path}/${mod.path}`)[0])
+        if(this.options.custom) this.custom = require(this.files.filter(mod => mod.type == "VERIONSCUSTOM").map(mod => `${this.path}/${mod.path}`)[0])
+
+        this.json = this.vanilla
+        this.json.id = this.files.filter(mod => mod.type == "JARVERSION").map(mod => `${this.path}/${mod.path}`)[0]
+        this.json.mainClass = this.vanilla.mainClass
         if(this.options.custom){
-            this.json = this.forge
-            this.forge.assetid = this.vanilla.assetIndex.id
-        } else {
-            this.json = this.vanilla
-            this.vanilla.assetid = this.vanilla.assetIndex.id
+            this.json.custom = this.custom
+            this.json.mainClass = this.custom.mainClass
         }
 
         let source = {
             natives: this.natives,
-            libraries: this.libraries,
             json: this.json,
             authorization: this.options.authorization,
             root: this.path,
-            }
+        }
 
 
         this.start = new start(this.options, source);
 
         let args = await this.start.agrs();
-        let launchargs = [].concat(args.jvm, args.classPaths, args.launchOptions)
+        
+        let jvm = args.jvm
+        let classPaths = args.classPaths
+        let launchOptions = args.launchOptions
+
+
+
+        let launchargs = [].concat(jvm, classPaths, launchOptions)
 
         let java;
         if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;

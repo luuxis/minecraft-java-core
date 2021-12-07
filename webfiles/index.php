@@ -16,7 +16,7 @@ function dirToArray($dir) {
             } else if (strpos($path, "mods") !== false) {
                $type = "MOD";
             } else if (strpos($path, "versions") !== false) {
-               $type = "VERIONS";
+               $type = "VERIONSCUSTOM";
             } else {
                $type = "FILE";
             }

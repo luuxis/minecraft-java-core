@@ -4,17 +4,17 @@ const launcher = new launch();
 
 
 let opts = {
-    url: "http://uzurion.luuxis.fr/test/",
+    url: "http://uzurion.luuxis.fr/1.18",
     authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
     version: "1.18",
-    detached: true,
+    detached: false,
 
     java: true,
-    custom: false,
+    custom: true,
 
     verify: true,
-    ignored: ["config", "logs", "saves", "screenshots", "resourcepacks", "shaderpacks", "options.txt", "servers.dat"],
+    ignored: ["options.txt", "servers.dat"],
 
     memory: {
         min: `1G`,
