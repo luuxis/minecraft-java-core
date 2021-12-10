@@ -37,7 +37,7 @@ class MCLCore {
             
             await new Promise((ret) => {
                 this.downloader.on("finish", ret);
-                this.downloader.multiple(todownload, totsize, 10);
+                this.downloader.multiple(todownload, totsize, 5);
             });
         }
         
