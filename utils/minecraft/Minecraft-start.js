@@ -40,9 +40,6 @@ class Start {
             }
         }
         
-        
-
-        
         if (this.argscustom && this.argscustom.jvm) {
             this.argscustom.jvm = this.argscustom.jvm.map(jvm => {
                 return jvm
