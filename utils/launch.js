@@ -82,8 +82,14 @@ class MCLCore {
         let launchargs = [].concat(jvm, classPaths, launchOptions)
 
         let java;
-        if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;
-        else java = `${this.path}/runtime/java/jre.bundle/Contents/Home/bin/java`;
+        if(this.options.java) {
+            if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;
+            else java = `${this.path}/runtime/java/jre.bundle/Contents/Home/bin/java`;
+        } else if (this.options.javapath) {
+            java = this.options.javapath;
+        } else {
+            java = "java";
+        }
         
         this.emit('data', `Launching with arguments ${launchargs.join(' ')}`)
         let game = this.start.start(launchargs, java)
