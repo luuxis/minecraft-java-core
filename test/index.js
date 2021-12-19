@@ -11,7 +11,6 @@ let opts = {
     detached: false,
 
     java: true,
-    javapath: "C:/Users/Luuxis/Desktop/Minecraft/Minecraft/runtime/jre-legacy/windows-x64/jre-legacy/bin/java.exe",
     custom: true,
 
     verify: true,
