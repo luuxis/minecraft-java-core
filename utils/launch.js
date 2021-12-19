@@ -68,7 +68,6 @@ class MCLCore {
             root: this.path,
         }
 
-
         this.start = new start(this.options, source);
 
         let args = await this.start.agrs();
@@ -77,16 +76,14 @@ class MCLCore {
         let classPaths = args.classPaths
         let launchOptions = args.launchOptions
 
-
-
         let launchargs = [].concat(jvm, classPaths, launchOptions)
-
         let java;
+
         if(this.options.java) {
             if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;
             else java = `${this.path}/runtime/java/jre.bundle/Contents/Home/bin/java`;
         } else if (this.options.javapath) {
-            java = this.options.javapath;
+            java = (`${path.resolve(this.options.javapath)}`).replace(/\\/g, "/");
         } else {
             java = "java";
         }

@@ -11,14 +11,15 @@ let opts = {
     detached: false,
 
     java: true,
+    javapath: "C:/Users/Luuxis/Desktop/Minecraft/Minecraft/runtime/jre-legacy/windows-x64/jre-legacy/bin/java.exe",
     custom: true,
 
     verify: true,
     ignored: ["options.txt", "servers.dat", "logs"],
 
     memory: {
-        min: `1G`,
-        max: `2G` 
+        min: `2G`,
+        max: `4G` 
     }
 }
 
