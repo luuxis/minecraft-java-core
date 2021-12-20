@@ -85,19 +85,16 @@ class Start {
 
         let jvm = [
             await this.getJVM(),
-            '-XX:-UseAdaptiveSizePolicy',
-            '-XX:-OmitStackTraceInFastThrow',
-            '-Dfml.ignorePatchDiscrepancies=true',
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:+UseG1GC',
+            '-XX:G1NewSizePercent=20',
+            '-XX:G1ReservePercent=20',
+            '-XX:MaxGCPauseMillis=50',
+            '-XX:G1HeapRegionSize=32M',
             '-Dfml.ignoreInvalidMinecraftCertificates=true',
-            `-XX:+UnlockExperimentalVMOptions`,
-            `-XX:+UseG1GC`,
-            `-XX:G1NewSizePercent=50`,
-            `-XX:G1ReservePercent=50`,
-            `-XX:MaxGCPauseMillis=80`,
-            `-XX:G1HeapRegionSize=64M`,
             `-Djava.library.path=${this.natives}`,
             `-Xms${this.client.memory.min}`,
-            `-Xmx${this.client.memory.max}`,
+            `-Xmx${this.client.memory.max}`
         ]
 
 
