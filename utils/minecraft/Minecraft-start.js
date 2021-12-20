@@ -72,6 +72,10 @@ class Start {
                 launchOptions[index] = fields[launchOptions[index]]
             }
         }
+        
+        if (this.authorization.meta.demo) {
+            launchOptions.push('--demo')
+        }
 
         let classPaths = [
             "-cp",
@@ -80,10 +84,17 @@ class Start {
         ]
 
         let jvm = [
+            await this.getJVM(),
             '-XX:-UseAdaptiveSizePolicy',
             '-XX:-OmitStackTraceInFastThrow',
             '-Dfml.ignorePatchDiscrepancies=true',
             '-Dfml.ignoreInvalidMinecraftCertificates=true',
+            `-XX:+UnlockExperimentalVMOptions`,
+            `-XX:+UseG1GC`,
+            `-XX:G1NewSizePercent=50`,
+            `-XX:G1ReservePercent=50`,
+            `-XX:MaxGCPauseMillis=80`,
+            `-XX:G1HeapRegionSize=64M`,
             `-Djava.library.path=${this.natives}`,
             `-Xms${this.client.memory.min}`,
             `-Xmx${this.client.memory.max}`,
@@ -106,6 +117,17 @@ class Start {
     start(args, java) {
         const minecraft = child.spawn(java, args, { cwd: this.root, detached: this.client.detached })
         return minecraft
+    }
+
+    
+
+    async getJVM () {
+        const opts = {
+            win32: '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
+            darwin: '-XstartOnFirstThread',
+            linux: '-Xss1M'
+        }
+        return opts[process.platform]
     }
 }
 module.exports = Start
