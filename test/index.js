@@ -4,13 +4,13 @@ const launcher = new launch();
 
 
 let opts = {
-    //url: "http://146.59.227.140/files/",
+    url: "http://146.59.227.140/files/",
     authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
-    version: "1.18.1",
+    version: "1.12.2",
     detached: false,
 
-    java: true,
+    java: false,
     custom: false,
 
     verify: true,
@@ -24,14 +24,14 @@ let opts = {
 
 launcher.launch(opts)
 
-launcher.on('progress', (DL, totDL) => {
-    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
-});
+// launcher.on('progress', (DL, totDL) => {
+//     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+// });
 
 
-launcher.on('speed', (speed) => {
-    console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
-})
+// launcher.on('speed', (speed) => {
+//     console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+// })
 
 launcher.on('estimated', (time) => {
     let hours = Math.floor(time / 3600);
@@ -45,6 +45,7 @@ launcher.on('data', (e) => {
     console.log(e)
 })
 
-// launcher.on('close', () => {
-//     console.log("[CLOSE]")
-// })
+launcher.on('close', () => {
+    console.clear();
+    console.log("game closed");
+})
