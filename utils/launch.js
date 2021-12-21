@@ -1,7 +1,8 @@
 'use strict';
-const downloader = require('./download.js');
+const download = require('./download.js');
 const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
+
 
 
 
@@ -16,7 +17,6 @@ class MCLCore {
         }
         this.options.authorization = await Promise.resolve(this.options.authorization);
         this.jsonversion = new Handler(options);
-        this.downloader = new downloader();
         this.checkFiles();
     }
     
@@ -25,19 +25,24 @@ class MCLCore {
         if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
         let totsize = this.jsonversion.getTotalSize(todownload);
-        
+        let downloader = new download();
+
         if (todownload.length > 0) {
-            this.downloader.on("progress", (DL, totDL) => {
+            downloader.on("progress", (DL, totDL) => {
                 this.emit("progress", DL, totDL);
             });
 
-            this.downloader.on("speed", (speed) => {
+            downloader.on("speed", (speed) => {
                 this.emit("speed", speed);
+            });
+
+            downloader.on("estimated", (time) => {
+                this.emit("estimated", time);
             });
             
             await new Promise((ret) => {
-                this.downloader.on("finish", ret);
-                this.downloader.multiple(todownload, totsize, 5);
+                downloader.on("finish", ret);
+                downloader.multiple(todownload, totsize, 10);
             });
         }
         

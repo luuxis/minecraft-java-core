@@ -102,8 +102,6 @@ module.exports = class Downloader {
       let flag = fs.openSync(file.path, "w", 0o755);
       let position = 0;
 
-      console.log(`Downloading ${file.url} at ${file.path}`);
-
       let res = await fetch(file.url);
       res.body.on('data', (chunk) => {
         downloaded += chunk.length;
