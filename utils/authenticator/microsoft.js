@@ -1,4 +1,6 @@
 const fetch = require('node-fetch');
+const opn = require('opn');
+
 
 const MICROSOFT_LIVE_LOGIN_URL = 'https://login.live.com';
 const MICROSOFT_XBOX_LOGIN_URL = 'https://user.auth.xboxlive.com';
@@ -16,16 +18,34 @@ if(!!process && !!process.versions && !!process.versions.electron) {
 }
 
 class Microsoft {
-    constructor(){
+    constructor(id = "00000000402b5328"){
         this.type = type;
+        this.id = id;
     }
     
-    async getMicrosoftToken() {
-        console.log(this.type);
-        
+    async authMicrosoft(){
+        if(this.type === 'electron'){
+            return this.authMicrosoftElectron();
+        } else if(this.type === 'nwjs'){
+            return this.authMicrosoftNWJS();
+        } else {
+            return this.authMicrosoftBrowser();
+        }
     }
+
+    authMicrosoftElectron(){
+        console.log(`conexion type: ${this.type}`);
+    }
+
+    authMicrosoftNWJS(){
+        console.log(`conexion type: ${this.type}`);
+    }
+
+    authMicrosoftBrowser(){
+        console.log(`conexion type: ${this.type}`);
+    }
+
 }
 
 let mc = new Microsoft();
-mc.getMicrosoftToken();
-
+mc.authMicrosoft();
