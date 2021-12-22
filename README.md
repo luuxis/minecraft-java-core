@@ -1,5 +1,8 @@
 # minecraft-java-core
-NodeJS Module for Minecraft launcher
+NodeJS Module for Minecraft launcher</br></br>
+<a href="https://www.npmjs.com/package/minecraft-java-core"><img src="https://img.shields.io/npm/v/minecraft-java-core" alt="Version Number"/>
+
+---
 
 ## Avantages :dizzy:
 
