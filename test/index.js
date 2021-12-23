@@ -10,23 +10,23 @@ let opts = {
     version: "1.12.2",
     detached: false,
 
-    java: false,
-    custom: false,
+    java: true,
+    custom: true,
 
     verify: true,
     ignored: ["options.txt", "servers.dat", "logs"],
 
     memory: {
         min: `2G`,
-        max: `4G` 
+        max: `9G` 
     }
 }
 
 launcher.launch(opts)
 
-// launcher.on('progress', (DL, totDL) => {
-//     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
-// });
+launcher.on('progress', (DL, totDL) => {
+    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+});
 
 
 // launcher.on('speed', (speed) => {
@@ -45,7 +45,7 @@ launcher.on('data', (e) => {
     console.log(e)
 })
 
-launcher.on('close', () => {
-    console.clear();
-    console.log("game closed");
-})
+// launcher.on('close', () => {
+//     console.clear();
+//     console.log("game closed");
+// })
