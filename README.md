@@ -29,7 +29,7 @@ npm i minecraft-java-core
 ## Usage :triangular_flag_on_post:
 Require library
 ```javascript
-const {launch, Authenticator} = require('minecraft-java-core');
+const {launch, mojang} = require('minecraft-java-core');
 ```
 
 Create and Init launcher var [launch](utils/launch.js)
@@ -46,7 +46,7 @@ const launcher = new launch();
 
 let opts = {
     url: "http://uzurion.luuxis.fr/1.18/",
-    authorization: Authenticator.getAuth("username", "password"),
+    authorization: mojang.getAuth("username", "password"),
     path: "./.Minecraft",
     version: "1.18",
     detached: true,
