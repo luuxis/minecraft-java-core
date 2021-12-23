@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const opn = require('opn');
-const electron = require('./GUI/electron.js');
+
 
 
 const MICROSOFT_LIVE_LOGIN_URL = 'https://login.live.com';
@@ -36,10 +36,12 @@ class Microsoft {
 
     authMicrosoftElectron(){
         console.log(`conexion type: ${this.type}`);
+        const electron = require('./GUI/electron.js');
     }
 
     authMicrosoftNWJS(){
         console.log(`conexion type: ${this.type}`);
+        const nwjs = require('./GUI/nwjs.js');
     }
 
     authMicrosoftBrowser(){
@@ -47,5 +49,5 @@ class Microsoft {
     }
 
 }
-
 module.exports = Microsoft;
+
