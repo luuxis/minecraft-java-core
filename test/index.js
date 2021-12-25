@@ -11,14 +11,17 @@ let opts = {
     detached: false,
 
     java: true,
+    args: [
+        '-XX:+AggressiveOpts',
+    ],
     custom: true,
 
     verify: true,
-    ignored: ["options.txt", "servers.dat", "logs"],
+    ignored: ["options.txt", "servers.dat", "logs", "optionsof.txt"],
 
     memory: {
-        min: `2G`,
-        max: `9G` 
+        min: `4G`,
+        max: `8G` 
     }
 }
 

@@ -97,6 +97,10 @@ class Start {
             `-Xmx${this.client.memory.max}`
         ]
 
+        if (this.client.args){
+            jvm.push(...this.client.args)
+        }
+
 
         if(this.client.custom){
             if(this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
