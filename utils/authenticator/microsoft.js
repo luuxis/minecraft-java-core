@@ -1,6 +1,10 @@
 const fetch = require('node-fetch');
 const opn = require('opn');
 
+/**
+ * metre en place un processus d'authentification avec microsoft pour minecraft
+ */
+
 
 
 const MICROSOFT_LIVE_LOGIN_URL = 'https://login.live.com';
@@ -24,30 +28,6 @@ class Microsoft {
         this.id = id;
     }
     
-    async authMicrosoft(){
-        if(this.type === 'electron'){
-            return this.authMicrosoftElectron();
-        } else if(this.type === 'nwjs'){
-            return this.authMicrosoftNWJS();
-        } else {
-            return this.authMicrosoftBrowser();
-        }
-    }
-
-    authMicrosoftElectron(){
-        console.log(`conexion type: ${this.type}`);
-        const electron = require('./GUI/electron.js');
-    }
-
-    authMicrosoftNWJS(){
-        console.log(`conexion type: ${this.type}`);
-        const nwjs = require('./GUI/nwjs.js');
-    }
-
-    authMicrosoftBrowser(){
-        console.log(`conexion type: ${this.type}`);
-    }
-
 }
 module.exports = Microsoft;
 
