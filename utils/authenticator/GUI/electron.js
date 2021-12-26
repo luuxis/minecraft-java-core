@@ -9,3 +9,4 @@ const defaultProperties = {
   icon: path.join(__dirname, '../../../assets/icons', `microsoft.${(process.platform === 'win32') ? 'ico' : 'png'}`),
 };
 
+
