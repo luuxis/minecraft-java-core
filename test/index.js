@@ -10,14 +10,12 @@ let opts = {
     version: "1.12.2",
     detached: false,
 
-    java: true,
-    args: [
-        '-XX:+AggressiveOpts',
-    ],
+    java: false,
+    args: [],
     custom: true,
 
     verify: true,
-    ignored: ["options.txt", "servers.dat", "logs", "optionsof.txt"],
+    ignored: ["options.txt", "logs", "optionsof.txt"],
 
     memory: {
         min: `4G`,
