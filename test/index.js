@@ -10,7 +10,7 @@ let opts = {
     version: "1.12.2",
     detached: false,
 
-    java: false,
+    java: true,
     args: [],
     custom: true,
 
