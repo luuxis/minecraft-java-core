@@ -6,7 +6,8 @@
         "nwjs-types": "^1.0.0"
     },
     "dependencies": {
-        "minecraft-java-core": "file:../../../."
+        "minecraft-java-core": "file:../../../.",
+        "nw": "^0.59.1-sdk"
     },
     "scripts": {
         "start": "nw"
