@@ -45,21 +45,22 @@ const launcher = new launch();
 
 
 let opts = {
-    url: "http://uzurion.luuxis.fr/1.18/",
-    authorization: mojang.getAuth("username", "password"),
+    url: "http://146.59.227.140/files/",
+    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
-    version: "1.18",
-    detached: true,
+    version: "1.12.2",
+    detached: false,
 
     java: true,
-    custom: true,
+    args: [],
+    custom: false,
 
     verify: true,
-    ignored: ["options.txt"],
+    ignored: ["options.txt", "logs", "optionsof.txt"],
 
     memory: {
         min: `1G`,
-        max: `1G` 
+        max: `2G` 
     }
 }
 ```

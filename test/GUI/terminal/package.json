@@ -6,9 +6,11 @@
         "nwjs-types": "^1.0.0"
     },
     "dependencies": {
-        "minecraft-java-core": "file:../../../."
+        "@xboxreplay/xboxlive-auth": "^4.0.0",
+        "minecraft-java-core": "file:../../../.",
+        "minecraft-protocol": "^1.30.0"
     },
     "scripts": {
-        "start": "node tests.js"
+        "start": "node index.js"
     }
 }

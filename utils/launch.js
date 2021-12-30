@@ -21,10 +21,11 @@ class MCLCore {
         this.files = await this.jsonversion.getJSONVersion(this.options.version);
         if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
-        let totsize = this.jsonversion.getTotalSize(todownload);
-        let downloader = new download();
 
         if (todownload.length > 0) {
+            let totsize = this.jsonversion.getTotalSize(todownload);
+            let downloader = new download();
+            
             downloader.on("progress", (DL, totDL) => {
                 this.emit("progress", DL, totDL);
             });

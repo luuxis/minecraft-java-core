@@ -1,17 +1,4 @@
 const fetch = require('node-fetch');
-const opn = require('opn');
-
-/**
- * metre en place un processus d'authentification avec microsoft pour minecraft
- */
-
-
-
-const MICROSOFT_LIVE_LOGIN_URL = 'https://login.live.com';
-const MICROSOFT_XBOX_LOGIN_URL = 'https://user.auth.xboxlive.com';
-const MICROSOFT_XSTS_AUTH_URL = 'https://xsts.auth.xboxlive.com';
-const MICROSOFT_OAUTH_REDIRECT_URL ='https://login.microsoftonline.com/common/oauth2/nativeclient';
-const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
 
 let type;
 if(!!process && !!process.versions && !!process.versions.electron) {
@@ -24,8 +11,34 @@ if(!!process && !!process.versions && !!process.versions.electron) {
 
 class Microsoft {
     constructor(id = "00000000402b5328"){
+        if(id === "") id = "00000000402b5328"
         this.type = type;
         this.id = id;
+        
+    }
+
+    mojangAuthToken() {
+        const token = {
+            client_id: this.id,
+            redirect: "https://login.live.com/oauth20_desktop.srf"
+        }
+        return token;
+    }
+
+    createLink(token = this.mojangAuthToken()){
+        return (
+            "https://login.live.com/oauth20_authorize.srf" +
+            "?client_id=" +
+            token.client_id +
+            "&response_type=code" +
+            "&redirect_uri=" + encodeURIComponent(token.redirect) +
+            "&scope=XboxLive.signin%20offline_access" +
+            (token.prompt ? "&prompt=" + token.prompt : "")
+        );
+    }
+
+    async getAuth(){
+        console.log(this.createLink());
     }
     
 }
