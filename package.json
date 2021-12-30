@@ -24,7 +24,6 @@
     "adm-zip": "^0.5.9",
     "minecraft-server-ping": "^0.0.8",
     "node-fetch": "^2.6.6",
-    "opn": "^6.0.0",
     "request": "^2.88.0",
     "uuid": "^8.3.2"
   },
