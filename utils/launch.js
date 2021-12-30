@@ -23,8 +23,8 @@ class MCLCore {
         let todownload = await this.jsonversion.checkBundle(this.options.version)
 
         if (todownload.length > 0) {
-            let totsize = this.jsonversion.getTotalSize(todownload);
             let downloader = new download();
+            let totsize = this.jsonversion.getTotalSize(todownload);
             
             downloader.on("progress", (DL, totDL) => {
                 this.emit("progress", DL, totDL);
