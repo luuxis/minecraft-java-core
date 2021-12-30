@@ -34,7 +34,7 @@ class Microsoft {
             "&redirect_uri=" + encodeURIComponent(token.redirect) +
             "&scope=XboxLive.signin%20offline_access" +
             (token.prompt ? "&prompt=" + token.prompt : "")
-        );
+        )
     }
 
     async getAuth(){
