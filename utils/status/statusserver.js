@@ -1,6 +1,5 @@
-const Gamedig = require('gamedig');
+const ping = require('minecraft-server-ping');
 
 module.exports.StatusServer = async function(ip, port = 25565) {
-    let result = Gamedig.query({type: 'minecraft',host: ip,port: port}).then(res => res).catch(err => false);
-    return result;
+    return await ping.ping(ip, port).catch(err => false);
 }

@@ -1,0 +1,16 @@
+{
+    "name": "launcher",
+    "version": "0.0.1",
+    "main": "index.js",
+    "devDependencies": {
+        "nwjs-types": "^1.0.0"
+    },
+    "dependencies": {
+        "@xboxreplay/xboxlive-auth": "^4.0.0",
+        "minecraft-java-core": "file:../../../.",
+        "minecraft-protocol": "^1.30.0"
+    },
+    "scripts": {
+        "start": "node index.js"
+    }
+}

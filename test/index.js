@@ -1,32 +1,33 @@
-const {launch, Authenticator} = require('../index');
+const { launch, mojang } = require('../index');
 const login = require('./login');
 const launcher = new launch();
 
 
 let opts = {
     url: "http://146.59.227.140/files/",
-    authorization: Authenticator.getAuth(login['E-mail'], login['PassWord']),
+    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
     version: "1.12.2",
     detached: false,
 
-    java: false,
-    custom: false,
+    java: true,
+    args: [],
+    custom: true,
 
     verify: true,
-    ignored: ["options.txt", "servers.dat", "logs"],
+    ignored: ["options.txt", "logs", "optionsof.txt"],
 
     memory: {
-        min: `2G`,
-        max: `4G` 
+        min: `4G`,
+        max: `8G` 
     }
 }
 
 launcher.launch(opts)
 
-// launcher.on('progress', (DL, totDL) => {
-//     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
-// });
+launcher.on('progress', (DL, totDL) => {
+    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+});
 
 
 // launcher.on('speed', (speed) => {
@@ -45,7 +46,7 @@ launcher.on('data', (e) => {
     console.log(e)
 })
 
-launcher.on('close', () => {
-    console.clear();
-    console.log("game closed");
-})
+// launcher.on('close', () => {
+//     console.clear();
+//     console.log("game closed");
+// })

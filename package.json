@@ -1,6 +1,6 @@
 {
   "name": "minecraft-java-core",
-  "version": "1.1.5",
+  "version": "1.1.5-alpha.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.9",
-    "gamedig": "^3.0.8",
+    "minecraft-server-ping": "^0.0.8",
     "node-fetch": "^2.6.6",
     "request": "^2.88.0",
     "uuid": "^8.3.2"

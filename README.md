@@ -1,5 +1,8 @@
 # minecraft-java-core
-NodeJS Module for Minecraft launcher
+NodeJS Module for Minecraft launcher</br></br>
+<a href="https://www.npmjs.com/package/minecraft-java-core"><img src="https://img.shields.io/npm/v/minecraft-java-core" alt="Version Number"/>
+
+---
 
 ## Avantages :dizzy:
 
@@ -26,7 +29,7 @@ npm i minecraft-java-core
 ## Usage :triangular_flag_on_post:
 Require library
 ```javascript
-const {launch, Authenticator} = require('minecraft-java-core');
+const {launch, mojang} = require('minecraft-java-core');
 ```
 
 Create and Init launcher var [launch](utils/launch.js)
@@ -37,26 +40,27 @@ const launcher = new launch();
 ## Launch :rocket:
 ### Options
 ```javascript
-const {launch, Authenticator} = require('minecraft-java-core');
+const { launch, mojang } = require('minecraft-java-core');
 const launcher = new launch();
 
 
 let opts = {
-    url: "http://uzurion.luuxis.fr/1.18/",
-    authorization: Authenticator.getAuth("username", "password"),
+    url: "http://146.59.227.140/files/",
+    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
-    version: "1.18",
-    detached: true,
+    version: "1.12.2",
+    detached: false,
 
     java: true,
-    custom: true,
+    args: [],
+    custom: false,
 
     verify: true,
-    ignored: ["options.txt"],
+    ignored: ["options.txt", "logs", "optionsof.txt"],
 
     memory: {
         min: `1G`,
-        max: `1G` 
+        max: `2G` 
     }
 }
 ```
