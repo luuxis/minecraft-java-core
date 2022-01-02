@@ -46,7 +46,7 @@ const launcher = new launch();
 
 let opts = {
     url: "http://146.59.227.140/files/",
-    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
+    authorization: mojang.getAuth('pseudo', 'password'),
     path: "./.Minecraft",
     version: "1.12.2",
     detached: false,
