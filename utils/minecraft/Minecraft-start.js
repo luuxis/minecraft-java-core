@@ -17,7 +17,13 @@ class Start {
         let all = []
         this.libraries = [];
         let libsminecraft = this.json.libraries.map(lib => lib);
-        if(this.client.custom) this.json.custom.libraries.map(lib => this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`));
+        if(this.client.custom){
+            if (this.json.custom.libraries.downloads){
+                this.json.custom.libraries.map(lib => this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`));
+            } else {
+                this.json.custom.libraries.map(libs => this.libraries.push(`${this.root}/libraries/${libs.name.split(':')[0].replace(/\./g, '/')}/${libs.name.split(':')[1]}/${libs.name.split(':')[2]}/${libs.name.split(':')[1]}-${libs.name.split(':')[2]}.jar`));
+            }
+        }
         
         for (let lib of libsminecraft) {
             if(!lib.downloads.artifact) continue;
