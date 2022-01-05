@@ -4,11 +4,11 @@ const launcher = new launch();
 
 
 let opts = {
-    url: "http://146.59.227.140/files/",
+    url: "http://146.59.227.140/1.7/",
     authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
     path: "./.Minecraft",
-    version: "1.12.2",
-    detached: false,
+    version: "1.7.10",
+    detached: true,
 
     java: true,
     args: [],
@@ -18,8 +18,8 @@ let opts = {
     ignored: ["options.txt", "logs", "optionsof.txt"],
 
     memory: {
-        min: `4G`,
-        max: `8G` 
+        min: `2G`,
+        max: `4G` 
     }
 }
 
