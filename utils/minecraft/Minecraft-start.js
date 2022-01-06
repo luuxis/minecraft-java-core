@@ -83,6 +83,17 @@ class Start {
             launchOptions.push('--demo')
         }
 
+        if (this.client.server) {
+            if (this.client.server.autoconnect){
+                launchOptions.push(
+                    '--server',
+                    this.client.server.ip,
+                    '--port',
+                    this.client.server.port || '25565'
+                )
+            } 
+        } 
+
         let classPaths = [
             "-cp",
             this.libraries.join(process.platform === 'win32' ? ';' : ':'),

@@ -14,8 +14,14 @@ let opts = {
     args: [],
     custom: true,
 
+    server: {
+        ip: "127.0.0.1",
+        port: 25565,
+        autoconnect: false
+    },
+
     verify: true,
-    ignored: ["options.txt", "logs", "optionsof.txt"],
+    ignored: ["options.txt", "logs", "optionsof.txt", "saves"],
 
     memory: {
         min: `2G`,
