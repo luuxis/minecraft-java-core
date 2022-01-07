@@ -56,6 +56,12 @@ let opts = {
     java: true,
     args: [],
     custom: false,
+    
+    server: {
+        ip: "127.0.0.1",
+        port: 25565,
+        autoconnect: false
+    },
 
     verify: true,
     ignored: ["options.txt", "logs", "optionsof.txt"],
