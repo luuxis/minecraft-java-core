@@ -7,6 +7,7 @@
     "test": "echo No command is set. && echo Aucune commande n'est definie."
   },
   "files": [
+    "assets/**",
     "utils/**",
     "index.js",
     "README.md"

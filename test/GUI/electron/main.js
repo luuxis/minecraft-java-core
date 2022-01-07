@@ -9,10 +9,7 @@ function createWindow() {
   mainWindow.webContents.openDevTools()
 }
 app.whenReady().then(() => {
-
   createWindow();
-
-
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
