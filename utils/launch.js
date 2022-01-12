@@ -14,6 +14,7 @@ class MCLCore {
         }
         this.options.authorization = await Promise.resolve(this.options.authorization);
         this.jsonversion = new Handler(options);
+        this.java_version = await this.jsonversion.java_version();
         this.checkFiles();
     }
     
@@ -83,8 +84,8 @@ class MCLCore {
         let java;
 
         if(this.options.java) {
-            if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/java/bin/java`;
-            else java = `${this.path}/runtime/java/jre.bundle/Contents/Home/bin/java`;
+            if(process.platform == "win32" || process.platform == "linux") java = `${this.path}/runtime/${this.java_version}/bin/java`;
+            else java = `${this.path}/runtime/${this.java_version}/jre.bundle/Contents/Home/bin/java`;
         } else if (this.options.javapath) {
             java = (`${path.resolve(this.options.javapath)}`).replace(/\\/g, "/");
         } else {

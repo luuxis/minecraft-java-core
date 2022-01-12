@@ -34,7 +34,7 @@ module.exports.GetJsonJava = async function (minecraftVersion) {
         if(info.downloads === undefined) continue;
         let file = {};
         if(info.downloads){
-            file.path = `runtime/java/${path}`;
+            file.path = `runtime/${jsonversion}/${path}`;
             file.sha1 = info.downloads.raw.sha1;
             file.size = info.downloads.raw.size;
             file.type = "JAVA"
@@ -42,5 +42,5 @@ module.exports.GetJsonJava = async function (minecraftVersion) {
             files.push(file);
         }
     }
-    return files
+    return {files: files, version: jsonversion};
 }

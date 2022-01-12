@@ -114,7 +114,7 @@ class Handler {
         }
 
         if(this.client.java){
-            let java = await this.java.GetJsonJava(this.client.version)
+            let java = (await this.java.GetJsonJava(this.client.version)).files
             java.forEach(Java => {
                 assets.push({
                     path: Java.path,
@@ -242,6 +242,10 @@ class Handler {
             }
         }
         return file;
+    }
+
+    async java_version(){
+        return (await this.java.GetJsonJava(this.client.version)).version 
     }
 }
 module.exports = Handler
