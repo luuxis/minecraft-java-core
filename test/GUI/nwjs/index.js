@@ -1,11 +1,10 @@
 const {microsoft, launch, mojang } = require('minecraft-java-core');
-let client_id = "d877d447-445a-4ab1-ab2f-093e3bf32eb4";
+const login = require('../../login.json');
 const launcher = new launch();
-
 
 let opts = {
     url: "http://146.59.227.140/fabric/",
-    authorization: mojang.getAuth("E-mail"),
+    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
     path: "../../.Minecraft",
     version: "1.18.1",
     detached: true,
@@ -20,7 +19,7 @@ let opts = {
         autoconnect: false
     },
 
-    verify: true,
+    verify: false,
     ignored: ["options.txt", "logs", "optionsof.txt", "saves"],
 
     memory: {
@@ -36,6 +35,10 @@ launcher.on('progress', (DL, totDL) => {
 });
 
 
+// launcher.on('speed', (speed) => {
+//     console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+// })
+
 launcher.on('estimated', (time) => {
     let hours = Math.floor(time / 3600);
     let minutes = Math.floor((time - hours * 3600) / 60);
@@ -47,3 +50,8 @@ launcher.on('estimated', (time) => {
 launcher.on('data', (e) => {
     console.log(e)
 })
+
+// launcher.on('close', () => {
+//     console.clear();
+//     console.log("game closed");
+// })
