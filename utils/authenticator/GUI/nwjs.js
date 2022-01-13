@@ -129,14 +129,19 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
-    return [
-        profile.id,
-        profile.name,
-        profile.id,
-        mcLogin.access_token,
-        oauth2.refresh_token, 
-        refresh_date
-    ]
+
+    const userProfile = {
+      access_token: mcLogin.access_token,
+      client_token: getUUID(),
+      uuid: profile.id,
+      name: profile.name,
+      meta: {
+        xuid: profile.xuid,
+        type: "msa",
+        demo: profile.demo
+      }
+    }
+    return userProfile
   }
 
   async refresh(){
@@ -211,5 +216,14 @@ class Microsoft {
       }
     }).then(res => res.json());
   }
+}
+
+function getUUID() {
+  var result = ""
+  for (var i = 0; i <= 4; i++) {
+      result += (Math.floor(Math.random() * 16777216 )+1048576).toString(16);
+      if (i < 4)result += "-"
+  }
+  return result;
 }
 module.exports = Microsoft;
