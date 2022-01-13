@@ -2,7 +2,6 @@ const { launch, mojang } = require('../index');
 const login = require('./login');
 const launcher = new launch();
 
-
 let opts = {
     url: "http://146.59.227.140/fabric/",
     authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
@@ -20,7 +19,7 @@ let opts = {
         autoconnect: false
     },
 
-    verify: true,
+    verify: false,
     ignored: ["options.txt", "logs", "optionsof.txt", "saves"],
 
     memory: {
