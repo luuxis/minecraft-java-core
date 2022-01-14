@@ -58,7 +58,7 @@ class Start {
         let fields = {
             '${auth_access_token}':this.authorization.access_token,
             '${auth_session}': this.authorization.access_token,
-            '${auth_player_name}': this.authorization.name || 'demo',
+            '${auth_player_name}': this.authorization.name,
             '${auth_uuid}': this.authorization.uuid,
             '${auth_xuid}': this.authorization.meta.xuid || this.authorization.access_token,
             '${user_properties}': this.authorization.user_properties,
