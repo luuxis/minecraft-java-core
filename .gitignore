@@ -1,4 +1,4 @@
 node_modules
 package-lock.json
-test/.Minecraft/
-test/login.json
+.Minecraft
+login.json

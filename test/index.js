@@ -1,10 +1,10 @@
-const { launch, mojang } = require('../index');
+const { launch } = require('../index');
 const login = require('./login.json');
 const launcher = new launch();
 
 let opts = {
     url: "http://146.59.227.140/fabric/",
-    authorization: mojang.getAuth(login['E-mail'], login['PassWord']),
+    authorization: login,
     path: "./.Minecraft",
     version: "1.18.1",
     detached: true,
