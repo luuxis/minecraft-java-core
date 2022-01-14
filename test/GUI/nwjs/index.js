@@ -1,5 +1,6 @@
 const Microsoft = require('../../../utils/authenticator/GUI/nwjs.js');
 const {launch} = require('minecraft-java-core');
+const fs = require('fs');
 const login = require('../../login.json');
 const launcher = new launch();
 
@@ -7,6 +8,7 @@ const microsoft = new Microsoft()
 
 
 async function authenticate(){
+    fs.writeFileSync(`../../.Minecraft/login.json`, JSON.stringify(await microsoft.authenticate(), true, 4), 'UTF-8')
     let opts = {
         url: "http://146.59.227.140/fabric/",
         authorization: await microsoft.authenticate(),
@@ -33,7 +35,7 @@ async function authenticate(){
         }
     }
     
-    launcher.launch(opts)
+    //launcher.launch(opts)
     
     launcher.on('progress', (DL, totDL) => {
         console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
