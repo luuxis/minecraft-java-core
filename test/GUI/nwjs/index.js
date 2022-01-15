@@ -8,7 +8,7 @@ async function authenticate(){
     fs.writeFileSync(`../../login.json`, JSON.stringify(await Microsoft.getAuth(), true, 4), 'UTF-8')
     // let opts = {
     //     url: "http://146.59.227.140/fabric/",
-    //     authorization: await microsoft.authenticate(),
+    //     authorization: await Microsoft.getAuth(),
     //     path: "../../.Minecraft",
     //     version: "1.18.1",
     //     detached: true,
