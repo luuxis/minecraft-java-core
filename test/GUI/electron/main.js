@@ -1,4 +1,6 @@
 const { app, BrowserWindow } = require('electron')
+const { microsoft } = require('minecraft-java-core');
+const Minecraft = new microsoft();
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -14,7 +16,11 @@ function createWindow() {
   mainWindow.webContents.openDevTools()
 }
 
-
 app.whenReady().then(() => {
   createWindow();
 })
+
+async function login() {
+  console.log(await Minecraft.getAuth())
+}
+login()

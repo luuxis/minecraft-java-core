@@ -1,5 +1,5 @@
 const path = require('path')
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow } = require('electron')
 
 const defaultProperties = {
   width: 1000,

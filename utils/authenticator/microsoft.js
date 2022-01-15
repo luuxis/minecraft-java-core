@@ -196,12 +196,12 @@ class Microsoft {
 }
 
 function getUUID() {
-    var result = ""
-    for (var i = 0; i <= 4; i++) {
-        result += (Math.floor(Math.random() * 16777216 )+1048576).toString(16);
-        if (i < 4)result += "-"
-    }
-    return result;
+  var result = ""
+  for (var i = 0; i <= 4; i++) {
+    result += (Math.floor(Math.random() * 16777216 )+1048576).toString(16);
+    if (i < 4)result += "-"
+  }
+  return result;
 }
 
 module.exports = Microsoft;
