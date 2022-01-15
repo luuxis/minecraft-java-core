@@ -8,7 +8,7 @@ const defaultProperties = {
   resizable: false,
   position: "center",
   frame: (process.platform == "win32") ? true : false,
-  icon: path.join(__dirname, '../../../assets/icons', `microsoft.png`)
+  icon: path.join(__dirname, '../../../assets/iconsmicrosoft.png')
 }
 
 module.exports = async function (client_id) {
@@ -22,7 +22,6 @@ module.exports = async function (client_id) {
     });
   });
 
-  
   let code = await new Promise((resolve) => {
     nw.Window.open(`https://login.live.com/oauth20_authorize.srf?client_id=${client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access`, defaultProperties, (Window) => {
       let interval = null;
@@ -46,6 +45,5 @@ module.exports = async function (client_id) {
       });
     });
   });
-
   return code
 }
