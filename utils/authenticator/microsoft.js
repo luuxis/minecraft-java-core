@@ -104,7 +104,7 @@ class Microsoft {
 
     let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
     
-    return JSON.stringify({
+    return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
@@ -115,7 +115,7 @@ class Microsoft {
         type: "msa",
         demo: this.demo
       }
-    }, true, 4);
+    }
   }
   
   async refresh(acc){
@@ -180,7 +180,7 @@ class Microsoft {
       }
     }).then(res => res.json());
 
-    return JSON.stringify({
+    return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
@@ -191,7 +191,7 @@ class Microsoft {
         type: "msa",
         demo: acc.demo
       }
-    }, true, 4)
+    }
   }
 }
 
