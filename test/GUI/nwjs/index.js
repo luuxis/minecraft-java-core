@@ -1,6 +1,5 @@
 const {launch, microsoft} = require('minecraft-java-core');
 const fs = require('fs');
-const login = require('../../login.json');
 const Microsoft = new microsoft()
 const launcher = new launch();
 

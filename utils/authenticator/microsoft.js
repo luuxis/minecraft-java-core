@@ -16,9 +16,9 @@ class Microsoft {
   
   async getAuth(){
     if(this.type == "electron"){
-      return this.url(await require("./GUI/electron.js")(this.client_id));
+      return await this.url(await require("./GUI/electron.js")(this.client_id));
     } else if(this.type == "nwjs"){
-      return this.url(await require("./GUI/nwjs.js")(this.client_id));
+      return await this.url(await require("./GUI/nwjs.js")(this.client_id));
     } else if (this.type == "browser"){
       return console.error("Terminal not supported");
     }
