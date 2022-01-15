@@ -104,7 +104,7 @@ class Microsoft {
 
     let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
     
-    return {
+    return JSON.stringify({
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
@@ -115,7 +115,7 @@ class Microsoft {
         type: "msa",
         demo: this.demo
       }
-    }
+    }, true, 4);
   }
   
   async refresh(acc){
@@ -179,8 +179,8 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
-    
-    return {
+
+    return JSON.stringify({
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
@@ -188,9 +188,10 @@ class Microsoft {
       refresh_token: oauth2.refresh_token, 
       refresh_date,
       meta: {
-        type: "msa"
+        type: "msa",
+        demo: acc.demo
       }
-    }
+    }, true, 4)
   }
 }
 
