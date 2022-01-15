@@ -28,7 +28,7 @@ let opts = {
     }
 }
 
-launcher.launch(opts)
+//launcher.launch(opts)
 
 launcher.on('progress', (DL, totDL) => {
     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
@@ -55,3 +55,9 @@ launcher.on('data', (e) => {
 //     console.clear();
 //     console.log("game closed");
 // })
+
+
+async function start() {
+    console.log(await require("../../../../utils/authenticator/GUI/electron")("00000000402b5328"));
+}
+start()
