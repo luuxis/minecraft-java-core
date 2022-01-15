@@ -1,12 +1,11 @@
-const {launch} = require('minecraft-java-core');
-const microsoft = require('../../../utils/authenticator/microsoft');
+const {launch, microsoft} = require('minecraft-java-core');
 const fs = require('fs');
 const login = require('../../login.json');
 const Microsoft = new microsoft()
 const launcher = new launch();
 
 async function authenticate(){
-    fs.writeFileSync(`../../.Minecraft/login.json`, JSON.stringify(await Microsoft.getAuth(), true, 4), 'UTF-8')
+    fs.writeFileSync(`../../login.json`, JSON.stringify(await Microsoft.getAuth(), true, 4), 'UTF-8')
     // let opts = {
     //     url: "http://146.59.227.140/fabric/",
     //     authorization: await microsoft.authenticate(),
