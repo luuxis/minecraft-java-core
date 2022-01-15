@@ -1,30 +1,24 @@
-let type;
-let demo
-if(!!process && !!process.versions && !!process.versions.electron) {
-    type = 'electron';
-} else if(!!process && !!process.versions && !!process.versions.nw) {
-    type = 'nwjs';
-} else {
-    type = 'browser';
-}
+const fetch = require('node-fetch');
 
 class Microsoft {
     constructor(/*client_id = "00000000402b5328"*/){
         // if(client_id === "") client_id = "00000000402b5328"
-        this.type = type;
         this.client_id = "00000000402b5328";
+        if(!!process && !!process.versions && !!process.versions.electron) {
+          this.type = 'electron';
+        } else if(!!process && !!process.versions && !!process.versions.nw) {
+          this.type = 'nwjs';
+        } else {
+          this.type = 'browser';
+        }
     }
 
     async getAuth(){
-      
-      return this.login(await require("./GUI/nwjs.js")(this.client_id));
-
-         
+      return this.url(await require("./GUI/nwjs.js")(this.client_id));
     }
     
-    async login(code){
-      
-        let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
+    async url(code){
+      let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
         method: "POST",
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -91,7 +85,7 @@ class Microsoft {
       }).then(res => res.json());
   
       if(!hasGame.items.find(i => i.name == "product_minecraft" || i.name == "game_minecraft")){
-        demo = true;
+        this.demo = true;
       }
   
   
@@ -112,7 +106,7 @@ class Microsoft {
         refresh_date,
         meta: {
           type: "msa",
-          demo: demo
+          demo: this.demo
         }
       }
     }
