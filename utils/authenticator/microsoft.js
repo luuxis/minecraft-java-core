@@ -111,6 +111,7 @@ class Microsoft {
       name: profile.name,
       refresh_token: oauth2.refresh_token, 
       refresh_date,
+      user_properties: '{}',
       meta: {
         type: "msa",
         demo: this.demo
@@ -187,6 +188,7 @@ class Microsoft {
       name: profile.name,
       refresh_token: oauth2.refresh_token, 
       refresh_date,
+      user_properties: '{}',
       meta: {
         type: "msa",
         demo: acc.demo

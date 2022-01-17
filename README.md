@@ -31,7 +31,7 @@ npm i minecraft-java-core
 ## Usage :triangular_flag_on_post:
 Require library
 ```javascript
-const {launch, mojang} = require('minecraft-java-core');
+const { launch, mojang } = require('minecraft-java-core');
 ```
 
 Create and Init launcher var [launch](utils/launch.js)
