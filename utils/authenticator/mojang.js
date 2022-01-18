@@ -12,6 +12,7 @@ module.exports.getAuth = function (username, password, client_token = null) {
         name: username,
         user_properties: '{}',
         meta: {
+          offline: true,
           type: 'mojang'
         }
       }
@@ -44,7 +45,6 @@ module.exports.getAuth = function (username, password, client_token = null) {
         client_token: body.clientToken,
         uuid: body.selectedProfile.id,
         name: body.selectedProfile.name,
-        selected_profile: body.selectedProfile,
         user_properties: parsePropts(body.user.properties),
         meta: {
           type: 'mojang'
@@ -97,7 +97,10 @@ module.exports.refreshAuth = function (accessToken, clientToken) {
         client_token: uuid(),
         uuid: body.selectedProfile.id,
         name: body.selectedProfile.name,
-        user_properties: parsePropts(body.user.properties)
+        user_properties: parsePropts(body.user.properties),
+        meta: {
+          type: 'mojang'
+        }
       }
 
       resolve(userProfile)
