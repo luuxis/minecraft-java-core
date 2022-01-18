@@ -1,23 +1,23 @@
-const { launch, microsoft } = require('../index');
+const { launch, microsoft, mojang } = require('../index');
 const login = require('./login.json');
 const Microsoft = new microsoft();
 const launcher = new launch();
 
 let opts = {
     url: "http://146.59.227.140/fabric/",
-    authorization: Microsoft.refresh(login),
+    authorization: login,
     path: "./.Minecraft",
     version: "1.18.1",
     detached: true,
 
     java: true,
     args: [],
-    custom: true,
+    custom: false,
 
     server: {
         ip: "51.178.131.70",
         port: 1410,
-        autoconnect: true
+        autoconnect: false
     },
 
     verify: false,
