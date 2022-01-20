@@ -4,13 +4,13 @@ class Microsoft {
   constructor(client_id = "00000000402b5328"){
     if(client_id === "") client_id = "00000000402b5328"
     this.client_id = client_id;
-
+    
     if(!!process && !!process.versions && !!process.versions.electron) {
       this.type = 'electron';
     } else if(!!process && !!process.versions && !!process.versions.nw) {
       this.type = 'nwjs';
     } else {
-      this.type = 'browser';
+      this.type = 'terminal';
     }
   }
   
@@ -19,8 +19,9 @@ class Microsoft {
       return await this.url(await require("./GUI/electron.js")(this.client_id));
     } else if(this.type == "nwjs"){
       return await this.url(await require("./GUI/nwjs.js")(this.client_id));
-    } else if (this.type == "browser"){
-      return console.error("Terminal not supported");
+    } else if (this.type == "terminal"){
+      return console.log("Terminal.js not supported");
+      //return await require("./GUI/terminal.js.js")(this.client_id);
     }
   }
   
