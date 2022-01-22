@@ -81,7 +81,10 @@ class Handler {
         }
         
         let Version = await fetch(jsonversion.url).then(res => res.json());
-        if (this.client.custom) Version.custom = await fetch(this.client.url).then(res => res.json());
+        if (this.client.custom) {
+            Version.custom = await fetch(this.client.url).then(res => res.json())
+            Version.custom.json = (await fetch((Version.custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())).libraries;
+        }
         
         let libraries = await this.getAllLibrairies(Version);
         let assets = await this.getAllAssets(Version);
@@ -127,6 +130,18 @@ class Handler {
         }
         
         if(Version.custom){
+            for(let custom of Version.custom.json){
+                if(!custom.url) continue;
+                if(!custom.name) return;
+                let lib = custom.name.split(':')
+                let path = `${lib[0].replace(/\./g, '/')}/${lib[1]}/${lib[2]}`
+                let name = `${lib[1]}-${lib[2]}.jar`
+                assets.push({
+                    path: `libraries/${path}/${name}`,
+                    url: `${custom.url}${path}/${name}`,
+                    size: 0
+                })
+            }
             let custom = Version.custom;
             custom.forEach(url => {
                 assets.push({
@@ -210,7 +225,7 @@ class Handler {
         bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
         
         files = files.filter(file => ignoredfiles.indexOf(file) < 0);
-
+        console.log(files);
         for(let file of files){
             try {
                 if(fs.statSync(file).isDirectory()){

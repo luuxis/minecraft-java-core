@@ -11,7 +11,7 @@ const defaultProperties = {
   icon: path.join(__dirname, '../../../assets/iconsmicrosoft.png')
 }
 
-module.exports = async function (client_id) {
+module.exports = async function (url) {
   await new Promise((resolve) => {
     win.cookies.getAll({domain: "live.com"}, async (cookies) => {
       for await (let cookie of cookies){
@@ -23,7 +23,7 @@ module.exports = async function (client_id) {
   });
 
   let code = await new Promise((resolve) => {
-    nw.Window.open(`https://login.live.com/oauth20_authorize.srf?client_id=${client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access`, defaultProperties, (Window) => {
+    nw.Window.open(url, defaultProperties, (Window) => {
       let interval = null;
       let code;
       interval = setInterval(() => {

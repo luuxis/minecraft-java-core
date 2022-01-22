@@ -2,7 +2,6 @@ const fetch = require('node-fetch');
 
 class Microsoft {
   constructor(client_id = "00000000402b5328"){
-    if(client_id === "") client_id = "00000000402b5328"
     this.client_id = client_id;
     
     if(!!process && !!process.versions && !!process.versions.electron) {
@@ -14,14 +13,16 @@ class Microsoft {
     }
   }
   
-  async getAuth(){
-    if(this.type == "electron"){
-      return await this.url(await require("./GUI/electron.js")(this.client_id));
-    } else if(this.type == "nwjs"){
-      return await this.url(await require("./GUI/nwjs.js")(this.client_id));
-    } else if (this.type == "terminal"){
-      return console.log("Terminal.js not supported");
-      //return await require("./GUI/terminal.js.js")(this.client_id);
+  async getAuth(type, url){
+    if(!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access`;
+    if(!type) type = this.type;
+    
+    if(type == "electron"){
+      return await this.url(await require("./GUI/electron.js")(url));
+    } else if(type == "nwjs"){
+      return await this.url(await require("./GUI/nwjs.js")(url));
+    } else if (type == "terminal"){
+      return await require("./GUI/terminal.js")(url);
     }
   }
   
