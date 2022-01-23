@@ -225,7 +225,7 @@ class Handler {
         bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
         
         files = files.filter(file => ignoredfiles.indexOf(file) < 0);
-        console.log(files);
+        
         for(let file of files){
             try {
                 if(fs.statSync(file).isDirectory()){

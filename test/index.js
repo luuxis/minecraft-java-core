@@ -6,12 +6,12 @@ const fs = require('fs');
 
 async function main() {
     let mc = await Microsoft.refresh(login);
-    fs.writeFileSync('login.json', JSON.stringify(mc));
+    fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
     let opts = {
         url: "http://146.59.227.140/fabric/",
         authorization: mc,
         path: "./.Minecraft",
-        version: "1.7.10",
+        version: "1.18.1",
         detached: false,
 
         java: true,

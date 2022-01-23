@@ -1,6 +1,6 @@
 {
   "name": "minecraft-java-core",
-  "version": "1.1.8-beta.1",
+  "version": "1.1.9-beta.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "adm-zip": "^0.5.9",
     "http": "^0.0.1-security",
     "minecraft-server-ping": "^0.0.8",
-    "node-fetch": "^2.6.6",
+    "node-fetch": "^2.6.7",
     "request": "^2.88.0",
     "uuid": "^8.3.2"
   },
