@@ -11,12 +11,12 @@ async function main() {
         url: "http://146.59.227.140/fabric/",
         authorization: mc,
         path: "./.Minecraft",
-        version: "1.18.1",
-        detached: false,
+        version: "1.17.1",
+        detached: true,
 
         java: true,
         args: [],
-        custom: true,
+        custom: false,
 
         server: {
             ip: "mc.hypixel.net",
@@ -24,12 +24,12 @@ async function main() {
             autoconnect: false,
         },
 
-        verify: true,
+        verify: false,
         ignored: ["options.txt", "optionsof.txt", "saves", "servers.dat"],
 
         memory: {
-            min: `2G`,
-            max: `4G` 
+            min: `3G`,
+            max: `6G` 
         }
     }
 
