@@ -4,6 +4,7 @@ const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
 const path = require('path');
+const fs = require('fs');
 
 class MCLCore {
     async launch(options){
@@ -90,6 +91,29 @@ class MCLCore {
             java = (`${path.resolve(this.options.javapath)}`).replace(/\\/g, "/");
         } else {
             java = "java";
+        }
+
+        if(this.start.isold()){
+            const legacyDirectory = `${this.path}/resources`;
+            const index = require(`${this.path}/assets/indexes/${this.json.assets}`);
+            if(!fs.existsSync(legacyDirectory)) fs.mkdirSync(legacyDirectory, {recursive: true});
+
+            await Promise.all(Object.keys(index.objects).map(async asset => {
+                const hash = index.objects[asset].hash
+                const subhash = hash.substring(0, 2)
+                const subAsset = `${this.path}/assets/objects/${subhash}`
+
+                const legacyAsset = asset.split('/')
+                legacyAsset.pop()
+
+                if (!fs.existsSync(path.join(legacyDirectory, legacyAsset.join('/')))) {
+                    fs.mkdirSync(path.join(legacyDirectory, legacyAsset.join('/')), { recursive: true })
+                }
+                
+                if (!fs.existsSync(path.join(legacyDirectory, asset))) {
+                    fs.copyFileSync(path.join(subAsset, hash), path.join(legacyDirectory, asset))
+                }
+            }))
         }
         
         this.emit('data', `Launching with arguments ${launchargs.join(' ')}`)

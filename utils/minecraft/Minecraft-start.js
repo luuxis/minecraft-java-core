@@ -66,8 +66,8 @@ class Start {
             '${version_name}': this.client.version,
             '${assets_index_name}': this.json.assetIndex.id,
             '${game_directory}': this.root,
-            '${assets_root}': `${this.root}/assets`,
-            '${game_assets}': `${this.root}/assets`,
+            '${assets_root}': this.isold() ? `${this.root}/resources` : `${this.root}/assets`,
+            '${game_assets}': this.isold() ? `${this.root}/resources` : `${this.root}/assets`,
             '${version_type}': this.json.type,
             '${clientid}': this.authorization.meta.clientId || (this.authorization.client_token || this.authorization.access_token)
         }
@@ -87,9 +87,9 @@ class Start {
             if (this.client.server.autoconnect){
                 launchOptions.push(
                     '--server',
-                    this.client.server.ip,
+                    this.client.server.ip || '127.0.0.1',
                     '--port',
-                    this.client.server.port || '25565'
+                    this.client.server.port || 25565
                 )
             } 
         } 
@@ -132,12 +132,14 @@ class Start {
         return all[0]
     }
 
+    isold() {
+        return this.json.assets === 'legacy' || this.json.assets === 'pre-1.6'
+    }
+
     start(args, java) {
         const minecraft = child.spawn(java, args, { cwd: this.root, detached: this.client.detached })
         return minecraft
     }
-
-    
 
     async getJVM () {
         const opts = {
