@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 class Microsoft {
   constructor(client_id = "00000000402b5328"){
-    this.client_id = client_id;
+    this.client_id = "00000000402b5328";
     
     if(!!process && !!process.versions && !!process.versions.electron) {
       this.type = 'electron';
@@ -22,7 +22,7 @@ class Microsoft {
     } else if(type == "nwjs"){
       return await this.url(await require("./GUI/nwjs.js")(url));
     } else if (type == "terminal"){
-      return await require("./GUI/terminal.js")(url);
+      console.log("terminal is not implemented yet");
     }
   }
   
