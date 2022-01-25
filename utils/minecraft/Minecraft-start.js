@@ -141,7 +141,7 @@ class Start {
         return minecraft
     }
 
-    async getJVM () {
+    async getJVM() {
         const opts = {
             win32: '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
             darwin: '-XstartOnFirstThread',

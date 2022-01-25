@@ -11,7 +11,7 @@ async function main() {
         url: "http://146.59.227.140/fabric/",
         authorization: mc,
         path: "./.Minecraft",
-        version: "1.17.1",
+        version: "1.2.5",
         detached: true,
 
         java: true,

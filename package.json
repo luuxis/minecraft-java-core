@@ -1,6 +1,6 @@
 {
   "name": "minecraft-java-core",
-  "version": "1.1.10",
+  "version": "1.1.11-beta.1",
   "description": "",
   "main": "index.js",
   "scripts": {
