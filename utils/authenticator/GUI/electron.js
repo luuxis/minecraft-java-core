@@ -12,18 +12,19 @@ const defaultProperties = {
 module.exports = function (url) {
   return new Promise(resolve => {
     app.whenReady().then(() => {
-      const mainWindow = new BrowserWindow(defaultProperties)
-      mainWindow.setMenu(null);
-      mainWindow.loadURL(url);
-      var loading = false;
 
-      session.defaultSession.cookies.get({domain: 'live.com'}).then((cookies) => {
+      session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies) => {
         for(let cookie of cookies){
           let urlcookie = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
           session.defaultSession.cookies.remove(urlcookie, cookie.name)
         }
       })
 
+      const mainWindow = new BrowserWindow(defaultProperties)
+      mainWindow.setMenu(null);
+      mainWindow.loadURL(url);
+      var loading = false;
+      
       mainWindow.on("close", () => {
         if (!loading) resolve("cancel");
       })
