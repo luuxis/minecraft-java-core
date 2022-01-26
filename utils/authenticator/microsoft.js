@@ -14,13 +14,17 @@ class Microsoft {
   }
   
   async getAuth(type, url){
-    if(!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access`;
+    if(!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access&prompt=select_account`;
     if(!type) type = this.type;
     
     if(type == "electron"){
-      return await this.url(await require("./GUI/electron.js")(url));
+      let usercode = await require("./GUI/electron.js")(url)
+      if(usercode === "cancel") return false;
+      else return await this.url(usercode);
     } else if(type == "nwjs"){
-      return await this.url(await require("./GUI/nwjs.js")(url));
+      let usercode = await require("./GUI/nwjs.js")(url)
+      if(usercode === "cancel") return false;
+      else return await this.url(usercode);
     } else if (type == "terminal"){
       console.log("terminal is not implemented yet");
     }

@@ -16,7 +16,6 @@ module.exports = async function (url) {
     win.cookies.getAll({domain: "live.com"}, async (cookies) => {
       for await (let cookie of cookies){
         let url = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
-        console.log(cookie.name);
         win.cookies.remove({ url: url, name: cookie.name });
       }
       return resolve();
