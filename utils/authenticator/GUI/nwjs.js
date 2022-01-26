@@ -8,7 +8,7 @@ const defaultProperties = {
   resizable: false,
   position: "center",
   frame: (process.platform == "win32") ? true : false,
-  icon: path.join(__dirname, '../../../assets/iconsmicrosoft.png')
+  icon: path.join(__dirname, '../../../assets/icons/microsoft.png')
 }
 
 module.exports = async function (url) {
@@ -16,6 +16,7 @@ module.exports = async function (url) {
     win.cookies.getAll({domain: "live.com"}, async (cookies) => {
       for await (let cookie of cookies){
         let url = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
+        console.log(cookie.name);
         win.cookies.remove({ url: url, name: cookie.name });
       }
       return resolve();

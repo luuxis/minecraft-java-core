@@ -205,11 +205,6 @@ class Handler {
             for(let entry of entries){
                 if(entry.entryName.startsWith("META-INF")) continue;
                 fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o755 });
-                // if(process.platform == "darwin" && ((`${nativeFolder}/${entry.entryName}`).endsWith(".dylib") || (`${nativeFolder}/${entry.entryName}`).endsWith(".jnilib"))){
-                //     console.log(`Whitelisting from Apple Quarantine ${`${nativeFolder}/${entry.entryName}`}`);
-                //     let id = String.fromCharCode.apply(null, execSync(`xattr -p com.apple.quarantine "${`${nativeFolder}/${entry.entryName}`}"`));
-                //     execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${`${nativeFolder}/${entry.entryName}`}"`);
-                // }
             }
         }
     }

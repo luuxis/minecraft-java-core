@@ -13,7 +13,7 @@ function createWindow() {
   })
   mainWindow.setMenu(null)
   mainWindow.loadFile('app/index.html')
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
@@ -21,6 +21,8 @@ app.whenReady().then(() => {
 })
 
 async function login() {
-  console.log(await Minecraft.getAuth())
+  await Minecraft.getAuth()
+  // console.log(`conexion successful pseudo: ${(await Minecraft.getAuth()).name}`);
 }
 login()
+
