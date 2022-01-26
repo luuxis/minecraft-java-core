@@ -18,7 +18,7 @@ class Microsoft {
     if(!type) type = this.type;
     
     if(type == "electron"){
-      return console.log(await require("./GUI/electron.js")(url));
+      return await this.url(await require("./GUI/electron.js")(url));
     } else if(type == "nwjs"){
       return await this.url(await require("./GUI/nwjs.js")(url));
     } else if (type == "terminal"){
