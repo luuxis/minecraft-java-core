@@ -23,7 +23,6 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.9",
-    "http": "^0.0.1-security",
     "minecraft-server-ping": "^0.0.8",
     "node-fetch": "^2.6.7",
     "request": "^2.88.0",

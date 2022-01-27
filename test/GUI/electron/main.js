@@ -21,8 +21,8 @@ app.whenReady().then(() => {
 })
 
 async function login() {
-  await Minecraft.getAuth()
-  // console.log(`conexion successful pseudo: ${(await Minecraft.getAuth()).name}`);
+  //await Minecraft.getAuth()
+  console.log(`conexion successful pseudo: ${(await Minecraft.getAuth()).name}`);
 }
 login()
 
