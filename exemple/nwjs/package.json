@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "app/index.html",
+  "window": {
+    "width": 400,
+    "height": 500,
+    "position": "center"
+  },
   "scripts": {
     "start": "run --64 --mirror https://dl.nwjs.io/ ."
   },
