@@ -9,17 +9,22 @@ const defaultProperties = {
   icon: path.join(__dirname, '../../../assets/icons', `microsoft.${(process.platform === 'win32') ? 'ico' : 'png'}`),
 };
 
-module.exports = function (url) {
-  return new Promise(resolve => {
+module.exports = async function (url) {
+  await new Promise((resolve) => {
     app.whenReady().then(() => {
       
-      // session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies) => {
-      //   for(let cookie of cookies){
-      //     let urlcookie = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
-      //     session.defaultSession.cookies.remove(urlcookie, cookie.name)
-      //   }
-      // })
+      session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies) => {
+        for(let cookie of cookies){
+          let urlcookie = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
+          session.defaultSession.cookies.remove(urlcookie, cookie.name)
+        }
+      })
+      return resolve();
+    });
+  });
 
+  return new Promise(resolve => {
+    app.whenReady().then(() => {
       const mainWindow = new BrowserWindow(defaultProperties)
       mainWindow.setMenu(null);
       mainWindow.loadURL(url);
