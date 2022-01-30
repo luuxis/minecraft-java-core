@@ -8,7 +8,7 @@ async function main() {
     let mc = await Microsoft.refresh(login);
     fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
     let opts = {
-        url: "http://146.59.227.140/fabric/",
+        url: "http://launcher.selvania.fr/files",
         authorization: mc,
         path: "./.Minecraft",
         version: "1.18.1",
@@ -16,7 +16,7 @@ async function main() {
 
         java: true,
         args: [],
-        custom: false,
+        custom: true,
 
         server: {
             ip: "mc.hypixel.net",
@@ -24,8 +24,8 @@ async function main() {
             autoconnect: false,
         },
 
-        verify: false,
-        ignored: ["options.txt", "optionsof.txt", "saves", "servers.dat"],
+        verify: true,
+        ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
 
         memory: {
             min: `3G`,
