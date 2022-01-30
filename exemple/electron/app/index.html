@@ -2,15 +2,22 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
 </head>
 <body>
-    <input type="text" class="email" autocomplete="false">
-    <input type="password" class="password">
-    <button class="microsoft">microsoft</button>
-    <button class="play" disabled>play</button>
+    <div class="input">
+        <input type="text" class="email" placeholder="E-mail (Pseudo = crack)">
+        <input type="password" class="password" placeholder="Password">
+    </div>
+
+    <div class="button">
+        <button class="microsoft">Microsoft</button>
+        <button class="mojang">Mojang</button>
+        <button class="play" disabled>Play</button>
+    </div>
+    <div class="ram-bar">
+        <input type="range" class="ram">
+        <div class="ram-text">0 Gb</div>
+    </div>
     <script src="index.js"></script>
 </body>
 </html>
