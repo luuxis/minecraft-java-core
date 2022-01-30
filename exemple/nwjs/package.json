@@ -1,0 +1,21 @@
+{
+  "name": "minecraft-java-core-nwjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.html",
+  "scripts": {
+    "start": "run --64 --mirror https://dl.nwjs.io/ ."
+  },
+  "chromium-args": "--enable-logging --v=1 --disable-gpu --mixed-content",
+  "webkit": { "plugin": true },
+  "build": {
+    "appId": "Uzurion Launcher",
+    "nwVersion": "0.60.0"
+  },
+  "devDependencies": {
+    "nwjs-builder-luuxis": "^1.15.0"
+  },
+  "dependencies": {
+    "minecraft-java-core": "file:../../."
+  }
+}
