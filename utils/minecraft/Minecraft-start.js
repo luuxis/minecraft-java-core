@@ -136,7 +136,7 @@ class Start {
         return this.json.assets === 'legacy' || this.json.assets === 'pre-1.6'
     }
 
-    start(args, java) {
+    async start(args, java) {
         const minecraft = child.spawn(java, args, { cwd: this.root, detached: this.client.detached })
         return minecraft
     }

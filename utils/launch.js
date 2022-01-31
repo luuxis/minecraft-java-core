@@ -21,7 +21,7 @@ class MCLCore {
     
     async checkFiles(){
         this.files = await this.jsonversion.getJSONVersion(this.options.version);
-        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
+        if(this.options.verify) this.jsonversion.removeNonIgnoredFiles(this.files);
         let todownload = await this.jsonversion.checkBundle(this.options.version)
 
         if (todownload.length > 0) {
@@ -46,7 +46,7 @@ class MCLCore {
             });
         }
         
-        if(this.options.verify) await this.jsonversion.removeNonIgnoredFiles(this.files);
+        if(this.options.verify) this.jsonversion.removeNonIgnoredFiles(this.files);
         this.jsonversion.natives(this.files);
         this.startgame();
     }

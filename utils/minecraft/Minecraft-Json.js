@@ -165,8 +165,8 @@ class Handler {
         return [assetsjson].concat(libraries).concat(assets);
     }
     
-    async checkBundle(ver, custom){
-        let bundle = await this.getJSONVersion(ver, custom)
+    async checkBundle(version){
+        let bundle = await this.getJSONVersion(version)
         let todownload = [];
         
         for (let file of bundle){
@@ -181,14 +181,14 @@ class Handler {
             }
             if(fs.existsSync(file.path)){
                 if(file.sha1){
-                    if(!(await this.checkSHA1(file.path, file.sha1))) todownload.push(file);
+                    if(!(this.checkSHA1(file.path, file.sha1))) todownload.push(file);
                 }
             } else todownload.push(file);
         }
         return todownload;
     }
 
-    async checkSHA1(file, hash){
+    checkSHA1(file, hash){
         const hex = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
         if(hex == hash) return true;
         return false;
