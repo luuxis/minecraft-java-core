@@ -43,11 +43,11 @@ ipcMain.on("microsoft", async (event, data) => {
     }
 })
 
-ipcMain.on("play", () => {
+ipcMain.on("play", async (event, data) => {
   let opts = {
     authorization: authenticator,
     path: "./AppData/.minecraft",
-    version: "20w14infinite",
+    version: data,
     detached: true,
     java: true,
     custom: false,

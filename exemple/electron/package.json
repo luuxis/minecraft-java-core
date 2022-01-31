@@ -7,6 +7,7 @@
     "start": "electron ."
   },
   "dependencies": {
+    "node-fetch": "^2.6.7",
     "minecraft-java-core": "file:../../."
   },
   "devDependencies": {

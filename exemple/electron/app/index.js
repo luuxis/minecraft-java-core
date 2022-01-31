@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron')
+let sel = document.querySelector('.minecraft-version');
 
 
 document.querySelector('.microsoft').addEventListener('click', async () => {
@@ -21,5 +22,25 @@ document.querySelector('.microsoft').addEventListener('click', async () => {
 })
 
 document.querySelector('.play').addEventListener('click', async () => {
-    ipcRenderer.send('play', 'login')
+    ipcRenderer.send('play', sel.value)
 })
+
+
+
+
+const fetch = require('node-fetch');
+
+
+
+async function get_version_list() {
+    let minenecraft_version = (await fetch('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json').then(res => res.json())).versions;
+    minenecraft_version.forEach(version => {
+        var opt = document.createElement("option");
+        opt.value = version.id;
+        opt.text = version.id;
+        sel.add(opt, null);
+    });
+}
+
+get_version_list();
+
