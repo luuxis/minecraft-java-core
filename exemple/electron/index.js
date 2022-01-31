@@ -43,21 +43,33 @@ ipcMain.on("microsoft", async (event, data) => {
     }
 })
 
+ipcMain.on("mojang", async (event, data) => {
+    if(data.login){
+      let login = await mojang.getAuth(data.email, data.password)
+      if(login){
+        event.sender.send("mojang", "success")
+        authenticator = login
+      } else {
+        event.sender.send("mojang", "cancel")
+      }
+    }
+})
+
 ipcMain.on("play", async (event, data) => {
   let opts = {
     authorization: authenticator,
     path: "./AppData/.minecraft",
-    version: data,
+    version: data.version,
     detached: true,
     java: true,
     custom: false,
     verify: false,
     memory: {
-      min: `3G`,
-      max: `6G` 
+      min: `${data.ram}G`,
+      max: `${data.ram}G`
     }
   }
-  
+
   Launch.launch(opts)
   
   Launch.on('progress', (DL, totDL) => {
