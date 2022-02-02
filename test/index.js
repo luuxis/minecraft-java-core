@@ -16,7 +16,7 @@ async function main() {
 
         java: true,
         args: [],
-        custom: true,
+        custom: false,
 
         server: {
             ip: "mc.hypixel.net",
@@ -24,7 +24,7 @@ async function main() {
             autoconnect: false,
         },
 
-        verify: true,
+        verify: false,
         ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
 
         memory: {
