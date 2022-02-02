@@ -8,6 +8,7 @@ let sel = document.querySelector('.minecraft-version');
 let btn_play = document.querySelector('.play');
 let btn_mojang = document.querySelector('.mojang');
 let btn_microsoft = document.querySelector('.microsoft');
+let ram = 1
 let authenticator
 
 (async () => {
@@ -40,32 +41,6 @@ const enabled = () => {
     document.querySelector('.ram').disabled = false;
 }
 
-const start = async (data) => {
-    let opts = {
-        authorization: authenticator,
-        path: "./AppData/.minecraft",
-        version: data.version,
-        detached: true,
-        java: true,
-        custom: false,
-        verify: false,
-        memory: {
-          min: `${data.ram}G`,
-          max: `${data.ram}G`
-        }
-      }
-    
-      Launch.launch(opts)
-      
-      Launch.on('progress', (DL, totDL) => {
-        console.log(`Telechargement ${((DL / totDL) * 100).toFixed(0)}%`)
-      });
-      
-      Launch.on('data', (e) => {
-        console.log(e)
-      })
-}
-
 document.querySelector('.ram').addEventListener('change', () => {
     let ram = document.querySelector('.ram').value;
     document.querySelector('.ram-text').innerHTML = ram + 'Go';
@@ -80,7 +55,29 @@ btn_mojang.addEventListener('click', () => {
 })
 
 btn_play.addEventListener('click', () => {
-    disabled();
+    let opts = {
+        authorization: authenticator,
+        path: "./AppData/.minecraft",
+        version: sel.value,
+        detached: true,
+        java: true,
+        custom: false,
+        verify: false,
+        memory: {
+            min: `${ram}G`,
+            max: `${ram}G`
+        }
+    }
+    
+    Launch.launch(opts)
+    
+    Launch.on('progress', (DL, totDL) => {
+        console.log(`Telechargement ${((DL / totDL) * 100).toFixed(0)}%`)
+    });
+      
+    Launch.on('data', (e) => {
+        console.log(e)
+    })
 })
 
 
