@@ -46,11 +46,13 @@ document.querySelector('.ram').addEventListener('change', () => {
     document.querySelector('.ram-text').innerHTML = ram + 'Go';
 })
 
-btn_microsoft.addEventListener('click', () => {
+btn_microsoft.addEventListener('click', async () => {
+    console.log(await Microsoft.getAuth())
     disabled();
 })
 
 btn_mojang.addEventListener('click', () => {
+    mojang.getAuth('test')
     disabled();
 })
 

@@ -1,0 +1,15 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.input {
+    display: table-caption;
+    background: red;
+    width: 100%;
+}
+
+.input input {
+    margin: 5px;
+    width: 100%;
+}
