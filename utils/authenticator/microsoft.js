@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 class Microsoft {
   constructor(client_id = "00000000402b5328"){
-    this.client_id = "00000000402b5328";
+    this.client_id = client_id;
     
     if(!!process && !!process.versions && !!process.versions.electron) {
       this.type = 'electron';
@@ -36,24 +36,21 @@ class Microsoft {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=service::user.auth.xboxlive.com::MBI_SSL`
+      body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf`
     }).then(res => res.json());
-    
+
     let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      method: "post",
       body: JSON.stringify({
         Properties: {
           AuthMethod: "RPS",
           SiteName: "user.auth.xboxlive.com",
-          RpsTicket: oauth2.access_token
+          RpsTicket: "d=" + oauth2.access_token
         },
         RelyingParty: "http://auth.xboxlive.com",
         TokenType: "JWT"
-      })
+      }),
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
     }).then(res => res.json());
     
     let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
@@ -131,25 +128,21 @@ class Microsoft {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: `grant_type=refresh_token&client_id=${this.client_id}&scope=service::user.auth.xboxlive.com::MBI_SSL&refresh_token=${acc.refresh_token}`
+      body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
     }).then(res => res.json());
     
-    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
     let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      method: "post",
       body: JSON.stringify({
         Properties: {
           AuthMethod: "RPS",
           SiteName: "user.auth.xboxlive.com",
-          RpsTicket: oauth2.access_token
+          RpsTicket: "d=" + oauth2.access_token
         },
         RelyingParty: "http://auth.xboxlive.com",
         TokenType: "JWT"
-      })
+      }),
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
     }).then(res => res.json());
     
     let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
@@ -199,6 +192,8 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
+
+    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
 
     return {
       access_token: mcLogin.access_token,
