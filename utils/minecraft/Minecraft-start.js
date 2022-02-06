@@ -83,16 +83,16 @@ class Start {
             launchOptions.push('--demo')
         }
 
-        if (this.client.server) {
-            if (this.client.server.autoconnect){
-                launchOptions.push(
-                    '--server',
-                    this.client.server.ip || '127.0.0.1',
-                    '--port',
-                    this.client.server.port || 25565
-                )
-            } 
-        } 
+        // if (this.client.server) {
+        //     if (this.client.server.autoconnect){
+        //         launchOptions.push(
+        //             '--server',
+        //             this.client.server.ip || '127.0.0.1',
+        //             '--port',
+        //             this.client.server.port || 25565
+        //         )
+        //     } 
+        // } 
 
         let classPaths = [
             "-cp",
@@ -103,7 +103,6 @@ class Start {
         let jvm = [
             await this.getJVM(),
             '-XX:+UnlockExperimentalVMOptions',
-            '-XX:+UseG1GC',
             '-XX:G1NewSizePercent=20',
             '-XX:G1ReservePercent=20',
             '-XX:MaxGCPauseMillis=50',
