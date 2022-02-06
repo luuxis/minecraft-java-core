@@ -16,7 +16,7 @@ async function main() {
 
         java: true,
         args: [],
-        custom: false,
+        custom: true,
 
         server: {
             ip: "mc.hypixel.net",
