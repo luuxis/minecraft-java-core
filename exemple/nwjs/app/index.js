@@ -47,7 +47,7 @@ document.querySelector('.ram').addEventListener('change', () => {
 })
 
 btn_microsoft.addEventListener('click', async () => {
-    console.log(await Microsoft.getAuth())
+    console.log(JSON.stringify(await Microsoft.getAuth(), true, 4))
     disabled();
 })
 
