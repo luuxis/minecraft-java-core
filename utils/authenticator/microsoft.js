@@ -71,7 +71,6 @@ class Microsoft {
       })
     }).then(res => res.json());
     
-    
     let uhs = xbl.DisplayClaims.xui[0].uhs;
     let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
       method: "POST",
