@@ -1,5 +1,6 @@
 # minecraft-java-core
-NodeJS Module for Minecraft launcher</br></br>
+NodeJS Module for Minecraft launcher
+<br>
 [![Number](https://img.shields.io/npm/v/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
 <br>
 [![Install](https://img.shields.io/npm/dm/minecraft-java-core.svg?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
