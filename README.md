@@ -1,6 +1,7 @@
 # minecraft-java-core
 NodeJS Module for Minecraft launcher</br></br>
 <a href="https://www.npmjs.com/package/minecraft-java-core"><img src="https://img.shields.io/npm/v/minecraft-java-core" alt="Version Number"/>
+[![Install](https://img.shields.io/npm/dm/minecraft-java-core.svg)](https://npmjs.com/minecraft-java-core)
 <a href="https://www.npmjs.com/package/minecraft-java-core"><img src="https://img.shields.io/github/languages/code-size/luuxis/minecraft-java-core" alt="size"/>
 
 
