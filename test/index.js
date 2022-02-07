@@ -7,12 +7,12 @@ const fs = require('fs');
 async function main() {
     // let mc = await Microsoft.refresh(login);
     // fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
-    let mc = mojang.getAuth('luuxis')
+    let mc = mojang.getAuth('Luuxis')
     let opts = {
-        url: "http://launcher.selvania.fr/forge",
+        url: "http://launcher.selvania.fr/files",
         authorization: mc,
         path: "./.Minecraft",
-        version: "1.12.2",
+        version: "1.18.1",
         detached: false,
 
         java: true,
