@@ -6,7 +6,6 @@ NodeJS Module for Minecraft launcher</br></br>
 <br>
 [![size](https://img.shields.io/github/languages/code-size/luuxis/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
 
-
 ---
 
 ## Avantages :dizzy:
