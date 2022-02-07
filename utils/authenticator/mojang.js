@@ -1,14 +1,15 @@
 const request = require('request')
-const uuid = require('uuid').v1
+const { v3: uuidv3 }  = require('uuid')
 let api_url = 'https://authserver.mojang.com'
 
-module.exports.getAuth = function (username, password, client_token = null) {
+module.exports.getAuth = function (username, password) {
   return new Promise((resolve, reject) => {
     if (!password) {
+      let UUID = uuidv3(username, uuidv3.DNS)
       const user = {
-        access_token: uuid(),
-        client_token: client_token || uuid(),
-        uuid: uuid(),
+        access_token: 'null',
+        client_token: 'null',
+        uuid: UUID,
         name: username,
         user_properties: '{}',
         meta: {

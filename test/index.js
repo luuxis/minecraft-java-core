@@ -1,18 +1,19 @@
-const { launch, microsoft } = require('../index');
+const { launch, microsoft, mojang } = require('../index');
 const login = require('./login.json');
 const Microsoft = new microsoft();
 const launcher = new launch();
 const fs = require('fs');
 
 async function main() {
-    let mc = await Microsoft.refresh(login);
-    fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
+    // let mc = await Microsoft.refresh(login);
+    // fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
+    let mc = mojang.getAuth('luuxis')
     let opts = {
-        url: "http://launcher.selvania.fr/files",
+        url: "http://launcher.selvania.fr/forge",
         authorization: mc,
         path: "./.Minecraft",
-        version: "1.18.1",
-        detached: true,
+        version: "1.12.2",
+        detached: false,
 
         java: true,
         args: [],

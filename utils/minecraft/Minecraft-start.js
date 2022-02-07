@@ -56,7 +56,7 @@ class Start {
         }
 
         let fields = {
-            '${auth_access_token}':this.authorization.access_token,
+            '${auth_access_token}': this.authorization.access_token,
             '${auth_session}': this.authorization.access_token,
             '${auth_player_name}': this.authorization.name,
             '${auth_uuid}': this.authorization.uuid,
@@ -116,7 +116,6 @@ class Start {
         if (this.client.args){
             jvm.push(...this.client.args)
         }
-
 
         if(this.client.custom){
             if(this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
