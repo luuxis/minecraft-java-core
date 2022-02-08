@@ -5,9 +5,8 @@ const launcher = new launch();
 const fs = require('fs');
 
 async function main() {
-    // let mc = await Microsoft.refresh(login);
-    // fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
-    let mc = mojang.getAuth('Luuxis')
+    let mc = await Microsoft.refresh(login);
+    fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
     let opts = {
         url: "http://launcher.selvania.fr/files",
         authorization: mc,

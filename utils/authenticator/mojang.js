@@ -17,7 +17,6 @@ module.exports.getAuth = function (username, password) {
           type: 'mojang'
         }
       }
-
       return resolve(user)
     }
 
