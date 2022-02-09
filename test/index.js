@@ -1,12 +1,13 @@
 const { launch, microsoft, mojang } = require('../index');
 const login = require('./login.json');
-const Microsoft = new microsoft();
 const launcher = new launch();
 const fs = require('fs');
 
 async function main() {
-    let mc = await Microsoft.refresh(login);
+    let mc = await microsoft.refresh(login);
     fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
+    console.log(JSON.stringify(mc, true, 4));
+    
     let opts = {
         url: "http://launcher.selvania.fr/files",
         authorization: mc,
