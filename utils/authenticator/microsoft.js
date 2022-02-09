@@ -220,5 +220,5 @@ function getUUID() {
   return result;
 }
 
-module.exports = Microsoft;
+module.exports = new Microsoft;
 
