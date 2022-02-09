@@ -132,4 +132,4 @@ class Launch {
     }
 }
 
-module.exports = Launch;
+module.exports = new Launch;
