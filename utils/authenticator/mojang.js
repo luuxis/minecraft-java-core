@@ -2,6 +2,7 @@
 
 const { v3: uuidv3 }  = require('uuid')
 const fetch = require('node-fetch')
+let api_url = 'https://authserver.mojang.com'
 
 class Mojang {
   async getAuth(username, password){
@@ -32,7 +33,7 @@ class Mojang {
       requestUser: true
     }
 
-    let message = await fetch("https://authserver.mojang.com/authenticate", {
+    let message = await fetch(`${api_url}/authenticate`, {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'
@@ -62,7 +63,7 @@ class Mojang {
       clientToken: acc.client_token,
       requestUser: true
     }
-    let message = await fetch("https://authserver.mojang.com/refresh", {
+    let message = await fetch(`${api_url}/refresh`, {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'
@@ -90,14 +91,14 @@ class Mojang {
       accessToken: acc.access_token,
       clientToken: acc.client_token,
     }
-    let message = await fetch("https://authserver.mojang.com/validate", {
+    let message = await fetch(`${api_url}/validate`, {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'
       }, 
       body: JSON.stringify(post)
     });
-    
+
     if(message.status == 204) return true
     else return false
   }
@@ -108,7 +109,7 @@ class Mojang {
       clientToken: acc.client_token,
     }
 
-    let message = await fetch("https://authserver.mojang.com/invalidate", {
+    let message = await fetch(`${api_url}/invalidate`, {
       method: 'POST', 
       headers: {
         'Content-Type': 'application/json'
@@ -119,6 +120,10 @@ class Mojang {
     if(message == ""){
       return true;
     } else return false;
+  }
+
+  ChangeAuthApi(url) {
+    api_url = url
   }
 }
 
