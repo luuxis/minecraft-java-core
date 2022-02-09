@@ -1,12 +1,13 @@
-const request = require('request')
-const { v3: uuidv3 }  = require('uuid')
-let api_url = 'https://authserver.mojang.com'
+'use strict';
 
-module.exports.getAuth = function (username, password) {
-  return new Promise((resolve, reject) => {
+const { v3: uuidv3 }  = require('uuid')
+const fetch = require('node-fetch')
+
+class Mojang {
+  async getAuth(username, password){
+    let UUID = uuidv3(username, uuidv3.DNS)
     if (!password) {
-      let UUID = uuidv3(username, uuidv3.DNS)
-      const user = {
+      let user = {
         access_token: 'null',
         client_token: 'null',
         uuid: UUID,
@@ -17,151 +18,108 @@ module.exports.getAuth = function (username, password) {
           type: 'mojang'
         }
       }
-      return resolve(user)
+      return user
     }
 
-    const requestObject = {
-      url: api_url + '/authenticate',
-      json: {
-        agent: {
-          name: 'Minecraft',
-          version: 1
-        },
-        username: username,
-        password: password,
-        clientToken: uuid(),
-        requestUser: true
-      }
+    let post = {
+      agent: {
+        name: "Minecraft",
+        version: 1
+      },
+      username,
+      password,
+      clientToken: UUID,
+      requestUser: true
     }
 
-    request.post(requestObject, function (error, response, body) {
-      if (error) return reject(error)
-      if (!body || !body.selectedProfile) {
-        return reject(new Error('Validation error: ' + response.statusMessage))
-      }
+    let message = await fetch("https://authserver.mojang.com/authenticate", {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify(post)
+    }).then(res => res.json());
 
-      const userProfile = {
-        access_token: body.accessToken,
-        client_token: body.clientToken,
-        uuid: body.selectedProfile.id,
-        name: body.selectedProfile.name,
-        user_properties: parsePropts(body.user.properties),
-        meta: {
-          type: 'mojang'
-        }
-      }
-
-      resolve(userProfile)
-    })
-  })
-}
-
-module.exports.validate = function (access_token, client_token) {
-  return new Promise((resolve, reject) => {
-    const requestObject = {
-      url: api_url + '/validate',
-      json: {
-        accessToken: access_token,
-        clientToken: client_token
+    if(message.error) return message;
+    if(message.availableProfiles.length == 0) return {error: true, errorMessage: "noacc"};
+    let user = {
+      access_token: message.accessToken,
+      client_token: message.clientToken,
+      uuid: message.selectedProfile.id,
+      name: message.selectedProfile.name,
+      user_properties: '{}',
+      meta: {
+        offline: false,
+        type: 'mojang'
       }
     }
+    return user
+  }
 
-    request.post(requestObject, async function (error, response, body) {
-      if (error) return reject(error)
-
-      if (!body) resolve(true)
-      else reject(body)
-    })
-  })
-}
-
-module.exports.refreshAuth = function (accessToken, clientToken) {
-  return new Promise((resolve, reject) => {
-    const requestObject = {
-      url: api_url + '/refresh',
-      json: {
-        accessToken: accessToken,
-        clientToken: clientToken,
-        requestUser: true
+  async refresh(acc){
+    let post = {
+      accessToken: acc.access_token,
+      clientToken: acc.client_token,
+      requestUser: true
+    }
+    let message = await fetch("https://authserver.mojang.com/refresh", {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify(post)
+    }).then(res => res.json());
+    
+    if(message.error) return message;
+    let user = {
+      access_token: message.accessToken,
+      client_token: message.clientToken,
+      uuid: message.selectedProfile.id,
+      name: message.selectedProfile.name,
+      user_properties: '{}',
+      meta: {
+        offline: false,
+        type: 'mojang'
       }
     }
+    return user
+  }
 
-    request.post(requestObject, function (error, response, body) {
-      if (error) return reject(error)
-      if (!body || !body.selectedProfile) {
-        return reject(new Error('Validation error: ' + response.statusMessage))
-      }
+  async validate(acc){
+    let post = {
+      accessToken: acc.access_token,
+      clientToken: acc.client_token,
+    }
+    let message = await fetch("https://authserver.mojang.com/validate", {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify(post)
+    });
+    
+    if(message.status == 204) return true
+    else return false
+  }
 
-      const userProfile = {
-        access_token: body.accessToken,
-        client_token: uuid(),
-        uuid: body.selectedProfile.id,
-        name: body.selectedProfile.name,
-        user_properties: parsePropts(body.user.properties),
-        meta: {
-          type: 'mojang'
-        }
-      }
-
-      resolve(userProfile)
-    })
-  })
-}
-
-module.exports.invalidate = function (accessToken, clientToken) {
-  return new Promise((resolve, reject) => {
-    const requestObject = {
-      url: api_url + '/invalidate',
-      json: {
-        accessToken: accessToken,
-        clientToken: clientToken
-      }
+  async invalidate(acc){
+    let post = {
+      accessToken: acc.access_token,
+      clientToken: acc.client_token,
     }
 
-    request.post(requestObject, function (error, response, body) {
-      if (error) return reject(error)
+    let message = await fetch("https://authserver.mojang.com/invalidate", {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      }, 
+      body: JSON.stringify(post)
+    }).then(res => res.text());
 
-      if (!body) resolve(true)
-      else reject(body)
-    })
-  })
-}
-
-module.exports.signOut = function (username, password) {
-  return new Promise((resolve, reject) => {
-    const requestObject = {
-      url: api_url + '/signout',
-      json: {
-        username: username,
-        password: password
-      }
-    }
-
-    request.post(requestObject, function (error, response, body) {
-      if (error) return reject(error)
-
-      if (!body) resolve(true)
-      else reject(body)
-    })
-  })
-}
-
-module.exports.changeApiUrl = function (url) {
-  api_url = url
-}
-
-function parsePropts (array) {
-  if (array) {
-    const newObj = {}
-    for (const entry of array) {
-      if (newObj[entry.name]) {
-        newObj[entry.name].push(entry.value)
-      } else {
-        newObj[entry.name] = [entry.value]
-      }
-    }
-    return JSON.stringify(newObj)
-  } else {
-    return '{}'
+    if(message == ""){
+      return true;
+    } else return false;
   }
 }
+
+module.exports = new Mojang;
