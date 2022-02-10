@@ -1,11 +1,14 @@
 const { launch, microsoft, mojang } = require('../index');
-const login = require('./login.json');
 const fs = require('fs');
 
 async function main() {
-    // let mc = JSON.stringify(await microsoft.refresh(login), true, 4);
+    let login
+    if(fs.existsSync('./login.json')) {
+        login = JSON.parse(fs.readFileSync('./login.json'));
+    }
+    let mc = JSON.stringify(await microsoft.refresh(login), true, 4);
     // fs.writeFileSync('login.json', mc);
-    let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
+    // let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
     console.log(mc);
 
     let opts = {
