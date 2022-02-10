@@ -3,14 +3,14 @@ const login = require('./login.json');
 const fs = require('fs');
 
 async function main() {
-    // let mc = await microsoft.refresh(login);
+    // let mc = JSON.stringify(await microsoft.refresh(login), true, 4);
     // fs.writeFileSync('login.json', mc);
-    let mc = await mojang.getAuth('luuxis');
-    console.log(JSON.stringify(mc, true, 4));
+    let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
+    console.log(mc);
 
     let opts = {
-        url: "http://launcher.selvania.fr/files",
-        authorization: mc,
+        url: "http://launcher.selvania.fr/forge",
+        authorization: JSON.parse(mc),
         path: "./.Minecraft",
         version: "1.18.1",
         detached: false,
