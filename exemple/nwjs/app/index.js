@@ -1,8 +1,6 @@
 const fetch = require('node-fetch');
 const os = require('os');
 const { microsoft, mojang, launch } = require('minecraft-java-core')
-const Launch = new launch()
-const Microsoft = new microsoft()
 document.querySelector('.ram').max = `${os.totalmem() / 1024 / 1024 / 1024}`
 let sel = document.querySelector('.minecraft-version');
 let btn_play = document.querySelector('.play');
@@ -47,7 +45,7 @@ document.querySelector('.ram').addEventListener('change', () => {
 })
 
 btn_microsoft.addEventListener('click', async () => {
-    console.log(JSON.stringify(await Microsoft.getAuth(), true, 4))
+    console.log(JSON.stringify(await new microsoft().getAuth(), true, 4))
     disabled();
 })
 
@@ -71,13 +69,13 @@ btn_play.addEventListener('click', () => {
         }
     }
     
-    Launch.launch(opts)
+    launch.launch(opts)
     
-    Launch.on('progress', (DL, totDL) => {
+    launch.on('progress', (DL, totDL) => {
         console.log(`Telechargement ${((DL / totDL) * 100).toFixed(0)}%`)
     });
       
-    Launch.on('data', (e) => {
+    launch.on('data', (e) => {
         console.log(e)
     })
 })

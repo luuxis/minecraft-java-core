@@ -7,15 +7,14 @@ async function main() {
         login = JSON.parse(fs.readFileSync('./login.json'));
     }
     let mc = JSON.stringify(await new microsoft("").refresh(login), true, 4);
-    // fs.writeFileSync('login.json', mc);
+    fs.writeFileSync('login.json', mc);
     // let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
-    console.log(mc);
 
     let opts = {
-        url: "http://launcher.selvania.fr/forge",
+        url: "http://137.74.231.91/files",
         authorization: JSON.parse(mc),
         path: "./.Minecraft",
-        version: "1.18.1",
+        version: "1.16.5",
         detached: false,
 
         java: true,
