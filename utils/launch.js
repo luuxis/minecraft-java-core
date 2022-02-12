@@ -6,7 +6,7 @@ const start = require('./minecraft/Minecraft-start.js');
 const path = require('path');
 const fs = require('fs');
 
-class MCLCore {
+class Launch {
     async launch(options){
         this.options = options;
         if(this.options.javapath) {
@@ -132,4 +132,4 @@ class MCLCore {
     }
 }
 
-module.exports = MCLCore;
+module.exports = new Launch;

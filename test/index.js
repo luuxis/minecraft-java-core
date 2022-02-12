@@ -1,15 +1,19 @@
 const { launch, microsoft, mojang } = require('../index');
-const login = require('./login.json');
-const Microsoft = new microsoft();
-const launcher = new launch();
 const fs = require('fs');
 
 async function main() {
-    let mc = await Microsoft.refresh(login);
-    fs.writeFileSync('login.json', JSON.stringify(mc, true, 4));
+    let login
+    if(fs.existsSync('./login.json')) {
+        login = JSON.parse(fs.readFileSync('./login.json'));
+    }
+    let mc = JSON.stringify(await new microsoft("").refresh(login), true, 4);
+    // fs.writeFileSync('login.json', mc);
+    // let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
+    console.log(mc);
+
     let opts = {
-        url: "http://launcher.selvania.fr/files",
-        authorization: mc,
+        url: "http://launcher.selvania.fr/forge",
+        authorization: JSON.parse(mc),
         path: "./.Minecraft",
         version: "1.18.1",
         detached: false,
@@ -33,18 +37,18 @@ async function main() {
         }
     }
 
-    launcher.launch(opts)
+    launch.launch(opts)
 
-    launcher.on('progress', (DL, totDL) => {
+    launch.on('progress', (DL, totDL) => {
         console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
     });
 
 
-    // launcher.on('speed', (speed) => {
+    // launch.on('speed', (speed) => {
     //     console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
     // })
 
-    launcher.on('estimated', (time) => {
+    launch.on('estimated', (time) => {
         let hours = Math.floor(time / 3600);
         let minutes = Math.floor((time - hours * 3600) / 60);
         let seconds = Math.floor(time - hours * 3600 - minutes * 60);
@@ -52,11 +56,11 @@ async function main() {
     })
 
 
-    launcher.on('data', (e) => {
+    launch.on('data', (e) => {
         console.log(e)
     })
 
-    // launcher.on('close', () => {
+    // launch.on('close', () => {
     //     console.clear();
     //     console.log("game closed");
     // })

@@ -2,8 +2,9 @@ const fetch = require('node-fetch');
 
 class Microsoft {
   constructor(client_id = "00000000402b5328"){
-    if(!client_id === "") client_id = "00000000402b5328";
+    if(client_id === "" || !client_id) client_id = "00000000402b5328";
     this.client_id = client_id;
+    console.log(`Microsoft Authenticator initialized with client_id: ${client_id}`);
     
     if(!!process && !!process.versions && !!process.versions.electron) {
       this.type = 'electron';

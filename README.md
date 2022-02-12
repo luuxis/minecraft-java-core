@@ -37,46 +37,64 @@ Require library
 const { launch, mojang } = require('minecraft-java-core');
 ```
 
-Create and Init launcher var [launch](utils/launch.js)
-```javascript
-const launcher = new launch();
-```
-
 ## Launch :rocket:
 ### Options
 ```javascript
 const { launch, mojang } = require('minecraft-java-core');
-const launcher = new launch();
-
 
 let opts = {
-    url: "http://146.59.227.140/files/",
-    authorization: mojang.getAuth('pseudo', 'password'),
-    path: "./minecraft",
-    version: "1.12.2",
+    url: "http://launcher.selvania.fr/files",
+    authorization: mojang.getAuth('luuxis'),
+    path: "./.Minecraft",
+    version: "1.18.1",
     detached: false,
-
+    
     java: true,
     args: [],
-    custom: false,
+    custom: true,
     
     server: {
-        ip: "127.0.0.1",
+        ip: "mc.hypixel.net",
         port: 25565,
-        autoconnect: false
+        autoconnect: false,
     },
-
-    verify: true,
-    ignored: ["options.txt", "logs", "optionsof.txt"],
-
+    
+    verify: false,
+    ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
+    
     memory: {
-        min: `1G`,
-        max: `2G` 
+        min: `3G`,
+        max: `6G` 
     }
 }
-```
 
-### Launching
-```javascript
-launcher.launch(opts);
-```` 
+launch.launch(opts)
+
+launch.on('progress', (DL, totDL) => {
+    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+});
+
+launch.on('speed', (speed) => {
+    console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+})
+
+launch.on('estimated', (time) => {
+    let hours = Math.floor(time / 3600);
+    let minutes = Math.floor((time - hours * 3600) / 60);
+    let seconds = Math.floor(time - hours * 3600 - minutes * 60);
+    console.log(`${hours}h ${minutes}m ${seconds}s`);
+})
+
+launch.on('data', (e) => {
+    console.log(e)
+})
+
+launch.on('close', () => {
+    console.clear();
+    console.log("game closed");
+})
+```
+---
+<br>
+
+[<p align="center"><img src="https://discordapp.com/api/guilds/819729377650278420/embed.png?style=banner4" alt="discord">](https://discord.gg/e9q7Yr2cuQ) 
