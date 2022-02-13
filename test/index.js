@@ -6,16 +6,16 @@ async function main() {
     if(fs.existsSync('./login.json')) {
         login = JSON.parse(fs.readFileSync('./login.json'));
     }
-    let mc = JSON.stringify(await new microsoft("").refresh(login), true, 4);
+    let mc = JSON.stringify(await new microsoft().refresh(login), true, 4);
     fs.writeFileSync('login.json', mc);
     // let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
 
     let opts = {
-        url: "http://137.74.231.91/files",
+        url: "http://launcher.selvania.fr/forge",
         authorization: JSON.parse(mc),
         path: "./.Minecraft",
-        version: "1.16.5",
-        detached: false,
+        version: "1.18.1",
+        detached: true,
 
         java: true,
         args: [],
@@ -42,11 +42,6 @@ async function main() {
         console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
     });
 
-
-    // launch.on('speed', (speed) => {
-    //     console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
-    // })
-
     launch.on('estimated', (time) => {
         let hours = Math.floor(time / 3600);
         let minutes = Math.floor((time - hours * 3600) / 60);
@@ -58,11 +53,6 @@ async function main() {
     launch.on('data', (e) => {
         console.log(e)
     })
-
-    // launch.on('close', () => {
-    //     console.clear();
-    //     console.log("game closed");
-    // })
 }
 main();
 
