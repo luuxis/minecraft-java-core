@@ -27,7 +27,10 @@ class Microsoft {
       if(usercode === "cancel") return false;
       else return await this.url(usercode);
     } else if (type == "terminal"){
-      console.log("terminal is not implemented yet");
+      let usercode = await require("./GUI/terminal.js")(url)
+      return usercode
+      // if(usercode === "cancel") return false;
+      // else return await this.url(usercode);
     }
   }
   
