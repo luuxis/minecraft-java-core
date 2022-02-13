@@ -28,9 +28,8 @@ class Microsoft {
       else return await this.url(usercode);
     } else if (type == "terminal"){
       let usercode = await require("./GUI/terminal.js")(url)
-      return usercode
-      // if(usercode === "cancel") return false;
-      // else return await this.url(usercode);
+      if(usercode === "cancel") return false;
+      else return await this.url(usercode);
     }
   }
   
@@ -107,16 +106,13 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
-
-    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
     
     return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
       name: profile.name,
-      refresh_token: oauth2.refresh_token, 
-      refresh_date,
+      refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
         type: "msa",
@@ -196,15 +192,12 @@ class Microsoft {
       }
     }).then(res => res.json());
 
-    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
-
     return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
       name: profile.name,
-      refresh_token: oauth2.refresh_token, 
-      refresh_date,
+      refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
         type: "msa",
