@@ -6,7 +6,7 @@ async function main() {
     if(fs.existsSync('./login.json')) {
         login = JSON.parse(fs.readFileSync('./login.json'));
     }
-    let mc = JSON.stringify(await new microsoft().refresh(login), true, 4);
+    let mc = JSON.stringify(await new microsoft('5a75d2a6-a3c0-4506-9f12-0a557534938a').refresh(login), true, 4);
     fs.writeFileSync('login.json', mc);
     // let mc = JSON.stringify(await mojang.getAuth('luuxis'), true, 4);
 
