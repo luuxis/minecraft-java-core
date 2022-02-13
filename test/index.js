@@ -1,7 +1,7 @@
 const { launch, microsoft } = require('../index');
 
 async function main() {
-    let mc = await new microsoft().getAuth();
+    let mc = await new microsoft('5a75d2a6-a3c0-4506-9f12-0a557534938a').getAuth();
 
     let opts = {
         url: "http://launcher.selvania.fr/forge",
