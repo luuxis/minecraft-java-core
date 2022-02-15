@@ -15,7 +15,7 @@ class Microsoft {
   }
   
   async getAuth(type, url){
-    if(!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&scope=XboxLive.signin%20offline_access&prompt=select_account`;
+    if(!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=XboxLive.signin%20offline_access&prompt=select_account`;
     if(!type) type = this.type;
     
     if(type == "electron"){
@@ -27,7 +27,9 @@ class Microsoft {
       if(usercode === "cancel") return false;
       else return await this.url(usercode);
     } else if (type == "terminal"){
-      console.log("terminal is not implemented yet");
+      let usercode = await require("./GUI/terminal.js")(url)
+      if(usercode === "cancel") return false;
+      else return await this.url(usercode);
     }
   }
   
@@ -104,16 +106,13 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
-
-    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
     
     return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
       name: profile.name,
-      refresh_token: oauth2.refresh_token, 
-      refresh_date,
+      refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
         type: "msa",
@@ -193,15 +192,12 @@ class Microsoft {
       }
     }).then(res => res.json());
 
-    let refresh_date = new Date().getTime() + oauth2.expires_in * 1000;
-
     return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
       uuid: profile.id,
       name: profile.name,
-      refresh_token: oauth2.refresh_token, 
-      refresh_date,
+      refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
         type: "msa",

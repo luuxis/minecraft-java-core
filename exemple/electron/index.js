@@ -1,7 +1,5 @@
 const {app, BrowserWindow, ipcMain } = require('electron')
 const { microsoft, mojang, launch } = require('minecraft-java-core')
-const Launch = new launch()
-const Microsoft = new microsoft()
 let authenticator
 
 
@@ -33,7 +31,7 @@ app.on('window-all-closed', function () {
 
 ipcMain.on("microsoft", async (event, data) => {
     if(data === "login"){
-      let login = await Microsoft.getAuth()
+      let login = await new microsoft('5a75d2a6-a3c0-4506-9f12-0a557534938a').getAuth()
       if(login){
         event.sender.send("microsoft", "success")
         authenticator = login
@@ -70,13 +68,13 @@ ipcMain.on("play", async (event, data) => {
     }
   }
 
-  Launch.launch(opts)
+  launch.launch(opts)
   
-  Launch.on('progress', (DL, totDL) => {
+  launch.on('progress', (DL, totDL) => {
     console.log(`Telechargement ${((DL / totDL) * 100).toFixed(0)}%`)
   });
   
-  Launch.on('data', (e) => {
+  launch.on('data', (e) => {
     console.log(e)
   })
 })
