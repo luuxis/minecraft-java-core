@@ -1,7 +1,22 @@
 const { launch, microsoft } = require('../index');
+const fs = require('fs');
+
+let save = true
+let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
+let mc
 
 async function main() {
-    let mc = await new microsoft('5a75d2a6-a3c0-4506-9f12-0a557534938a').getAuth();
+    if (save) {
+        if (!fs.existsSync('./account.json')) {
+            mc = await new microsoft(client_id).getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify(mc));
+        } else {
+            mc = JSON.parse(fs.readFileSync('./account.json'));
+            console.log(mc.refresh_token);
+        }
+    } else {
+        mc = await new microsoft(client_id).getAuth();
+    }
 
     let opts = {
         url: "http://launcher.selvania.fr/forge",
