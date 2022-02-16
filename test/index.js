@@ -9,10 +9,15 @@ async function main() {
     if (save) {
         if (!fs.existsSync('./account.json')) {
             mc = await new microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc));
+            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
-            console.log(mc.refresh_token);
+        }
+        if(!mc.refresh_token){
+            mc = await new microsoft(client_id).getAuth();
+        } else {
+            mc = await new microsoft(client_id).refresh(mc);
+            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         }
     } else {
         mc = await new microsoft(client_id).getAuth();
