@@ -1,7 +1,7 @@
 const { launch, microsoft } = require('../index');
 const fs = require('fs');
 
-let save = true
+let save = false
 let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
 let mc
 
@@ -15,6 +15,7 @@ async function main() {
         }
         if(!mc.refresh_token){
             mc = await new microsoft(client_id).getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         } else {
             mc = await new microsoft(client_id).refresh(mc);
             fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
@@ -28,7 +29,7 @@ async function main() {
         authorization: mc,
         path: "./.Minecraft",
         version: "1.18.1",
-        detached: true,
+        detached: false,
 
         java: true,
         args: [],
