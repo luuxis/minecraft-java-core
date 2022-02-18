@@ -83,22 +83,7 @@ class Microsoft {
       },
       body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
     }).then(res => res.json());
-    
-    
-    //Check if the player have the game
-    let hasGame = await fetch("https://api.minecraftservices.com/entitlements/mcstore", {
-      method: "GET",
-      headers: {
-        'Authorization': `Bearer ${mcLogin.access_token}`
-      }
-    }).then(res => res.json());
-    
-    if(!hasGame.items.find(i => i.name == "product_minecraft" || i.name == "game_minecraft")){
-      this.demo = true;
-    } else {
-      this.demo = false;
-    }
-    
+        
     //Get the profile
     let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
       method: "GET",
@@ -106,6 +91,12 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
+
+    if(profile.error){
+      this.demo = true;
+    } else {
+      this.demo = false;
+    }
     
     return {
       access_token: mcLogin.access_token,
@@ -171,19 +162,6 @@ class Microsoft {
       },
       body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
     }).then(res => res.json());
-
-    let hasGame = await fetch("https://api.minecraftservices.com/entitlements/mcstore", {
-      method: "GET",
-      headers: {
-        'Authorization': `Bearer ${mcLogin.access_token}`
-      }
-    }).then(res => res.json());
-    
-    if(!hasGame.items.find(i => i.name == "product_minecraft" || i.name == "game_minecraft")){
-      this.demo = true;
-    } else {
-      this.demo = false;
-    }
     
     let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
       method: "GET",
@@ -191,6 +169,12 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
+
+    if(profile.error){
+      this.demo = true;
+    } else {
+      this.demo = false;
+    }
 
     return {
       access_token: mcLogin.access_token,
