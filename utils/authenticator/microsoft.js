@@ -91,12 +91,6 @@ class Microsoft {
         'Authorization': `Bearer ${mcLogin.access_token}`
       }
     }).then(res => res.json());
-
-    if(profile.error){
-      this.demo = true;
-    } else {
-      this.demo = false;
-    }
     
     return {
       access_token: mcLogin.access_token,
@@ -106,8 +100,8 @@ class Microsoft {
       refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
-        type: "msa",
-        demo: this.demo
+        type: "Xbox",
+        demo: profile.error ? true : false
       }
     }
   }
@@ -170,12 +164,6 @@ class Microsoft {
       }
     }).then(res => res.json());
 
-    if(profile.error){
-      this.demo = true;
-    } else {
-      this.demo = false;
-    }
-
     return {
       access_token: mcLogin.access_token,
       client_token: getUUID(),
@@ -184,8 +172,8 @@ class Microsoft {
       refresh_token: oauth2.refresh_token,
       user_properties: '{}',
       meta: {
-        type: "msa",
-        demo: this.demo
+        type: "Xbox",
+        demo: profile.error ? true : false
       }
     }
   }
