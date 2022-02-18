@@ -1,7 +1,7 @@
 const { launch, microsoft } = require('../index');
 const fs = require('fs');
 
-let save = false
+let save = true;
 let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
 let mc
 
