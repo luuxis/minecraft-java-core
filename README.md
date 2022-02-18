@@ -10,7 +10,7 @@ NodeJS Module for Minecraft launcher
 ---
 
 ## Avantages :dizzy:
-**Minecraft-Java-Core** is based of [minecraft-launcher-core](https://www.npmjs.com/package/minecraft-launcher-core) *dev by Pierce01* **and based of** [Paladium-dev](https://github.com/Paladium-Dev)
+**Minecraft-Java-Core** is based of [minecraft-launcher-core](https://www.npmjs.com/package/minecraft-launcher-core) *dev by Pierce01* **and based of** [pharuxtan](https://github.com/pharuxtan)
 - Auto check & downloading compatible java version
 - Support 100% custom minecraft version
 - Work with ftp without any zip file, juste drop folder in your ftp
