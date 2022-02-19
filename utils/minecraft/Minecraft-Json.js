@@ -14,7 +14,7 @@ let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
 let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
 let ignoredfiles = []
 
-class Handler {
+class Json {
     constructor (client){
         this.client = client
         this.java = java
@@ -264,4 +264,4 @@ class Handler {
         return (await this.java.GetJsonJava(this.client.version)).version 
     }
 }
-module.exports = Handler
+module.exports = Json

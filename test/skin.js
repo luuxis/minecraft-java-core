@@ -1,0 +1,1 @@
+const { skin } = require('../index');
