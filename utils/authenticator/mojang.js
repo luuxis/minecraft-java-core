@@ -40,9 +40,8 @@ class Mojang {
       }, 
       body: JSON.stringify(post)
     }).then(res => res.json());
-
-    if(message.error) return message;
-    if(message.availableProfiles.length == 0) return {error: true, errorMessage: "noacc"};
+    
+    if(message.error) throw (`error: ${message.errorMessage}`);
     let user = {
       access_token: message.accessToken,
       client_token: message.clientToken,
