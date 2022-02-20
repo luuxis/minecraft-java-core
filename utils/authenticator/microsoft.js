@@ -41,6 +41,7 @@ class Microsoft {
       },
       body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf`
     }).then(res => res.json());
+    if(oauth2.error) throw (`error: ${oauth2.error_description}`);
 
     let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
       method: "post",
@@ -55,6 +56,7 @@ class Microsoft {
       }),
       headers: { "Content-Type": "application/json", Accept: "application/json" },
     }).then(res => res.json());
+    if(xbl.error) throw (`error: ${xbl.error_description}`);
     
     let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
       method: "POST",
@@ -73,6 +75,7 @@ class Microsoft {
         TokenType: "JWT"
       })
     }).then(res => res.json());
+    if(xsts.error) throw (`error: ${xsts.error_description}`);
     
     let uhs = xbl.DisplayClaims.xui[0].uhs;
     let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
@@ -83,6 +86,7 @@ class Microsoft {
       },
       body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
     }).then(res => res.json());
+    if(mcLogin.error) throw (`error: ${mcLogin.error_description}`);
         
     //Get the profile
     let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
@@ -114,6 +118,7 @@ class Microsoft {
       },
       body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
     }).then(res => res.json());
+    if(oauth2.error) throw (`error: ${oauth2.error_description}`);
     
     let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
       method: "post",
@@ -128,6 +133,7 @@ class Microsoft {
       }),
       headers: { "Content-Type": "application/json", Accept: "application/json" },
     }).then(res => res.json());
+    if(xbl.error) throw (`error: ${xbl.error_description}`);
     
     let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
       method: "POST",
@@ -146,6 +152,7 @@ class Microsoft {
         TokenType: "JWT"
       })
     }).then(res => res.json());
+    if(xsts.error) throw (`error: ${xsts.error_description}`);
     
     let uhs = xbl.DisplayClaims.xui[0].uhs;
     let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
@@ -156,6 +163,7 @@ class Microsoft {
       },
       body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
     }).then(res => res.json());
+    if(mcLogin.error) throw (`error: ${mcLogin.error_description}`);
     
     let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
       method: "GET",
