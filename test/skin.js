@@ -3,7 +3,6 @@ const fs = require('fs');
 
 let save = true;
 let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
-let skin_url = 'https://cdn.discordapp.com/attachments/877154497233813524/945035875459432548/skin.png';
 let mc
 
 async function main() {
@@ -26,8 +25,15 @@ async function main() {
     }
 
 
-    let profile = await skin.skin({access_token: mc.access_token, slim: true, skin_url: skin_url});
-    console.log(profile);
+    let conf = {
+        access_token: mc.access_token, // Your access token
+        data_skin: "https://cdn.discordapp.com/attachments/877154497233813524/945035875459432548/skin.png", // Your skin url
+        slim: false, // true for slim skin, false for classic skin
+    }
+
+    // console.log(await skin.SkinChange(conf));
+    // console.log(await skin.SkinChangeURL(conf));
+    console.log(await skin.SkinDelete(conf));
 
 }
 main();
