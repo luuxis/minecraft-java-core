@@ -25,7 +25,8 @@ async function main() {
         mc = await new microsoft(client_id).getAuth();
     }
 
-    let profile = await skin.skin(mc.access_token, skin_url);
+
+    let profile = await skin.skin({access_token: mc.access_token, slim: true, skin_url: skin_url});
     console.log(profile);
 
 }

@@ -1,21 +1,21 @@
 const fetch = require('node-fetch');
 
 class skin {
-    async skin(access_token, skin_url){
-        let profile = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
+
+    async skin(data){
+        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${access_token}`,
-                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${data.access_token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                url: skin_url,
-                variant: 'Classic'
+                variant: data.slim ? 'slim' : 'Classic',
+                url: data.skin_url
             }),
         }).then(res => res.json());
-        if(profile.error) throw (`error: ${profile.errorType}`);
-        return profile;
+        if(skin.error) throw (`error: ${skin.errorType}`);
+        return skin;
     }
     
 }
