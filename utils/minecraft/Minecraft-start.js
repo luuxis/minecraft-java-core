@@ -10,7 +10,7 @@ class Start {
         this.natives = source.natives
         this.root = source.root
         this.json = source.json
-        this.authorization = source.authorization
+        this.authenticator = source.authenticator
     }
 
     async agrs() {
@@ -56,20 +56,20 @@ class Start {
         }
 
         let fields = {
-            '${auth_access_token}': this.authorization.access_token,
-            '${auth_session}': this.authorization.access_token,
-            '${auth_player_name}': this.authorization.name,
-            '${auth_uuid}': this.authorization.uuid,
-            '${auth_xuid}': this.authorization.meta.xuid || this.authorization.access_token,
-            '${user_properties}': this.authorization.user_properties,
-            '${user_type}': this.authorization.meta.type,
+            '${auth_access_token}': this.authenticator.access_token,
+            '${auth_session}': this.authenticator.access_token,
+            '${auth_player_name}': this.authenticator.name,
+            '${auth_uuid}': this.authenticator.uuid,
+            '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
+            '${user_properties}': this.authenticator.user_properties,
+            '${user_type}': this.authenticator.meta.type,
             '${version_name}': this.client.version,
             '${assets_index_name}': this.json.assetIndex.id,
             '${game_directory}': this.root,
             '${assets_root}': this.isold() ? `${this.root}/resources` : `${this.root}/assets`,
             '${game_assets}': this.isold() ? `${this.root}/resources` : `${this.root}/assets`,
             '${version_type}': this.json.type,
-            '${clientid}': this.authorization.meta.clientId || (this.authorization.client_token || this.authorization.access_token)
+            '${clientid}': this.authenticator.meta.clientId || (this.authenticator.client_token || this.authenticator.access_token)
         }
         
         for (let index = 0; index < launchOptions.length; index++) {
@@ -79,7 +79,7 @@ class Start {
             }
         }
         
-        if (this.authorization.meta.demo) {
+        if (this.authenticator.meta.demo) {
             launchOptions.push('--demo')
         }
 

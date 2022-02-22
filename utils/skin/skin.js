@@ -1,7 +1,6 @@
 const fetch = require('node-fetch');
 
 class skin {
-
     async SkinChange(data){
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
@@ -38,12 +37,11 @@ class skin {
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins/active", {
             method: "DELETE",
             headers: {
-                'Authorization': `Bearer ${data.access_token}`,
+                'Authorization': `Bearer ${data.access_token}`
             }
         }).then(res => res.json());
         if(skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
-    
 }
 module.exports = new skin;

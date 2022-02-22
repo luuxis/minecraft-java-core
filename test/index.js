@@ -13,6 +13,7 @@ async function main() {
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
         }
+        
         if(!mc.refresh_token){
             mc = await new microsoft(client_id).getAuth();
             fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
@@ -26,7 +27,7 @@ async function main() {
 
     let opts = {
         url: "http://launcher.selvania.fr/forge",
-        authorization: mc,
+        authenticator: mc,
         path: "./.Minecraft",
         version: "1.18.1",
         detached: false,
@@ -34,12 +35,6 @@ async function main() {
         java: true,
         args: [],
         custom: true,
-
-        server: {
-            ip: "mc.hypixel.net",
-            port: 25565,
-            autoconnect: false,
-        },
 
         verify: false,
         ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],

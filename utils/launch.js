@@ -69,7 +69,7 @@ class Launch {
         let source = {
             natives: this.natives,
             json: this.json,
-            authorization: this.options.authorization,
+            authenticator: this.options.authenticator,
             root: this.path,
         }
 

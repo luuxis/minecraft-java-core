@@ -34,6 +34,5 @@ async function main() {
     // console.log(await skin.SkinChange(conf));
     // console.log(await skin.SkinChangeURL(conf));
     console.log(await skin.SkinDelete(conf));
-
 }
 main();
