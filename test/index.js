@@ -36,6 +36,12 @@ async function main() {
         args: [],
         custom: true,
 
+        server: {
+            ip: "mc.hypixel.net",
+            port: 25565,
+            autoconnect: false,
+        },
+
         verify: false,
         ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
 
