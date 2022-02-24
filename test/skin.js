@@ -32,12 +32,15 @@ async function main() {
         access_token: mc.access_token, // Your access token
         data_skin: buffer, // Your skin url
         slim: false, // true for slim skin, false for classic skin
+        cape_id: '', // Your cape id
     }
 
     console.log(conf)
-    console.log(await skin.SkinChangeUpload(conf));
+    // console.log(await skin.SkinChangeUpload(conf));
     // console.log(await skin.SkinChangeURL(conf));
     // console.log(await skin.SkinDelete(conf));
+    // console.log(await skin.CapeChange(conf));
+    // console.log(await skin.CapeDelete(conf));
 }
 
 main();

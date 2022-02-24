@@ -42,5 +42,31 @@ class skin {
         if(skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
+
+    async CapeChange(data){
+        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
+            method: "PUT",
+            headers: {
+                'Authorization': `Bearer ${data.access_token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                capeId: data.cape_id
+            })
+        }).then(res => res.json());
+        if(skin.error) throw (`error: ${skin.errorType}`);
+        return skin;
+    }
+
+    async CapeDelete(data){
+        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${data.access_token}`
+            }
+        }).then(res => res.json());
+        if(skin.error) throw (`error: ${skin.errorType}`);
+        return skin;
+    }
 }
 module.exports = new skin;
