@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const fs = require('fs');
 const FormData = require("form-data");
 
 class skin {
@@ -67,6 +68,18 @@ class skin {
         }).then(res => res.json());
         if(skin.error) throw (`error: ${skin.errorType}`);
         return skin;
+    }
+
+    BufferToBase64(buffer) {
+        return fs.readFileSync(buffer, 'base64');
+    }
+
+    buffer(buffer) {
+        return fs.readFileSync(buffer);
+    }
+
+    base64ToBuffer(base64) {
+        return Buffer.from(base64, 'base64');
     }
 }
 module.exports = new skin;

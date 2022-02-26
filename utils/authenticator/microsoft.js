@@ -106,6 +106,10 @@ class Microsoft {
       meta: {
         type: "Xbox",
         demo: profile.error ? true : false
+      },
+      profile: {
+        skins: profile.skins,
+        cape: profile.capes
       }
     }
   }
@@ -182,6 +186,10 @@ class Microsoft {
       meta: {
         type: "Xbox",
         demo: profile.error ? true : false
+      },
+      profile: {
+        skins: profile.skins,
+        cape: profile.capes
       }
     }
   }
