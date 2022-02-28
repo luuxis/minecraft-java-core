@@ -29,12 +29,12 @@ async function main() {
         url: "http://launcher.selvania.fr/forge",
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.18.1",
+        version: "1.12.2",
         detached: false,
 
         java: true,
         args: [],
-        custom: true,
+        custom: "MCP",
 
         server: {
             ip: "mc.hypixel.net",

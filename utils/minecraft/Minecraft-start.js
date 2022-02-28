@@ -7,6 +7,7 @@ let os = { win32: 'windows', darwin: 'osx', linux: 'linux', sunos: 'linux', open
 class Start {
     constructor(client, source) {
         this.client = client
+        if(this.client.custom === "MCP") this.client.custom = false
         this.natives = source.natives
         this.root = source.root
         this.json = source.json

@@ -82,9 +82,15 @@ class Json {
         }
         
         let Version = await fetch(jsonversion.url).then(res => res.json());
-        if (this.client.custom) {
+        if (this.client.custom === true) {
             Version.custom = await fetch(this.client.url).then(res => res.json())
             Version.custom.json = (await fetch((Version.custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())).libraries;
+        } else if (this.client.custom === "MCP") {
+            let custom = await fetch(this.client.url).then(res => res.json())
+            Version = await fetch((custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())
+            Version.custom = custom
+            Version.custom.json = (await fetch((custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())).libraries;
+       
         }
         
         let libraries = await this.getAllLibrairies(Version);
