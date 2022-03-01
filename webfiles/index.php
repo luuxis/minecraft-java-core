@@ -19,7 +19,7 @@ function dirToArray($dir) {
                if (substr($path, -5) == ".json") {
                   $type = "VERIONSCUSTOM";
                } else {
-                  $type = "FILE";
+                  $type = "VERIONS";
                }
             } else {
                $type = "FILE";
