@@ -13,8 +13,8 @@ async function main() {
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
         }
-        
-        if(!mc.refresh_token){
+
+        if (!mc.refresh_token) {
             mc = await new microsoft(client_id).getAuth();
             fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         } else {
@@ -29,12 +29,12 @@ async function main() {
         url: "http://launcher.selvania.fr/forge",
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.12.2",
+        version: "1.18.1",
         detached: false,
 
         java: true,
         args: [],
-        custom: "MCP",
+        custom: true,
 
         server: {
             ip: "mc.hypixel.net",
@@ -47,7 +47,7 @@ async function main() {
 
         memory: {
             min: `3G`,
-            max: `6G` 
+            max: `6G`
         }
     }
 
@@ -70,4 +70,3 @@ async function main() {
     })
 }
 main();
-

@@ -10,35 +10,35 @@ const AdmZip = require('adm-zip');
 const { execSync } = require("child_process");
 const fs = require('fs');
 
-let MojangLib = {win32: "windows", darwin: "osx", linux: "linux"};
-let Arch = {x32: "32", x64: "64", arm: "32", arm64: "64"};
+let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
+let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 let ignoredfiles = []
 
 class Json {
-    constructor (client){
+    constructor(client) {
         this.client = client
         this.java = java
     }
 
     getTotalSize(bundle) {
         let size = 0;
-        for(let file of bundle){
+        for (let file of bundle) {
             size += file.size;
         }
         return size;
     }
 
-    async getAllLibrairies(jsonversion){
+    async getAllLibrairies(jsonversion) {
         let libraries = [];
-        for(let lib of jsonversion.libraries){
+        for (let lib of jsonversion.libraries) {
             let artifact;
             let type = "LIBRARY"
-            if(lib.natives){
+            if (lib.natives) {
                 let classifiers = lib.downloads.classifiers;
                 let native = lib.natives[MojangLib[process.platform]];
-                if(!native) native = lib.natives[process.platform];
+                if (!native) native = lib.natives[process.platform];
                 type = "NATIVE";
-                if(native) artifact = classifiers[native.replace("${arch}", Arch[os.arch()])];
+                if (native) artifact = classifiers[native.replace("${arch}", Arch[os.arch()])];
                 else continue;
             } else {
                 if (lib.rules && lib.rules[0].os) {
@@ -47,7 +47,7 @@ class Json {
                 }
                 artifact = lib.downloads.artifact;
             }
-            if(!artifact) continue;
+            if (!artifact) continue;
             libraries.push({
                 sha1: artifact.sha1,
                 size: artifact.size,
@@ -58,11 +58,11 @@ class Json {
         }
         return libraries;
     }
-    
-    async getAllAssets(jsonversion){
+
+    async getAllAssets(jsonversion) {
         let assetsjson = await fetch(jsonversion.assetIndex.url).then(res => res.json());
         let assets = [];
-        for(let asset of Object.values(assetsjson.objects)){
+        for (let asset of Object.values(assetsjson.objects)) {
             assets.push({
                 sha1: asset.hash,
                 size: asset.size,
@@ -71,16 +71,16 @@ class Json {
                 url: `https://resources.download.minecraft.net/${asset.hash.substring(0, 2)}/${asset.hash}`
             });
         }
-        return {json: assetsjson, assets};
+        return { json: assetsjson, assets };
     }
 
-    async getJSONVersion(version_id){
+    async getJSONVersion(version_id) {
         let jsonversion = (await fetch("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").then(res => res.json())).versions.find(ver => ver.id == version_id);
         if (!jsonversion) {
             console.log(`version ${version_id} not found`);
             return;
         }
-        
+
         let Version = await fetch(jsonversion.url).then(res => res.json());
         if (this.client.custom === true) {
             Version.custom = await fetch(this.client.url).then(res => res.json())
@@ -94,7 +94,7 @@ class Json {
                 url: MCP.url
             }
         }
-        
+
         let libraries = await this.getAllLibrairies(Version);
         let assets = await this.getAllAssets(Version);
         let assetsjson = {
@@ -103,8 +103,8 @@ class Json {
             content: JSON.stringify(assets.json)
         }
         assets = assets.assets;
-        
-        
+
+
         let clientjar = Version.downloads.client;
         assets.push({
             sha1: clientjar.sha1,
@@ -113,8 +113,8 @@ class Json {
             type: "JARVERSION",
             url: clientjar.url
         })
-        
-        if(Version.logging){
+
+        if (Version.logging) {
             let logging = Version.logging.client.file;
             assets.push({
                 sha1: logging.sha1,
@@ -125,7 +125,7 @@ class Json {
             })
         }
 
-        if(this.client.java){
+        if (this.client.java) {
             let java = (await this.java.GetJsonJava(this.client.version)).files
             java.forEach(Java => {
                 assets.push({
@@ -137,27 +137,28 @@ class Json {
                 })
             });
         }
-        
-        if(Version.custom === true){
-            for(let custom of Version.custom.json){
-                if(!custom.url) continue;
-                if(!custom.name) return;
-                let lib = custom.name.split(':')
-                let path = `${lib[0].replace(/\./g, '/')}/${lib[1]}/${lib[2]}`
-                let name = `${lib[1]}-${lib[2]}.jar`
-                assets.push({
-                    path: `libraries/${path}/${name}`,
-                    url: `${custom.url}${path}/${name}`,
-                    size: 0
-                })
-            }
-        }
 
-        if(Version.custom){
+        if (Version.custom) {
+            if (this.client.custom === true) {
+                for (let custom of Version.custom.json) {
+                    if (!custom.url) continue;
+                    if (!custom.name) continue;
+                    let lib = custom.name.split(':')
+                    let path = `${lib[0].replace(/\./g, '/')}/${lib[1]}/${lib[2]}`
+                    let name = `${lib[1]}-${lib[2]}.jar`
+                    assets.push({
+                        path: `libraries/${path}/${name}`,
+                        url: `${custom.url}${path}/${name}`,
+                        size: 0
+                    })
+                }
+            }
+
             let custom = Version.custom;
             custom.forEach(url => {
-                if(Version.custom === "MCP"){
-                    if(url.type === "VERIONSCUSTOM") return
+                if (this.client.custom === "MCP") {
+                    if (url.type === "VERIONSCUSTOM") return
+                    if (url.type === "VERIONS") return
                 }
                 assets.push({
                     sha1: url.sha1,
@@ -178,38 +179,38 @@ class Json {
         });
         return [assetsjson].concat(libraries).concat(assets);
     }
-    
-    async checkBundle(version){
+
+    async checkBundle(version) {
         let bundle = await this.getJSONVersion(version)
         let todownload = [];
-        
-        for (let file of bundle){
-            if(file.path == undefined) continue;
+
+        for (let file of bundle) {
+            if (file.path == undefined) continue;
             file.path = (`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/");
             file.folder = file.path.split("/").slice(0, -1).join("/");
-            
-            if(file.type == "CFILE"){
-                if(!fs.existsSync(file.folder)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
+
+            if (file.type == "CFILE") {
+                if (!fs.existsSync(file.folder)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
                 fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
                 continue;
             }
-            if(fs.existsSync(file.path)){
-                if(file.sha1){
-                    if(!(this.checkSHA1(file.path, file.sha1))) todownload.push(file);
+            if (fs.existsSync(file.path)) {
+                if (file.sha1) {
+                    if (!(this.checkSHA1(file.path, file.sha1))) todownload.push(file);
                 }
             } else todownload.push(file);
         }
         return todownload;
     }
 
-    checkSHA1(file, hash){
+    checkSHA1(file, hash) {
         const hex = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
-        if(hex == hash) return true;
+        if (hex == hash) return true;
         return false;
     }
-    
-    async natives(bundle){
-        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${(`${path.resolve(this.client.path)}/`).replace(/\\/g, "/")}${mod.path}`);
+
+    async natives(bundle) {
+            let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${(`${path.resolve(this.client.path)}/`).replace(/\\/g, "/")}${mod.path}`);
         let nativeFolder = (`${path.resolve(this.client.path)}/versions/${this.client.version}/natives`).replace(/\\/g, "/");
         if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
         
