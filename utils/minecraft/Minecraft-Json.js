@@ -86,11 +86,13 @@ class Json {
             Version.custom = await fetch(this.client.url).then(res => res.json())
             Version.custom.json = (await fetch((Version.custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())).libraries;
         } else if (this.client.custom === "MCP") {
-            let custom = await fetch(this.client.url).then(res => res.json())
-            Version = await fetch((custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())
-            Version.custom = custom
-            Version.custom.json = (await fetch((custom.filter(mod => mod.type == "VERIONSCUSTOM")[0]).url).then(res => res.json())).libraries;
-       
+            Version.custom = await fetch(this.client.url).then(res => res.json())
+            let MCP = Version.custom.filter(mod => mod.type == "VERIONS")[0]
+            Version.downloads.client = {
+                sha1: MCP.sha1,
+                size: MCP.size,
+                url: MCP.url
+            }
         }
         
         let libraries = await this.getAllLibrairies(Version);
@@ -136,7 +138,7 @@ class Json {
             });
         }
         
-        if(Version.custom){
+        if(Version.custom === true){
             for(let custom of Version.custom.json){
                 if(!custom.url) continue;
                 if(!custom.name) return;
@@ -149,8 +151,14 @@ class Json {
                     size: 0
                 })
             }
+        }
+
+        if(Version.custom){
             let custom = Version.custom;
             custom.forEach(url => {
+                if(Version.custom === "MCP"){
+                    if(url.type === "VERIONSCUSTOM") return
+                }
                 assets.push({
                     sha1: url.sha1,
                     size: url.size,
