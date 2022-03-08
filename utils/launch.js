@@ -56,12 +56,12 @@ class Launch {
         this.natives = `${this.path}/versions/${this.options.version}/natives`
 
         this.vanilla = require(this.files.filter(mod => mod.type == "VERSION").map(mod => `${this.path}/${mod.path}`)[0])
-        if(this.options.custom) this.custom = require(this.files.filter(mod => mod.type == "VERIONSCUSTOM").map(mod => `${this.path}/${mod.path}`)[0])
+        if(this.options.custom === true) this.custom = require(this.files.filter(mod => mod.type == "VERIONSCUSTOM").map(mod => `${this.path}/${mod.path}`)[0])
 
         this.json = this.vanilla
         this.json.id = this.files.filter(mod => mod.type == "JARVERSION").map(mod => `${this.path}/${mod.path}`)[0]
         this.json.mainClass = this.vanilla.mainClass
-        if(this.options.custom){
+        if(this.options.custom === true){
             this.json.custom = this.custom
             this.json.mainClass = this.custom.mainClass
         }
