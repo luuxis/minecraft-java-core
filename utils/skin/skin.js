@@ -3,21 +3,21 @@ const fs = require('fs');
 const FormData = require("form-data");
 
 class skin {
-    async SkinChangeUpload(data){
+    async SkinChangeUpload(data) {
         const body = new FormData();
         body.append("variant", data.slim ? 'slim' : 'Classic');
-        body.append("file", data.data_skin, {contentType: "image/png", filename: "skin.png"});
-    
+        body.append("file", data.data_skin, { contentType: "image/png", filename: "skin.png" });
+
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
-            headers: {'Authorization': `Bearer ${data.access_token}`},
+            headers: { 'Authorization': `Bearer ${data.access_token}` },
             body: body,
         }).then(res => res.json());
-        if(skin.error) throw (`error: ${skin.errorType}`);
+        if (skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
 
-    async SkinChangeURL(data){
+    async SkinChangeURL(data) {
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
             headers: {
@@ -29,22 +29,22 @@ class skin {
                 url: data.data_skin
             }),
         }).then(res => res.json());
-        if(skin.error) throw (`error: ${skin.errorType}`);
+        if (skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
 
-    async SkinDelete(data){
+    async SkinDelete(data) {
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins/active", {
             method: "DELETE",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`
             }
         }).then(res => res.json());
-        if(skin.error) throw (`error: ${skin.errorType}`);
+        if (skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
 
-    async CapeChange(data){
+    async CapeChange(data) {
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
             method: "PUT",
             headers: {
@@ -55,18 +55,18 @@ class skin {
                 capeId: data.cape_id
             })
         }).then(res => res.json());
-        if(skin.error) throw (`error: ${skin.errorType}`);
+        if (skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
 
-    async CapeDelete(data){
+    async CapeDelete(data) {
         let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
             method: "DELETE",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`
             }
         }).then(res => res.json());
-        if(skin.error) throw (`error: ${skin.errorType}`);
+        if (skin.error) throw (`error: ${skin.errorType}`);
         return skin;
     }
 

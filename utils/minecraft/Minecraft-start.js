@@ -7,7 +7,7 @@ let os = { win32: 'windows', darwin: 'osx', linux: 'linux', sunos: 'linux', open
 class Start {
     constructor(client, source) {
         this.client = client
-        if(this.client.custom === "MCP") this.client.custom = false
+        if (this.client.custom === "MCP") this.client.custom = false
         this.natives = source.natives
         this.root = source.root
         this.json = source.json
@@ -18,19 +18,19 @@ class Start {
         let all = []
         this.libraries = [];
         let libsminecraft = this.json.libraries.map(lib => lib);
-        if(this.client.custom){
-            if (this.json.custom.libraries.downloads){
+        if (this.client.custom) {
+            if (this.json.custom.libraries.downloads) {
                 this.json.custom.libraries.map(lib => this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`));
             } else {
                 this.json.custom.libraries.map(libs => this.libraries.push(`${this.root}/libraries/${libs.name.split(':')[0].replace(/\./g, '/')}/${libs.name.split(':')[1]}/${libs.name.split(':')[2]}/${libs.name.split(':')[1]}-${libs.name.split(':')[2]}.jar`));
             }
         }
-        
+
         for (let lib of libsminecraft) {
-            if(!lib.downloads.artifact) continue;
+            if (!lib.downloads.artifact) continue;
             if (lib.rules && lib.rules[0].os) {
                 if (lib.rules[0].os.name !== os)
-                continue;
+                    continue;
             }
             this.libraries.push(`${this.root}/libraries/${lib.downloads.artifact.path}`);
         }
@@ -39,20 +39,20 @@ class Start {
 
 
         let launchOptions = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game
-        if(this.client.custom) {
+        if (this.client.custom) {
             this.argscustom = this.json.custom.minecraftArguments ? this.json.custom.minecraftArguments.split(' ') : this.json.custom.arguments
-            if(!this.argscustom.game){
+            if (!this.argscustom.game) {
                 launchOptions.push(...this.argscustom)
                 launchOptions = [...new Set(launchOptions)]
             }
         }
-        
+
         if (this.argscustom && this.argscustom.jvm) {
             this.argscustom.jvm = this.argscustom.jvm.map(jvm => {
                 return jvm
-                .replace(/\${version_name}/g, this.client.version)
-                .replace(/\${library_directory}/g, `${this.root}/libraries`)
-                .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+                    .replace(/\${version_name}/g, this.client.version)
+                    .replace(/\${library_directory}/g, `${this.root}/libraries`)
+                    .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
             })
         }
 
@@ -72,14 +72,14 @@ class Start {
             '${version_type}': this.json.type,
             '${clientid}': this.authenticator.meta.clientId || (this.authenticator.client_token || this.authenticator.access_token)
         }
-        
+
         for (let index = 0; index < launchOptions.length; index++) {
             if (typeof launchOptions[index] === 'object') launchOptions.splice(index, 2)
             if (Object.keys(fields).includes(launchOptions[index])) {
                 launchOptions[index] = fields[launchOptions[index]]
             }
         }
-        
+
         if (this.authenticator.meta.demo) {
             launchOptions.push('--demo')
         }
@@ -114,15 +114,15 @@ class Start {
             `-Xmx${this.client.memory.max}`
         ]
 
-        if (this.client.args){
+        if (this.client.args) {
             jvm.push(...this.client.args)
         }
 
-        if(this.client.custom){
-            if(this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
-            if(this.argscustom && this.argscustom.game) classPaths.push(...this.argscustom.game)
+        if (this.client.custom) {
+            if (this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
+            if (this.argscustom && this.argscustom.game) classPaths.push(...this.argscustom.game)
         }
-        
+
         all.push({
             launchOptions: launchOptions,
             classPaths: classPaths,
