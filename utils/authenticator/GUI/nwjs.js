@@ -7,7 +7,7 @@ const defaultProperties = {
     height: 650,
     resizable: false,
     position: "center",
-    frame: (process.platform == "win32") ? true : false,
+    frame: true,
     icon: path.join(__dirname, '../../../assets/icons/microsoft.png')
 }
 
