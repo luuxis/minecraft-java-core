@@ -7,7 +7,6 @@ const os = require('os');
 const java = require('../java/Java-json.js');
 
 const AdmZip = require('adm-zip');
-const { execSync } = require("child_process");
 const fs = require('fs');
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
@@ -194,6 +193,7 @@ class Json {
                 fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
                 continue;
             }
+            console.log(`Verifying ${file.path.split("/").slice(-1)[0]}`);
             if (fs.existsSync(file.path)) {
                 if (file.sha1) {
                     if (!(this.checkSHA1(file.path, file.sha1))) todownload.push(file);
