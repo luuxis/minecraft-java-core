@@ -26,10 +26,10 @@ async function main() {
     }
 
     let opts = {
-        url: "http://launcher.selvania.fr/forge",
+        url: "http://launcher.selvania.fr/luuxis",
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.18.1",
+        version: "1.18.2",
         detached: false,
 
         java: true,
@@ -42,7 +42,7 @@ async function main() {
             autoconnect: false,
         },
 
-        verify: false,
+        verify: true,
         ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
 
         memory: {
