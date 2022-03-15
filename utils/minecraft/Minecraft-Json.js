@@ -193,8 +193,13 @@ class Json {
                 fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
                 continue;
             }
+
             console.log(`Verifying ${file.path.split("/").slice(-1)[0]}`);
+
             if (fs.existsSync(file.path)) {
+                if (this.client.verify)
+                    if (this.client.ignored.find(ignored => ignored == file.path.split("/").slice(-1)[0])) continue
+
                 if (file.sha1) {
                     if (!(this.checkSHA1(file.path, file.sha1))) todownload.push(file);
                 }
@@ -237,6 +242,7 @@ class Json {
                 }
             }
         }
+
         ignoredfiles.forEach(file => this.client.ignored.push((`${path.resolve(this.client.path)}/${file}`).replace(/\\/g, "/")));
         bundle.forEach(file => ignoredfiles.push((`${path.resolve(this.client.path)}/${file.path}`).replace(/\\/g, "/")));
         
