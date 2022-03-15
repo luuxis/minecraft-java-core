@@ -278,5 +278,13 @@ class Json {
     async java_version(){
         return (await this.java.GetJsonJava(this.client.version)).version 
     }
+
+    on(event, func) {
+        this[event] = func;
+    }
+
+    emit(event, ...args) {
+        if (this[event]) this[event](...args);
+    }
 }
 module.exports = Json
