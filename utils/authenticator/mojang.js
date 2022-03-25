@@ -16,7 +16,7 @@ class Mojang {
                 user_properties: '{}',
                 meta: {
                     offline: true,
-                    type: 'mojang'
+                    type: 'Mojang'
                 }
             }
             return user
@@ -50,7 +50,7 @@ class Mojang {
             user_properties: '{}',
             meta: {
                 offline: false,
-                type: 'mojang'
+                type: 'Mojang'
             }
         }
         return user
@@ -79,7 +79,7 @@ class Mojang {
             user_properties: '{}',
             meta: {
                 offline: false,
-                type: 'mojang'
+                type: 'Mojang'
             }
         }
         return user
