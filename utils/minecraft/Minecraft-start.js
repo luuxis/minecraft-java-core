@@ -84,16 +84,22 @@ class Start {
             launchOptions.push('--demo')
         }
 
-        // if (this.client.server) {
-        //     if (this.client.server.autoconnect){
-        //         launchOptions.push(
-        //             '--server',
-        //             this.client.server.ip || '127.0.0.1',
-        //             '--port',
-        //             this.client.server.port || 25565
-        //         )
-        //     } 
-        // } 
+        if (this.client.server) {
+            if (this.client.server.autoconnect) {
+                launchOptions.push(
+                    '--server',
+                    this.client.server.ip || '127.0.0.1',
+                    '--port',
+                    this.client.server.port || 25565
+                )
+            }
+        }
+
+        if (this.client.screen) {
+            if (this.client.screen.fullscreen) launchOptions.push('--fullscreen')
+            launchOptions.push('--width', this.client.screen.width, '--height', this.client.screen.height)
+        }
+
 
         let classPaths = [
             "-cp",
