@@ -1,7 +1,7 @@
 'use strict';
 const download = require('./download.js');
 const Handler = require('./minecraft/Minecraft-Json.js');
-const start = require('./minecraft/Minecraft-start.js');
+const start = require('./minecraft/Minecraft-start.js'); 
 
 const path = require('path');
 const fs = require('fs');
