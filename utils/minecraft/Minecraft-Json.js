@@ -215,7 +215,7 @@ class Json {
     }
 
     async natives(bundle) {
-            let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${(`${path.resolve(this.client.path)}/`).replace(/\\/g, "/")}${mod.path}`);
+        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${(`${path.resolve(this.client.path)}/`).replace(/\\/g, "/")}${mod.path}`);
         let nativeFolder = (`${path.resolve(this.client.path)}/versions/${this.client.version}/natives`).replace(/\\/g, "/");
         if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
         
@@ -224,7 +224,11 @@ class Json {
             let entries = zip.getEntries();
             for(let entry of entries){
                 if(entry.entryName.startsWith("META-INF")) continue;
-                fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o755 });
+                if(entry.isDirectory){
+                    fs.mkdirSync(`${nativeFolder}/${entry.entryName}`, { recursive: true, mode: 0o777 });
+                    continue
+                } 
+                fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o777 });
             }
         }
     }

@@ -80,27 +80,6 @@ class Start {
             }
         }
 
-        if (this.authenticator.meta.demo) {
-            launchOptions.push('--demo')
-        }
-
-        if (this.client.server) {
-            if (this.client.server.autoconnect) {
-                launchOptions.push(
-                    '--server',
-                    this.client.server.ip || '127.0.0.1',
-                    '--port',
-                    this.client.server.port || 25565
-                )
-            }
-        }
-
-        if (this.client.screen) {
-            if (this.client.screen.fullscreen) launchOptions.push('--fullscreen')
-            launchOptions.push('--width', this.client.screen.width, '--height', this.client.screen.height)
-        }
-
-
         let classPaths = [
             "-cp",
             this.libraries.join(process.platform === 'win32' ? ';' : ':'),
@@ -119,10 +98,6 @@ class Start {
             `-Xms${this.client.memory.min}`,
             `-Xmx${this.client.memory.max}`
         ]
-
-        if (this.client.args) {
-            jvm.push(...this.client.args)
-        }
 
         if (this.client.custom) {
             if (this.argscustom && this.argscustom.jvm) jvm.push(...this.argscustom.jvm)
