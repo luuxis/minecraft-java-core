@@ -21,7 +21,8 @@ module.exports.GetJsonJava = async function(minecraftVersion) {
         let arch = { x64: "windows-x64", ia32: "windows-x86" }
         javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else if (os.platform() == "darwin") {
-        javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`mac-os`][jsonversion][0].manifest.url).then(res => res.json())).files)
+        let arch = { x86_64: "mac-os", aarch64: "mac-os-arm64" }
+        javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
     } else if (os.platform() == "linux") {
         let arch = { x64: "linux", ia32: "linux-i386" }
         javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
