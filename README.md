@@ -44,31 +44,23 @@ const { launch, mojang } = require('minecraft-java-core');
 ```javascript
 const { launch, mojang } = require('minecraft-java-core');
 
-let opts = {
-    url: "http://launcher.selvania.fr/files",
-    authorization: mojang.getAuth('luuxis'),
-    path: "./.Minecraft",
-    version: "1.18.1",
-    detached: false,
-    
-    java: true,
-    args: [],
-    custom: true,
-    
-    server: {
-        ip: "mc.hypixel.net",
-        port: 25565,
-        autoconnect: false,
-    },
-    
-    verify: false,
-    ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
-    
-    memory: {
-        min: `3G`,
-        max: `6G` 
+    let opts = {
+        url: "http://launcher.selvania.fr/files",
+        authenticator: mojang.getAuth('luuxis'),
+        path: "./.Minecraft",
+        version: "1.18.2",
+        detached: false,
+        java: true,
+        args: [],
+        custom: true,
+        verify: false,
+        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
+
+        memory: {
+            min: `1G`,
+            max: `2G`
+        }
     }
-}
 
 launch.launch(opts)
 

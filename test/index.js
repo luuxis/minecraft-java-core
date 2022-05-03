@@ -26,28 +26,20 @@ async function main() {
     }
 
     let opts = {
-        url: "http://launcher.selvania.fr/luuxis",
+        url: "http://launcher.selvania.fr/files",
         authenticator: mc,
         path: "./.Minecraft",
         version: "1.18.2",
         detached: false,
-
         java: true,
         args: [],
-        custom: false,
-
-        server: {
-            ip: "mc.hypixel.net",
-            port: 25565,
-            autoconnect: false,
-        },
-
-        verify: true,
-        ignored: ["options.txt", ".fabric", "config", "logs", "ressourcepacks", "shaderpacks", "crash-reports"],
+        custom: true,
+        verify: false,
+        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
 
         memory: {
-            min: `3G`,
-            max: `6G`
+            min: `1G`,
+            max: `2G`
         }
     }
 

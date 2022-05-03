@@ -30,18 +30,21 @@ module.exports.GetJsonJava = async function(minecraftVersion) {
         return console.log("OS not supported");
     }
 
+    let java = javaVersionsJson.find(file => file[0].endsWith(process.platform == "win32" || process.platform == "linux" ? "bin/javaw.exe" : "bin/java"))[0];
+    let toDelete = java.replace(process.platform == "win32" || process.platform == "linux" ? "bin/javaw.exe" : "bin/java", "");
+
     for (let [path, info] of javaVersionsJson) {
         if (info.type == "directory") continue;
-        if (info.downloads === undefined) continue;
+        if (!info.downloads) continue;
         let file = {};
-        if (info.downloads) {
-            file.path = `runtime/${jsonversion}/${path}`;
-            file.sha1 = info.downloads.raw.sha1;
-            file.size = info.downloads.raw.size;
-            file.type = "JAVA"
-            file.url = info.downloads.raw.url;
-            files.push(file);
-        }
+        file.path = `runtime/${jsonversion}/${path.replace(toDelete, "")}`;
+        file.folder = file.path.split("/").slice(0, -1).join("/");
+        file.executable = info.executable;
+        file.sha1 = info.downloads.raw.sha1;
+        file.size = info.downloads.raw.size;
+        file.url = info.downloads.raw.url;
+        file.type = "JAVA";
+        files.push(file);
     }
     return { files: files, version: jsonversion };
 }
