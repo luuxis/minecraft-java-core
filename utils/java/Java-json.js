@@ -30,8 +30,8 @@ module.exports.GetJsonJava = async function(minecraftVersion) {
         return console.log("OS not supported");
     }
 
-    let java = javaVersionsJson.find(file => file[0].endsWith(process.platform == "win32" || process.platform == "linux" ? "bin/javaw.exe" : "bin/java"))[0];
-    let toDelete = java.replace(process.platform == "win32" || process.platform == "linux" ? "bin/javaw.exe" : "bin/java", "");
+    let java = javaVersionsJson.find(file => file[0].endsWith(process.platform == "win32" ? "bin/javaw.exe" : "bin/java"))[0];
+    let toDelete = java.replace(process.platform == "win32" ? "bin/javaw.exe" : "bin/java", "");
 
     for (let [path, info] of javaVersionsJson) {
         if (info.type == "directory") continue;
