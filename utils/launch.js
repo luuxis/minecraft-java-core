@@ -4,9 +4,7 @@ const Handler = require('./minecraft/Minecraft-Json.js');
 const start = require('./minecraft/Minecraft-start.js');
 
 const path = require('path');
-const { execSync } = require("child_process");
 const fs = require('fs');
-const os = require('os');
 
 class Launch {
     async launch(options) {
@@ -46,17 +44,6 @@ class Launch {
                 downloader.on("finish", ret);
                 downloader.multiple(todownload, totsize, 10);
             });
-
-            if (os.platform() == "darwin") {
-                for (let file of this.files) {
-                    if (this.files.type == 'JAVA') {
-                        if (file.executable) {
-                            let id = String.fromCharCode.apply(null, execSync(`xattr -p com.apple.quarantine "${file.path}"`));
-                            execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${file.path}"`);
-                        }
-                    }
-                }
-            }
         }
 
         if (this.options.verify) this.jsonversion.removeNonIgnoredFiles(this.files);

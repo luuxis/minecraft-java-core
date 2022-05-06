@@ -99,7 +99,7 @@ module.exports = class Downloader {
             queued++;
 
             if (!fs.existsSync(file.folder)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
-            let flag = fs.openSync(file.path, "w", 0o755);
+            let flag = fs.openSync(file.path, "w", 0o777);
             let position = 0;
 
             let res = await fetch(file.url);

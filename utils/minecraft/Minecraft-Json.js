@@ -7,7 +7,6 @@ const os = require('os');
 const java = require('../java/Java-json.js');
 
 const AdmZip = require('adm-zip');
-const { execSync } = require("child_process");
 const fs = require('fs');
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
@@ -231,11 +230,6 @@ class Json {
                 }
 
                 fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o777 });
-                if(process.platform == "darwin" && (`${nativeFolder}/${entry.entryName}`.endsWith(".dylib") || `${nativeFolder}/${entry.entryName}`.endsWith(".jnilib"))){
-                    console.log(`Whitelisting from Apple Quarantine ${`${nativeFolder}/${entry.entryName}`}`);
-                    let id = String.fromCharCode.apply(null, execSync(`xattr -p com.apple.quarantine "${`${nativeFolder}/${entry.entryName}`}"`));
-                    execSync(`xattr -w com.apple.quarantine "${id.replace("0081;", "00c1;")}" "${`${nativeFolder}/${entry.entryName}`}"`);
-                }
             }
         }
     }
