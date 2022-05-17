@@ -1,4 +1,3 @@
-
 const os = require('os');
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
@@ -8,11 +7,14 @@ class libraries {
     constructor(version) {
         this.version = version;
     }
+
     async Getlibraries() {
         let libraries = [];
+
         for (let lib of this.version.libraries) {
             let artifact;
-            let type = "LIBRARY"
+            let type = "LIBRARY";
+
             if (lib.natives) {
                 let classifiers = lib.downloads.classifiers;
                 let native = lib.natives[MojangLib[process.platform]];
@@ -22,8 +24,7 @@ class libraries {
                 else continue;
             } else {
                 if (lib.rules && lib.rules[0].os) {
-                    if (lib.rules[0].os.name !== "")
-                        continue;
+                    if (lib.rules[0].os.name !== "") continue;
                 }
                 artifact = lib.downloads.artifact;
             }
