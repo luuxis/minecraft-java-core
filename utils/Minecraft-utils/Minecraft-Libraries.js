@@ -4,7 +4,7 @@ const os = require('os');
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
 let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
-class libraries {
+class Libraries {
     constructor(version) {
         this.version = version;
     }
@@ -42,4 +42,4 @@ class libraries {
     }
 }
 
-module.exports = libraries;
+module.exports = Libraries;

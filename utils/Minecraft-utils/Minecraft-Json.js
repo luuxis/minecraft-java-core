@@ -1,7 +1,7 @@
 'use strict';
 const fetch = require('node-fetch');
 
-class json {
+class Json {
     constructor(version) {
         this.version = version;
     }
@@ -28,4 +28,4 @@ class json {
     }
 }
 
-module.exports = json;
+module.exports = Json;

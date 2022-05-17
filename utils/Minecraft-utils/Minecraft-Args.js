@@ -1,6 +1,6 @@
 'use strict';
-class args {
+class Args {
 
 }
 
-module.exports = args;
+module.exports = Args;
