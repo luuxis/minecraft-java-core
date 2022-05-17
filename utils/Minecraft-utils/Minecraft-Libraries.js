@@ -1,3 +1,4 @@
+'use strict';
 const os = require('os');
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
