@@ -8,8 +8,6 @@ NodeJS Module for Minecraft launcher
 [![size](https://img.shields.io/github/languages/code-size/luuxis/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
 <br>
 [![sizeinstall](https://badgen.net/packagephobia/install/minecraft-java-core)](https://npmjs.com/minecraft-java-core)
----
-**Minecraft-Java-Core** is based of [minecraft-launcher-core](https://www.npmjs.com/package/minecraft-launcher-core) *dev by Pierce01* **and based of** [pharuxtan](https://github.com/pharuxtan)
 
 ---
 ## Avantages :dizzy:
