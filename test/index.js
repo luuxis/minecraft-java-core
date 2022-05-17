@@ -33,7 +33,7 @@ async function main() {
         detached: false,
         java: true,
         args: [],
-        custom: true,
+        custom: false,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
 
