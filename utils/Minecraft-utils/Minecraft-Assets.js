@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 class assets {
     constructor(assetIndex) {
         this.assetIndex = assetIndex;
@@ -5,7 +7,8 @@ class assets {
 
     async Getassets() {
         let assets = [];
-        for (let asset of Object.values(this.assetIndex.objects)) {
+        let data = await fetch(this.assetIndex).then(res => res.json());
+        for (let asset of Object.values(data.objects)) {
             assets.push({
                 sha1: asset.hash,
                 size: asset.size,
@@ -14,7 +17,7 @@ class assets {
                 url: `https://resources.download.minecraft.net/${asset.hash.substring(0, 2)}/${asset.hash}`
             });
         }
-        return assets;
+        return { assetIndex: data, assets: assets };
     }
 }
 
