@@ -31,7 +31,7 @@ async function main() {
         authenticator: mc,
         path: "./.Minecraft",
         version: "latest_snapshot",
-        detached: false,
+        detached: true,
         java: true,
         args: [],
         custom: false,
@@ -44,22 +44,21 @@ async function main() {
         }
     }
 
-    fs.writeFileSync('./test.json', JSON.stringify(await launch.Launch(opts), true, 4));
+    launch.Launch(opts)
 
-    // Launch.on('progress', (DL, totDL) => {
-    //     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
-    // });
+    launch.on('progress', (DL, totDL) => {
+        console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+    });
 
-    // Launch.on('estimated', (time) => {
-    //     let hours = Math.floor(time / 3600);
-    //     let minutes = Math.floor((time - hours * 3600) / 60);
-    //     let seconds = Math.floor(time - hours * 3600 - minutes * 60);
-    //     console.log(`${hours}h ${minutes}m ${seconds}s`);
-    // })
+    launch.on('estimated', (time) => {
+        let hours = Math.floor(time / 3600);
+        let minutes = Math.floor((time - hours * 3600) / 60);
+        let seconds = Math.floor(time - hours * 3600 - minutes * 60);
+        console.log(`${hours}h ${minutes}m ${seconds}s`);
+    })
 
-
-    // Launch.on('data', (e) => {
-    //     console.log(e)
-    // })
+    launch.on('data', (e) => {
+        console.log(e)
+    })
 }
 main();

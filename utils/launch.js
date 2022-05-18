@@ -47,7 +47,7 @@ class Launch {
 
         // download files
         let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
-        new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs();
+        console.log(new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs());
     }
 
     async DownloadGame() {
