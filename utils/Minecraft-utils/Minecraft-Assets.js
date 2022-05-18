@@ -2,13 +2,13 @@
 const fetch = require('node-fetch');
 
 class Assets {
-    constructor(assetIndexUrl) {
-        this.assetIndexUrl = assetIndexUrl;
+    constructor(assetIndex) {
+        this.assetIndex = assetIndex;
     }
 
     async Getassets() {
         let assets = [];
-        let data = await fetch(this.assetIndexUrl).then(res => res.json());
+        let data = await fetch(this.assetIndex.url).then(res => res.json());
         for (let asset of Object.values(data.objects)) {
             assets.push({
                 sha1: asset.hash,
@@ -18,6 +18,13 @@ class Assets {
                 url: `https://resources.download.minecraft.net/${asset.hash.substring(0, 2)}/${asset.hash}`
             });
         }
+        assets.push({
+            sha1: this.assetIndex.sha1,
+            size: this.assetIndex.size,
+            type: "FILE",
+            path: `assets/indexes/${this.assetIndex.id}.json`,
+            url: this.assetIndex.url
+        });
         return { assetIndex: data, assets: assets };
     }
 }

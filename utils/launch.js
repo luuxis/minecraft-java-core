@@ -10,6 +10,15 @@ const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
 const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
 
 class Launch {
+    async GetJsonVersion() {
+        let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
+        if (InfoVersion.error) {
+            return InfoVersion;
+        }
+        let json = await fetch(InfoVersion.url).then(res => res.json());
+        return { InfoVersion: InfoVersion, json: json };
+    }
+    
     async Launch(config = {}) {
         this.config = {
             url: config.url ? config.url : null,
@@ -33,21 +42,12 @@ class Launch {
         }
 
         let gameJson = await this.GetJsonVersion();
-        let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex.url).Getassets();
+        let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
         let gameLibraries = await new gameLibrariesMinecraft(gameJson.json).Getlibraries();
         let Bundle = [...gameLibraries, ...gameAssets.assets]
         let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
         new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles()
-        return gameVerify
-    }
-
-    async GetJsonVersion() {
-        let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
-        if (InfoVersion.error) {
-            return InfoVersion;
-        }
-        let json = await fetch(InfoVersion.url).then(res => res.json());
-        return { InfoVersion: InfoVersion, json: json };
+        return gameDownloadListe
     }
 }
 module.exports = Launch;
