@@ -6,7 +6,8 @@ let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
 class Libraries {
     constructor(version) {
-        this.version = version;
+        this.version = version.json;
+        this.infoVersion = version.InfoVersion;
     }
 
     async Getlibraries() {
@@ -46,6 +47,11 @@ class Libraries {
             path: `versions/${this.version.id}/${this.version.id}.jar`,
             type: "JARVERSION",
             url: clientjar.url
+        });
+        libraries.push({
+            path: `versions/${this.version.id}/${this.version.id}.json`,
+            type: "CFILE",
+            content: JSON.stringify(this.version)
         });
         return libraries;
     }
