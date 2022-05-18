@@ -69,7 +69,9 @@ class Verify {
                         folder = folder.split("/").slice(0, -1).join("/");
                     }
                 }
-            } catch (e) {}
+            } catch (e) {
+                continue;
+            }
         }
     }
 
