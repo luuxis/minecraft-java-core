@@ -35,5 +35,57 @@ class Verify {
         if (hex == hash) return true;
         return false;
     }
+
+    async removeNonIgnoredFiles() {
+        let files = this.getFiles(this.config.path);
+        let ignoredfiles = []
+
+        for (let file of this.config.ignored) {
+            file = (`${this.config.path}/${file}`)
+            if (fs.existsSync(file)) {
+                if (fs.statSync(file).isDirectory()) {
+                    ignoredfiles.push(...this.getFiles(file));
+                } else if (fs.statSync(file).isFile()) {
+                    ignoredfiles.push(file);
+                }
+            }
+        }
+
+        ignoredfiles.forEach(file => this.config.ignored.push((file)));
+        this.bundle.forEach(file => ignoredfiles.push((file.path)));
+        files = files.filter(file => ignoredfiles.indexOf(file) < 0);
+
+        for (let file of files) {
+            try {
+                if (fs.statSync(file).isDirectory()) {
+                    fs.rmdirSync(file);
+                } else {
+                    fs.unlinkSync(file);
+                    let folder = file.split("/").slice(0, -1).join("/");
+                    while (true) {
+                        if (folder == this.config.path) break;
+                        let content = fs.readdirSync(folder);
+                        if (content.length == 0) fs.rmdirSync(folder);
+                        folder = folder.split("/").slice(0, -1).join("/");
+                    }
+                }
+            } catch (e) {}
+        }
+    }
+
+    getFiles(path, file = []) {
+        if (fs.existsSync(path)) {
+            let files = fs.readdirSync(path);
+            if (files.length == 0) file.push(path);
+            for (let i in files) {
+                let name = `${path}/${files[i]}`;
+                if (fs.statSync(name).isDirectory())
+                    this.getFiles(name, file);
+                else
+                    file.push(name);
+            }
+        }
+        return file;
+    }
 }
 module.exports = Verify;
