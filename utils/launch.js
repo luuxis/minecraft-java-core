@@ -8,6 +8,9 @@ const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
 const gameAssetsMinecraft = require('./Minecraft-utils/Minecraft-Assets');
 const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
 const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
+const gameArgumentsMinecraft = require('./Minecraft-utils/Minecraft-Args');
+const gameJavaMinecraft = require('./java/Java-json');
+const gameDownloadMinecraft = require('./download');
 
 class Launch {
     async GetJsonVersion() {
@@ -20,6 +23,7 @@ class Launch {
     }
     
     async Launch(config = {}) {
+        // set variables config
         this.config = {
             url: config.url ? config.url : null,
             authenticator: config.authenticator ? config.authenticator : null,
@@ -33,21 +37,57 @@ class Launch {
             args: config.args ? config.args : [],
 
             javaPath: config.javaPath ? config.javaPath : null,
-            java: config.java ? config.java : true,
+            java: config.java ? config.java : false,
 
             memory: {
                 min: config.memory?.min ? config.memory.min : '1G',
                 max: config.memory?.max ? config.memory.max : '2G'
             }
-        }
+        };
 
+        // download files
+        let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
+        new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs();
+    }
+
+    async DownloadGame() {
         let gameJson = await this.GetJsonVersion();
         let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
-        let gameLibraries = await new gameLibrariesMinecraft(gameJson.json).Getlibraries();
-        let Bundle = [...gameLibraries, ...gameAssets.assets]
+        let gameLibraries = await new gameLibrariesMinecraft(gameJson).Getlibraries();
+        let gameJava = this.config.java ? await gameJavaMinecraft.GetJsonJava(gameJson.json) : [];
+        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameJava.files ? gameJava.files : []];
         let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
-        new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles()
-        return gameDownloadListe
+        
+        if (gameDownloadListe.length > 0) {
+            let downloader = new gameDownloadMinecraft();
+            let totsize = await new gameVerifyMinecraft().getTotalSize(gameDownloadListe);
+
+            downloader.on("progress", (DL, totDL) => {
+                this.emit("progress", DL, totDL);
+            });
+
+            downloader.on("speed", (speed) => {
+                this.emit("speed", speed);
+            });
+
+            downloader.on("estimated", (time) => {
+                this.emit("estimated", time);
+            });
+
+            await new Promise((ret) => {
+                downloader.on("finish", ret);
+                downloader.multiple(gameDownloadListe, totsize, 10);
+            });
+        }
+        return [gameJson, gameAssets, gameLibraries, gameJava];
+    }
+
+    on(event, func) {
+        this[event] = func;
+    }
+
+    emit(event, ...args) {
+        if (this[event]) this[event](...args);
     }
 }
 module.exports = Launch;

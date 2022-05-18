@@ -18,6 +18,12 @@ class Verify {
             file.path = `${this.config.path}/${file.path}`
             file.folder = file.path.split("/").slice(0, -1).join("/");
 
+            if (file.type == "CFILE") {
+                if (!fs.existsSync(file.folder)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
+                fs.writeFileSync(file.path, file.content, { encoding: "utf8", mode: 0o755 });
+                continue;
+            }
+
             if (fs.existsSync(file.path)) {
                 if (this.config.verify) {
                     if (this.config.ignored.find(ignored => ignored == file.path.split("/").slice(-1)[0])) continue
@@ -88,6 +94,14 @@ class Verify {
             }
         }
         return file;
+    }
+
+    async getTotalSize(bundle) {
+        let todownload = 0;
+        for (let file of bundle) {
+            todownload += file.size;
+        }
+        return todownload;
     }
 }
 module.exports = Verify;
