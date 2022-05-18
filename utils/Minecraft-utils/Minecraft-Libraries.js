@@ -38,6 +38,15 @@ class Libraries {
                 url: artifact.url
             });
         }
+
+        let clientjar = this.version.downloads.client;
+        libraries.push({
+            sha1: clientjar.sha1,
+            size: clientjar.size,
+            path: `versions/${this.version.id}/${this.version.id}.jar`,
+            type: "JARVERSION",
+            url: clientjar.url
+        });
         return libraries;
     }
 }
