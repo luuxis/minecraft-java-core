@@ -35,7 +35,9 @@ class Launch {
         let gameJson = await this.GetJsonVersion();
         let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex.url).Getassets();
         let gameLibraries = await new gameLibrariesMinecraft(gameJson.json).Getlibraries();
-        let gameVerify = await new gameVerifyMinecraft([...gameLibraries, ...gameAssets.assets], this.config).checkBundle();
+        let Bundle = [...gameLibraries, ...gameAssets.assets]
+        let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
+        new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles()
         return gameVerify
     }
 
