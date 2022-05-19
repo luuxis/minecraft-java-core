@@ -7,7 +7,7 @@ class Args {
         this.authenticator = this.config.authenticator;
     }
     GetArgs() {
-        let args = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game;
+        let options = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game;
         let table = {
             '${auth_access_token}': this.authenticator.access_token,
             '${auth_session}': this.authenticator.access_token,
@@ -26,8 +26,12 @@ class Args {
         }
 
 
+        for (let i in options) {
+            if (typeof options[i] === 'object') options.splice(i, 2)
+            if (Object.keys(table).includes(options[i])) options[i] = table[options[i]]
+        }
 
-        return table
+        return options;
     }
     isold() {
         return this.json.assets === 'legacy' || this.json.assets === 'pre-1.6'
