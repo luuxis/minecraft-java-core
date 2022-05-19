@@ -2,6 +2,7 @@
 // import librairies nodejs
 const path = require('path');
 const fetch = require('node-fetch');
+const fs = require('fs');
 
 //import modules minecraft-java-core
 const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
@@ -47,7 +48,8 @@ class Launch {
 
         // download files
         let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
-        console.log(new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs());
+        let args = new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs()
+        fs.writeFileSync(`${this.config.path}/test.json`, JSON.stringify(args, null, 4));
     }
 
     async DownloadGame() {
