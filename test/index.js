@@ -30,7 +30,7 @@ async function main() {
         url: null,
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.18.2",
+        version: "latest_snapshot",
         detached: false,
         java: true,
         args: [],

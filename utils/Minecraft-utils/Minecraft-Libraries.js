@@ -29,7 +29,7 @@ class Libraries {
                 else continue;
             } else {
                 if (lib.rules && lib.rules[0].os) {
-                    if (lib.rules[0].os.name !== "") continue;
+                    if (lib.rules[0].os.name !== MojangLib[process.platform]) continue;
                 }
                 artifact = lib.downloads.artifact;
             }
