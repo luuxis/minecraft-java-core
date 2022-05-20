@@ -27,10 +27,10 @@ async function main() {
     }
 
     let opts = {
-        url: null,
+        url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "latest_snapshot",
+        version: "1.18.2",
         detached: false,
         java: true,
         args: [],
@@ -39,8 +39,8 @@ async function main() {
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
 
         memory: {
-            min: `1G`,
-            max: `2G`
+            min: `2G`,
+            max: `4G`
         }
     }
 
