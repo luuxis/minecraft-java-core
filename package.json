@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "2.0.0-PreAlpha.1",
+    "version": "2.0.0-alpha.1",
     "description": "A library starting minecraft game NW.js and Electron.js (premium and crack)",
     "main": "index.js",
     "scripts": {
