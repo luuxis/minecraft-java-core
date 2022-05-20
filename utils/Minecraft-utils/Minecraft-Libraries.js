@@ -1,13 +1,16 @@
 'use strict';
 const os = require('os');
+const fs = require('fs');
+const AdmZip = require('adm-zip');
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
 let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
 class Libraries {
-    constructor(version) {
+    constructor(version, config) {
         this.version = version.json;
         this.infoVersion = version.InfoVersion;
+        this.config = config;
     }
 
     async Getlibraries() {
@@ -45,15 +48,35 @@ class Libraries {
             sha1: clientjar.sha1,
             size: clientjar.size,
             path: `versions/${this.version.id}/${this.version.id}.jar`,
-            type: "JARVERSION",
+            type: "LIBRARY",
             url: clientjar.url
         });
         libraries.push({
             path: `versions/${this.version.id}/${this.version.id}.json`,
             type: "CFILE",
-            content: JSON.stringify(this.version)
+            content: JSON.stringify(this.version, null, 4)
         });
         return libraries;
+    }
+
+    async natives(bundle) {
+        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${mod.path}`);
+        let nativeFolder = (`${this.config.path}/versions/${this.version.id}/natives`).replace(/\\/g, "/");
+        if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
+    
+        for(let native of natives){
+            let zip = new AdmZip(native);
+            let entries = zip.getEntries();
+            for(let entry of entries){
+                if(entry.entryName.startsWith("META-INF")) continue;
+                if(entry.isDirectory){
+                    fs.mkdirSync(`${nativeFolder}/${entry.entryName}`, { recursive: true, mode: 0o777 });
+                    continue
+                }
+                fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o777 });
+            }
+        }
+        return natives;
     }
 }
 

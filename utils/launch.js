@@ -2,6 +2,7 @@
 // import librairies nodejs
 const path = require('path');
 const fetch = require('node-fetch');
+const child = require("child_process");
 const fs = require('fs');
 
 //import modules minecraft-java-core
@@ -48,8 +49,14 @@ class Launch {
 
         // download files
         let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
-        let args = new gameArgumentsMinecraft(gameJson.json, this.config).GetArgs()
-        fs.writeFileSync(`${this.config.path}/test.json`, JSON.stringify(args, null, 4));
+        let args = new gameArgumentsMinecraft(gameJson.json, gameLibraries, this.config).GetArgs();
+        args = [...args.jvm, ...args.game];
+        
+        console.log(args.join(' '));
+        let minecraft = child.spawn(`${this.config.path}/runtime/${gameJava.version}/bin/java.exe`, args, { cwd: this.config.path, detached: this.config.detached })
+        minecraft.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraft.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraft.on('close', (code) => this.emit('close', code))
     }
 
     async DownloadGame() {
@@ -81,6 +88,7 @@ class Launch {
                 downloader.multiple(gameDownloadListe, totsize, 10);
             });
         }
+        new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
         return [gameJson, gameAssets, gameLibraries, gameJava];
     }
 
