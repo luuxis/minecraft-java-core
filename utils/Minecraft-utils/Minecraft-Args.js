@@ -1,9 +1,10 @@
 'use strict';
 
 class Args {
-    constructor(json, librariesMinecraft, config) {
+    constructor(json, librariesMinecraft, gameModdeJson, config) {
         this.json = json;
         this.librariesMinecraft = librariesMinecraft;
+        this.gameModdeJson = gameModdeJson;
         this.config = config;
         this.version = this.json.id;
         this.authenticator = this.config.authenticator;
@@ -11,7 +12,8 @@ class Args {
     GetArgs() {
         let game = this.GetGame();
         let jvm = this.GetJVM();
-        let args = { game, jvm };
+        let classpath = this.classPath()
+        let args = { game, jvm, classpath };
         return args;
     }
 
@@ -43,10 +45,6 @@ class Args {
     }
 
     GetJVM() {
-        let libraries = this.librariesMinecraft.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
-        if (process.platform == "win32") libraries = libraries.join(";");
-        else libraries = libraries.join(":");
-
         let jvm = [
             this.getjvm(),
             '-XX:+UnlockExperimentalVMOptions',
@@ -57,12 +55,21 @@ class Args {
             '-Dfml.ignoreInvalidMinecraftCertificates=true',
             `-Djava.library.path=${this.config.path}/versions/${this.version}/natives`,
             `-Xms${this.config.memory.min}`,
-            `-Xmx${this.config.memory.max}`,
+            `-Xmx${this.config.memory.max}`
+        ]
+        return jvm;
+    }
+
+    classPath() {
+        let libraries = this.librariesMinecraft.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
+        if (process.platform == "win32") libraries = libraries.join(";");
+        else libraries = libraries.join(":");
+        let classpath = [
             `-cp`,
             `${libraries}`,
             this.json.mainClass
         ]
-        return jvm;
+        return classpath;
     }
 
     isold() {

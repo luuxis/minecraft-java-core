@@ -5,9 +5,9 @@ const fetch = require('node-fetch');
 
 //import modules minecraft-java-core
 const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
+const gameModde = require('./Minecraft-utils/minecraft-modde');
 const gameAssetsMinecraft = require('./Minecraft-utils/Minecraft-Assets');
 const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
-const gameModdeMinecraft = require('./Minecraft-utils/Minecraft-modde');
 const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
 const gameArgumentsMinecraft = require('./Minecraft-utils/Minecraft-Args');
 const gameStartMinecraft = require('./Minecraft-utils/Minecraft-start');
@@ -48,12 +48,11 @@ class Launch {
         };
 
         // download files
-        let [gameJson, gameAssets, gameLibraries, gameModde, gameJava] = await this.DownloadGame();
-        // set arguments to start game
-        let argsMinecraft = new gameArgumentsMinecraft(gameJson.json, gameLibraries, this.config).GetArgs();
-        let argsModde = new gameModdeMinecraft(this.config, gameModde).GetArgs();
-        let args = [...argsMinecraft.jvm, ...argsMinecraft.game];
-
+        let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
+        let gameModdeJson = await new gameModde(this.config).jsonModde();
+        let args = new gameArgumentsMinecraft(gameJson.json, gameLibraries, gameModdeJson, this.config).GetArgs();
+        args = [...args.jvm, ...args.classpath, ...args.game];
+        
         // set java path
         let java = ''
         if (this.config.javaPath) {
@@ -71,11 +70,11 @@ class Launch {
 
     async DownloadGame() {
         let gameJson = await this.GetJsonVersion();
+        let gameModdeFiles = await new gameModde(this.config).filesGameModde();
         let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
         let gameLibraries = await new gameLibrariesMinecraft(gameJson).Getlibraries();
-        let gameModde = await new gameModdeMinecraft(this.config).filesGameModde();
         let gameJava = this.config.java ? await gameJavaMinecraft.GetJsonJava(gameJson.json) : [];
-        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameJava.files ? gameJava.files : [], ...gameModde];
+        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameModdeFiles, ...gameJava.files ? gameJava.files : []];
         let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
         
         if (gameDownloadListe.length > 0) {
@@ -100,7 +99,7 @@ class Launch {
             });
         }
         new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
-        return [gameJson, gameAssets, gameLibraries, gameModde, gameJava];
+        return [gameJson, gameAssets, gameLibraries, gameJava];
     }
 
     on(event, func) {
