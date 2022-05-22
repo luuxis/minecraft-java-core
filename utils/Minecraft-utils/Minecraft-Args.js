@@ -13,7 +13,9 @@ class Args {
         let game = this.GetGame();
         let jvm = this.GetJVM();
         let classpath = this.classPath()
-        let args = { game, jvm, classpath };
+        let moddeArguments = this.GetArgumentsModde();
+        console.log(moddeArguments)
+        let args = { jvm, classpath: [...moddeArguments.jvm, ...classpath], game: [...moddeArguments.game, ...game] };
         return args;
     }
 
@@ -60,14 +62,29 @@ class Args {
         return jvm;
     }
 
+    GetArgumentsModde() {
+        let moddeArguments = this.gameModdeJson.arguments;
+        let Arguments = {}
+        if(moddeArguments.game) Arguments.game = moddeArguments.game;
+        if (moddeArguments.jvm) Arguments.jvm = moddeArguments.jvm.map(jvm => {
+            return jvm
+                .replace(/\${version_name}/g, this.version)
+                .replace(/\${library_directory}/g, `${this.config.path}/libraries`)
+                .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+        }) 
+        return Arguments; 
+    }
+
     classPath() {
-        let libraries = this.librariesMinecraft.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
+        let librariesMinecraft = this.librariesMinecraft.filter(mod => mod.type == "LIBRARY").map(mod => mod.path);
+        let librairiesModde = this.gameModdeJson.libraries.map(librarie => `${this.config.path}/libraries/${librarie.downloads.artifact.path}`);
+        let libraries = [...librariesMinecraft, ...librairiesModde];
         if (process.platform == "win32") libraries = libraries.join(";");
         else libraries = libraries.join(":");
         let classpath = [
             `-cp`,
             `${libraries}`,
-            this.json.mainClass
+            this.gameModdeJson.mainClass
         ]
         return classpath;
     }

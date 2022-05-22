@@ -8,10 +8,8 @@ class moddeFiles {
 
     async jsonModde(files) {
         let pathModdejson = files.filter(file => file.type == 'VERIONSCUSTOM').map(file => file.path)[0];
-        console.log(pathModdejson);
-
         let json = fs.readFileSync(`${this.config.path}/${pathModdejson}`, 'utf8');
-        return json
+        return JSON.parse(json)
     }
 }
 module.exports = moddeFiles;
