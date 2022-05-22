@@ -61,7 +61,7 @@ class Launch {
             java = `${this.config.path}/runtime/${gameJava.version}/bin/java`
         }
         // start game
-        this.emit('data', `Launching with arguments ${args.join(' ')}`)
+        // this.emit('data', `Launching with arguments ${args.join(' ')}`)
         let minecraft = new gameStartMinecraft(this.config, args, gameJson.json).start(java);
         minecraft.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraft.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
