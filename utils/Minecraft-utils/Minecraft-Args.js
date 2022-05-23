@@ -20,6 +20,14 @@ class Args {
 
     GetGame() {
         let game = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game;
+        if (this.config.custom) {
+            let gamemodde = this.gameModdeJson.minecraftArguments ? this.gameModdeJson.minecraftArguments.split(' ') : this.gameModdeJson.arguments
+            if (!gamemodde.game) {
+                game.push(...gamemodde)
+                game = [...new Set(game)]
+            }
+        }
+        
         let table = {
             '${auth_access_token}': this.authenticator.access_token,
             '${auth_session}': this.authenticator.access_token,
@@ -62,20 +70,18 @@ class Args {
     }
 
     GetArgumentsModde() {
-        if (this.gameModdeJson) {
-            let moddeArguments = this.gameModdeJson.arguments;
-            let Arguments = {}
-            if (moddeArguments.game) Arguments.game = moddeArguments.game;
-            if (moddeArguments.jvm) Arguments.jvm = moddeArguments.jvm.map(jvm => {
-                return jvm
-                    .replace(/\${version_name}/g, this.version)
-                    .replace(/\${library_directory}/g, `${this.config.path}/libraries`)
-                    .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
-            })
-            return Arguments;
-        } else {
-            return { game: [], jvm: [] };
-        }
+        if (!this.gameModdeJson) return { game: [], jvm: [] }
+        let moddeArguments = this.gameModdeJson.arguments;
+        if (!moddeArguments) return { game: [], jvm: [] };
+        let Arguments = {}
+        if (moddeArguments.game) Arguments.game = moddeArguments.game;
+        if (moddeArguments.jvm) Arguments.jvm = moddeArguments.jvm.map(jvm => {
+            return jvm
+                .replace(/\${version_name}/g, this.version)
+                .replace(/\${library_directory}/g, `${this.config.path}/libraries`)
+                .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+        })
+        return Arguments;
     }
 
     classPath() {
@@ -83,7 +89,8 @@ class Args {
         let librairiesModde = {}
 
         if (!this.gameModdeJson) librairiesModde = []
-        else librairiesModde = this.gameModdeJson.libraries.map(librarie => `${this.config.path}/libraries/${librarie.downloads.artifact.path}`);
+        else librairiesModde = this.gameModdeJson.libraries.map(librarie => `${this.config.path}/libraries/${librarie.name.split(':')[0].replace(/\./g, '/')}/${librarie.name.split(':')[1]}/${librarie.name.split(':')[2]}/${librarie.name.split(':')[1]}-${librarie.name.split(':')[2]}.jar`);
+
         let libraries = [...librariesMinecraft, ...librairiesModde];
         if (process.platform == "win32") libraries = libraries.join(";");
         else libraries = libraries.join(":");

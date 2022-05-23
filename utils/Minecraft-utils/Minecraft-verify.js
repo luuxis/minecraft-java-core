@@ -14,7 +14,7 @@ class Verify {
         let todownload = [];
 
         for (let file of bundle) {
-            if (file.path == undefined) continue;
+            if (!file.path) continue;
             file.path = `${this.config.path}/${file.path}`
             file.folder = file.path.split("/").slice(0, -1).join("/");
 
