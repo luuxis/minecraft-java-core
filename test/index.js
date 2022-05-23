@@ -19,8 +19,8 @@ async function main() {
             mc = await new Microsoft(client_id).getAuth();
             fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         } else {
-            // mc = await new Microsoft(client_id).refresh(mc);
-            // fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            mc = await new Microsoft(client_id).refresh(mc);
+            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
         }
     } else {
         mc = await new Microsoft(client_id).getAuth();
@@ -34,9 +34,9 @@ async function main() {
         detached: false,
         java: true,
         args: [],
-        custom: false,
-        verify: false,
-        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
+        custom: true,
+        verify: true,
+        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
         memory: {
             min: `2G`,

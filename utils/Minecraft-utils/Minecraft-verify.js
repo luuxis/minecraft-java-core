@@ -25,12 +25,8 @@ class Verify {
             }
 
             if (fs.existsSync(file.path)) {
-                if (this.config.verify) {
-                    if (this.config.ignored.find(ignored => ignored == file.path.split("/").slice(-1)[0])) continue
-                }
-                if (file.sha1) {
-                    if (!(await this.checkSHA1(file.path, file.sha1))) todownload.push(file);
-                }
+                if (this.config.ignored.find(ignored => ignored == file.path.split("/").slice(-1)[0])) continue                
+                if (file.sha1) if (!(await this.checkSHA1(file.path, file.sha1))) todownload.push(file);
             } else todownload.push(file);
         }
         return todownload;

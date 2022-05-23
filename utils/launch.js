@@ -15,15 +15,6 @@ const gameJavaMinecraft = require('./java/Java-json');
 const gameDownloadMinecraft = require('./download');
 
 class Launch {
-    async GetJsonVersion() {
-        let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
-        if (InfoVersion.error) {
-            return InfoVersion;
-        }
-        let json = await fetch(InfoVersion.url).then(res => res.json());
-        return { InfoVersion: InfoVersion, json: json };
-    }
-    
     async Launch(config = {}) {
         // set variables config
         this.config = {
@@ -39,13 +30,15 @@ class Launch {
             args: config.args ? config.args : [],
 
             javaPath: config.javaPath ? config.javaPath : null,
-            java: config.java ? config.java : false,
+            java: config.java ? config.java : true,
 
             memory: {
                 min: config.memory?.min ? config.memory.min : '1G',
                 max: config.memory?.max ? config.memory.max : '2G'
             }
         };
+
+        if(this.config.javaPath) this.config.java = false;
 
         // download files
         let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
@@ -59,13 +52,24 @@ class Launch {
             java = this.config.javaPath;
         } else if (this.config.java) {
             java = `${this.config.path}/runtime/${gameJava.version}/bin/java`
+        } else {
+            java = 'java';
         }
         // start game
-        // this.emit('data', `Launching with arguments ${args.join(' ')}`)
+        this.emit('data', `Launching with arguments ${args.join(' ')}`)
         let minecraft = new gameStartMinecraft(this.config, args, gameJson.json).start(java);
         minecraft.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraft.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraft.on('close', (code) => this.emit('close', code))
+    }
+
+    async GetJsonVersion() {
+        let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
+        if (InfoVersion.error) {
+            return InfoVersion;
+        }
+        let json = await fetch(InfoVersion.url).then(res => res.json());
+        return { InfoVersion: InfoVersion, json: json };
     }
 
     async DownloadGame() {
@@ -98,6 +102,7 @@ class Launch {
                 downloader.multiple(gameDownloadListe, totsize, 10);
             });
         }
+        if(this.config.verify) new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles();
         new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
         return [gameJson, gameAssets, gameLibraries, gameJava];
     }
