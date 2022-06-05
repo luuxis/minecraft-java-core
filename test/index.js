@@ -3,24 +3,24 @@ const launch = new Launch();
 const fs = require('fs');
 
 let save = true;
-let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
+let client_id = ''
 let mc
 
 async function main() {
     if (save) {
         if (!fs.existsSync('./account.json')) {
             mc = await new Microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
         }
 
         if (!mc.refresh_token) {
             mc = await new Microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         } else {
             mc = await new Microsoft(client_id).refresh(mc);
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         }
     } else {
         mc = await new Microsoft(client_id).getAuth();
@@ -30,11 +30,11 @@ async function main() {
         url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.12.2",
+        version: "lastest_snapshot",
         detached: false,
         java: true,
         args: [],
-        custom: true,
+        custom: false,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
