@@ -8,14 +8,14 @@ const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
 const gameModde = require('./Minecraft-utils/minecraft-modde');
 const gameAssetsMinecraft = require('./Minecraft-utils/Minecraft-Assets');
 const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
-const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-verify');
+const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
 const gameArgumentsMinecraft = require('./Minecraft-utils/Minecraft-Args');
 const gameStartMinecraft = require('./Minecraft-utils/Minecraft-start');
 const gameJavaMinecraft = require('./java/Java-json');
 const gameDownloadMinecraft = require('./download');
 
 class Launch {
-    async Launch(config = {}) {
+    Launch(config = {}) {
         // set variables config
         this.config = {
             url: config.url ? config.url : null,
@@ -39,7 +39,10 @@ class Launch {
         };
 
         if(this.config.javaPath) this.config.java = false;
+        this.start()
+    }
 
+    async start() {
         // download files
         let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
         let gameModdeJson = await new gameModde(this.config).jsonModde();
