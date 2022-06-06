@@ -30,7 +30,7 @@ async function main() {
         url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "lastest_snapshot",
+        version: "latest_snapshot",
         detached: false,
         java: true,
         args: [],
