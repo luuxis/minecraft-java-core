@@ -1,12 +1,12 @@
 const os = require("os");
-const fetch = require("node-fetch");
+const nodeFetch = require("node-fetch");
 
 class java {
     async GetJsonJava(jsonversion) {
         let files = [];
         let version
         jsonversion = jsonversion
-        let javaVersionsJson = await fetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
+        let javaVersionsJson = await nodeFetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
         
         if (!jsonversion.javaVersion) jsonversion = "jre-legacy"
         else jsonversion = jsonversion.javaVersion.component
@@ -14,15 +14,15 @@ class java {
         if (os.platform() == "win32") {
             let arch = { x64: "windows-x64", ia32: "windows-x86" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
         } else if (os.platform() == "darwin") {
             let arch = { x64: "mac-os", aarch64: "mac-os-arm64" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)   
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)   
         } else if (os.platform() == "linux") {
             let arch = { x64: "linux", ia32: "linux-i386" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await fetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
         } else {
             return console.log("OS not supported");
         }

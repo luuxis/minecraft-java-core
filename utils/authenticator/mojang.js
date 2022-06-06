@@ -1,7 +1,7 @@
 'use strict';
 
 const { v3: uuidv3 } = require('uuid')
-const fetch = require('node-fetch')
+const nodeFetch = require("node-fetch")
 let api_url = 'https://authserver.mojang.com'
 
 class Mojang {
@@ -33,7 +33,7 @@ class Mojang {
             requestUser: true
         }
 
-        let message = await fetch(`${api_url}/authenticate`, {
+        let message = await nodeFetch(`${api_url}/authenticate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ class Mojang {
             clientToken: acc.client_token,
             requestUser: true
         }
-        let message = await fetch(`${api_url}/refresh`, {
+        let message = await nodeFetch(`${api_url}/refresh`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ class Mojang {
             accessToken: acc.access_token,
             clientToken: acc.client_token,
         }
-        let message = await fetch(`${api_url}/validate`, {
+        let message = await nodeFetch(`${api_url}/validate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ class Mojang {
             clientToken: acc.client_token,
         }
 
-        let message = await fetch(`${api_url}/invalidate`, {
+        let message = await nodeFetch(`${api_url}/invalidate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

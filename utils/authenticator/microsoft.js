@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const nodeFetch = require('node-fetch');
 
 class Microsoft {
     constructor(client_id) {
@@ -34,7 +34,7 @@ class Microsoft {
     }
 
     async url(code) {
-        let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
+        let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -43,7 +43,7 @@ class Microsoft {
         }).then(res => res.json());
         if (oauth2.error) throw (`error: ${oauth2.error_description}`);
 
-        let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
+        let xbl = await nodeFetch("https://user.auth.xboxlive.com/user/authenticate", {
             method: "post",
             body: JSON.stringify({
                 Properties: {
@@ -58,7 +58,7 @@ class Microsoft {
         }).then(res => res.json());
         if (xbl.error) throw (`error: ${xbl.error_description}`);
 
-        let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
+        let xsts = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ class Microsoft {
         if (xsts.error) throw (`error: ${xsts.error_description}`);
 
         let uhs = xbl.DisplayClaims.xui[0].uhs;
-        let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
+        let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ class Microsoft {
         if (mcLogin.error) throw (`error: ${mcLogin.error_description}`);
 
         //Get the profile
-        let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
+        let profile = await nodeFetch("https://api.minecraftservices.com/minecraft/profile", {
             method: "GET",
             headers: {
                 'Authorization': `Bearer ${mcLogin.access_token}`
@@ -115,7 +115,7 @@ class Microsoft {
     }
 
     async refresh(acc) {
-        let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
+        let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -124,7 +124,7 @@ class Microsoft {
         }).then(res => res.json());
         if (oauth2.error) throw (`error: ${oauth2.error_description}`);
 
-        let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
+        let xbl = await nodeFetch("https://user.auth.xboxlive.com/user/authenticate", {
             method: "post",
             body: JSON.stringify({
                 Properties: {
@@ -139,7 +139,7 @@ class Microsoft {
         }).then(res => res.json());
         if (xbl.error) throw (`error: ${xbl.error_description}`);
 
-        let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
+        let xsts = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ class Microsoft {
         if (xsts.error) throw (`error: ${xsts.error_description}`);
 
         let uhs = xbl.DisplayClaims.xui[0].uhs;
-        let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
+        let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ class Microsoft {
         }).then(res => res.json());
         if (mcLogin.error) throw (`error: ${mcLogin.error_description}`);
 
-        let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
+        let profile = await nodeFetch("https://api.minecraftservices.com/minecraft/profile", {
             method: "GET",
             headers: {
                 'Authorization': `Bearer ${mcLogin.access_token}`

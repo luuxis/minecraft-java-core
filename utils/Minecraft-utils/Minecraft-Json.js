@@ -1,5 +1,5 @@
 'use strict';
-const fetch = require('node-fetch');
+const nodeFetch = require("node-fetch");
 
 class Json {
     constructor(version) {
@@ -7,7 +7,7 @@ class Json {
     }
 
     async GetInfoVersion() {
-        let data = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
+        let data = await nodeFetch('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
         data = await data.json();
 
         if (this.version == 'latest_release' || this.version == 'r' || this.version == 'lr') {

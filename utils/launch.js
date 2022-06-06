@@ -1,16 +1,16 @@
 'use strict';
 // import librairies nodejs
 const path = require('path');
-const fetch = require('node-fetch');
+const nodeFetch = require('node-fetch');
 
 //import modules minecraft-java-core
 const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
-const gameModde = require('./Minecraft-utils/minecraft-modde');
+const gameModde = require('./Minecraft-utils/Minecraft-Modde');
 const gameAssetsMinecraft = require('./Minecraft-utils/Minecraft-Assets');
 const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
 const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
 const gameArgumentsMinecraft = require('./Minecraft-utils/Minecraft-Args');
-const gameStartMinecraft = require('./Minecraft-utils/Minecraft-start');
+const gameStartMinecraft = require('./Minecraft-utils/Minecraft-Start');
 const gameJavaMinecraft = require('./java/Java-json');
 const gameDownloadMinecraft = require('./download');
 
@@ -71,7 +71,7 @@ class Launch {
         if (InfoVersion.error) {
             return InfoVersion;
         }
-        let json = await fetch(InfoVersion.url).then(res => res.json());
+        let json = await nodeFetch(InfoVersion.url).then(res => res.json());
         return { InfoVersion: InfoVersion, json: json };
     }
 

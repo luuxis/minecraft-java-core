@@ -1,5 +1,5 @@
 'use strict';
-const fetch = require('node-fetch');
+const nodeFetch = require("node-fetch");
 
 class Assets {
     constructor(assetIndex) {
@@ -8,7 +8,7 @@ class Assets {
 
     async Getassets() {
         let assets = [];
-        let data = await fetch(this.assetIndex.url).then(res => res.json());
+        let data = await nodeFetch(this.assetIndex.url).then(res => res.json());
         for (let asset of Object.values(data.objects)) {
             assets.push({
                 sha1: asset.hash,

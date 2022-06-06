@@ -1,5 +1,5 @@
 'use strict';
-const fetch = require('node-fetch');
+const nodeFetch = require("node-fetch");
 const fs = require('fs');
 
 class moddeFiles {
@@ -11,7 +11,7 @@ class moddeFiles {
         if (this.config.url == null) {
             return [];
         }
-        let json = await fetch(this.config.url).then(res => res.json());
+        let json = await nodeFetch(this.config.url).then(res => res.json());
         let files = [];
         for (let modde of json) {
             if (!modde.url) continue;

@@ -11,7 +11,6 @@ class modde {
     async filesGameModde() {
         if(this.config.custom) return new moddeFiles(this.config).filesGameModde();
         else return [];
-        
     }
 
     async jsonModde() {
