@@ -34,7 +34,7 @@ async function main() {
         detached: false,
         java: true,
         args: [],
-        custom: false,
+        custom: true,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
