@@ -89,7 +89,7 @@ class Args {
         let librairiesModde = {}
 
         if (!this.gameModdeJson) librairiesModde = []
-        else librairiesModde = this.gameModdeJson.libraries.map(librarie => `${this.config.path}/libraries/${librarie.name.split(':')[0]}/${librarie.name.split(':')[1]}/${librarie.name.split(':')[2]}/${librarie.name.split(':')[1]}-${librarie.name.split(':')[2]}.jar`);
+        else librairiesModde = this.gameModdeJson.libraries.map(librarie => `${this.config.path}/libraries/${librarie.name.split(':')[0].replace(/\./g, '/')}/${librarie.name.split(':')[1]}/${librarie.name.split(':')[2]}/${librarie.name.split(':')[1]}-${librarie.name.split(':')[2]}.jar`);
 
         let libraries = [...librairiesModde, ...librariesMinecraft];
         if (process.platform == "win32") libraries = libraries.join(";");
