@@ -16,7 +16,7 @@ class java {
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
         } else if (os.platform() == "darwin") {
-            let arch = { x64: "mac-os", aarch64: "mac-os-arm64" }
+            let arch = { x64: "mac-os", arm64: "mac-os-arm64" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)   
         } else if (os.platform() == "linux") {
