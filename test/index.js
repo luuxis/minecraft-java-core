@@ -1,49 +1,50 @@
-const { launch, microsoft } = require('../index');
+const { Launch, Microsoft } = require('../index');
+const launch = new Launch();
 const fs = require('fs');
 
 let save = true;
-let client_id = '5a75d2a6-a3c0-4506-9f12-0a557534938a'
+let client_id = ''
 let mc
 
 async function main() {
     if (save) {
         if (!fs.existsSync('./account.json')) {
-            mc = await new microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            mc = await new Microsoft(client_id).getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
         }
 
         if (!mc.refresh_token) {
-            mc = await new microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            mc = await new Microsoft(client_id).getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         } else {
-            mc = await new microsoft(client_id).refresh(mc);
-            fs.writeFileSync('./account.json', JSON.stringify(mc, true, 4));
+            mc = await new Microsoft(client_id).refresh(mc);
+            fs.writeFileSync('./account.json', JSON.stringify({ refresh_token: mc.refresh_token }));
         }
     } else {
-        mc = await new microsoft(client_id).getAuth();
+        mc = await new Microsoft(client_id).getAuth();
     }
 
     let opts = {
-        url: "http://launcher.selvania.fr/files",
+        url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.18.2",
+        version: "latest_snapshot",
         detached: false,
         java: true,
         args: [],
         custom: true,
         verify: false,
-        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
+        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
         memory: {
-            min: `1G`,
-            max: `2G`
+            min: `2G`,
+            max: `4G`
         }
     }
 
-    launch.launch(opts)
+    launch.Launch(opts)
 
     launch.on('progress', (DL, totDL) => {
         console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
@@ -55,7 +56,6 @@ async function main() {
         let seconds = Math.floor(time - hours * 3600 - minutes * 60);
         console.log(`${hours}h ${minutes}m ${seconds}s`);
     })
-
 
     launch.on('data', (e) => {
         console.log(e)

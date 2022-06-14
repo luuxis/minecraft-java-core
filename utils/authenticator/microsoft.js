@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const nodeFetch = require('node-fetch');
 
 class Microsoft {
     constructor(client_id) {
@@ -15,7 +15,7 @@ class Microsoft {
     }
 
     async getAuth(type, url) {
-        if (!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=XboxLive.signin%20offline_access&prompt=select_account`;
+        if (!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=XboxLive.signin%20offline_access&cobrandid=8058f65d-ce06-4c30-9559-473c9275a65d&prompt=select_account`;
         if (!type) type = this.type;
 
         if (type == "electron") {
@@ -34,97 +34,31 @@ class Microsoft {
     }
 
     async url(code) {
-        let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
+        let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf`
         }).then(res => res.json());
-        if (oauth2.error) throw (`error: ${oauth2.error_description}`);
-
-        let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
-            method: "post",
-            body: JSON.stringify({
-                Properties: {
-                    AuthMethod: "RPS",
-                    SiteName: "user.auth.xboxlive.com",
-                    RpsTicket: "d=" + oauth2.access_token
-                },
-                RelyingParty: "http://auth.xboxlive.com",
-                TokenType: "JWT"
-            }),
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
-        }).then(res => res.json());
-        if (xbl.error) throw (`error: ${xbl.error_description}`);
-
-        let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                Properties: {
-                    SandboxId: "RETAIL",
-                    UserTokens: [
-                        xbl.Token
-                    ]
-                },
-                RelyingParty: "rp://api.minecraftservices.com/",
-                TokenType: "JWT"
-            })
-        }).then(res => res.json());
-        if (xsts.error) throw (`error: ${xsts.error_description}`);
-
-        let uhs = xbl.DisplayClaims.xui[0].uhs;
-        let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
-        }).then(res => res.json());
-        if (mcLogin.error) throw (`error: ${mcLogin.error_description}`);
-
-        //Get the profile
-        let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
-            method: "GET",
-            headers: {
-                'Authorization': `Bearer ${mcLogin.access_token}`
-            }
-        }).then(res => res.json());
-
-        return {
-            access_token: mcLogin.access_token,
-            client_token: getUUID(),
-            uuid: profile.id,
-            name: profile.name,
-            refresh_token: oauth2.refresh_token,
-            user_properties: '{}',
-            meta: {
-                type: "Xbox",
-                demo: profile.error ? true : false
-            },
-            profile: {
-                skins: profile.skins,
-                cape: profile.capes
-            }
-        }
+        if (oauth2.error) return oauth2;
+        return await this.getAccount(oauth2)
     }
 
     async refresh(acc) {
-        let oauth2 = await fetch("https://login.live.com/oauth20_token.srf", {
+        let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
         }).then(res => res.json());
-        if (oauth2.error) throw (`error: ${oauth2.error_description}`);
+        if (oauth2.error) return oauth2.error;
+        return await this.getAccount(oauth2)
+    }
 
-        let xbl = await fetch("https://user.auth.xboxlive.com/user/authenticate", {
+    async getAccount(oauth2) {
+        let xbl = await nodeFetch("https://user.auth.xboxlive.com/user/authenticate", {
             method: "post",
             body: JSON.stringify({
                 Properties: {
@@ -137,9 +71,9 @@ class Microsoft {
             }),
             headers: { "Content-Type": "application/json", Accept: "application/json" },
         }).then(res => res.json());
-        if (xbl.error) throw (`error: ${xbl.error_description}`);
+        if (xbl.error) return xbl.error;
 
-        let xsts = await fetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
+        let xsts = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -156,25 +90,19 @@ class Microsoft {
                 TokenType: "JWT"
             })
         }).then(res => res.json());
-        if (xsts.error) throw (`error: ${xsts.error_description}`);
+        if (xsts.error) return xsts.error;
 
-        let uhs = xbl.DisplayClaims.xui[0].uhs;
-        let mcLogin = await fetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
+        let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ "identityToken": `XBL3.0 x=${uhs};${xsts.Token}` })
+            body: JSON.stringify({ "identityToken": `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}` })
         }).then(res => res.json());
-        if (mcLogin.error) throw (`error: ${mcLogin.error_description}`);
+        if (mcLogin.error) return mcLogin.error;
 
-        let profile = await fetch("https://api.minecraftservices.com/minecraft/profile", {
-            method: "GET",
-            headers: {
-                'Authorization': `Bearer ${mcLogin.access_token}`
-            }
-        }).then(res => res.json());
+        let profile = await this.getProfile(mcLogin);
 
         return {
             access_token: mcLogin.access_token,
@@ -189,10 +117,41 @@ class Microsoft {
             },
             profile: {
                 skins: profile.skins,
-                cape: profile.capes
+                capes: profile.capes
             }
         }
     }
+
+    async getProfile(mcLogin) {
+        let profile = await nodeFetch("https://api.minecraftservices.com/minecraft/profile", {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${mcLogin.access_token}`
+            }
+        }).then(res => res.json());
+        if (profile.error) return profile;
+        let skins = profile.skins;
+        let capes = profile.capes;
+
+        for(let skin of skins) {
+            skin.base64 = await getBuffer(skin.url)
+        }
+        for(let cape of capes) {
+            cape.base64 = await getBuffer(cape.url)
+        }
+
+        return {
+            id: profile.id,
+            name: profile.name,
+            skins: profile.skins,
+            capes: profile.capes
+        }
+    }
+}
+async function getBuffer(url) {
+    let response = await nodeFetch(url);
+    let buffer = await response.buffer();
+    return `data:image/png;base64,${buffer.toString('base64')}`;
 }
 
 function getUUID() {

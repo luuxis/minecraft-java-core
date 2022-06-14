@@ -1,8 +1,8 @@
 module.exports = {
-    mojang: require('./utils/authenticator/mojang.js'),
-    microsoft: require('./utils/authenticator/microsoft.js'),
-    java: require('./utils/java/Java-json.js'),
-    launch: require('./utils/launch.js'),
-    status: require('./utils/status/statusserver.js'),
-    skin: require('./utils/skin/skin.js')
+    Mojang: require('./utils/authenticator/mojang.js'),
+    Microsoft: require('./utils/authenticator/microsoft.js'),
+    Java: require('./utils/java/Java-json.js'),
+    Launch: require('./utils/launch.js'),
+    Status: require('./utils/status/statusserver.js'),
+    Skin: require('./utils/skin/skin.js')
 }

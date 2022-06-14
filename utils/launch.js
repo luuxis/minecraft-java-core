@@ -1,32 +1,92 @@
 'use strict';
-const download = require('./download.js');
-const Handler = require('./minecraft/Minecraft-Json.js');
-const start = require('./minecraft/Minecraft-start.js');
-
+// import librairies nodejs
 const path = require('path');
-const fs = require('fs');
+const nodeFetch = require('node-fetch');
+
+//import modules minecraft-java-core
+const gameJsonMinecraft = require('./Minecraft-utils/Minecraft-Json');
+const gameModde = require('./Minecraft-utils/Minecraft-Modde');
+const gameAssetsMinecraft = require('./Minecraft-utils/Minecraft-Assets');
+const gameLibrariesMinecraft = require('./Minecraft-utils/Minecraft-Libraries');
+const gameVerifyMinecraft = require('./Minecraft-utils/Minecraft-Verify');
+const gameArgumentsMinecraft = require('./Minecraft-utils/Minecraft-Args');
+const gameStartMinecraft = require('./Minecraft-utils/Minecraft-Start');
+const gameJavaMinecraft = require('./java/Java-json');
+const gameDownloadMinecraft = require('./download');
 
 class Launch {
-    async launch(options) {
-        this.options = options;
-        if (this.options.javapath) {
-            this.options.java = false;
-            this.options.ignored.push(this.options.javapath);
-        }
-        this.options.authorization = await Promise.resolve(this.options.authorization);
-        this.jsonversion = new Handler(options);
-        this.java_version = await this.jsonversion.java_version();
-        this.checkFiles();
+    Launch(config = {}) {
+        // set variables config
+        this.config = {
+            url: config.url ? config.url : null,
+            authenticator: config.authenticator ? config.authenticator : null,
+            path: path.resolve(config.path ? config.path : './Minecraft').replace(/\\/g, '/'),
+            version: config.version ? config.version : 'latest_release',
+            detached: config.detached ? config.detached : false,
+
+            custom: config.custom ? config.custom : false,
+            verify: config.verify ? config.verify : false,
+            ignored: config.ignored ? config.ignored : [],
+            args: config.args ? config.args : [],
+
+            javaPath: config.javaPath ? config.javaPath : null,
+            java: config.java ? config.java : true,
+
+            memory: {
+                min: config.memory?.min ? config.memory.min : '1G',
+                max: config.memory?.max ? config.memory.max : '2G'
+            }
+        };
+
+        if(this.config.javaPath) this.config.java = false;
+        this.start()
     }
 
-    async checkFiles() {
-        this.files = await this.jsonversion.getJSONVersion(this.options.version);
-        if (this.options.verify) this.jsonversion.removeNonIgnoredFiles(this.files);
-        let todownload = await this.jsonversion.checkBundle(this.options.version)
+    async start() {
+        // download files
+        let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
+        let gameModdeJson = await new gameModde(this.config).jsonModde();
+        let args = new gameArgumentsMinecraft(gameJson.json, gameLibraries, gameModdeJson, this.config).GetArgs();
+        args = [...args.jvm, ...args.classpath, ...args.game];
+        
+        // set java path
+        let java = ''
+        if (this.config.javaPath) {
+            java = this.config.javaPath;
+        } else if (this.config.java) {
+            java = `${this.config.path}/runtime/${gameJava.version}/bin/java`
+        } else {
+            java = 'java';
+        }
+        // start game
+        this.emit('data', `Launching with arguments ${args.join(' ')}`)
+        let minecraft = new gameStartMinecraft(this.config, args, gameJson.json).start(java);
+        minecraft.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraft.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraft.on('close', (code) => this.emit('close', code))
+    }
 
-        if (todownload.length > 0) {
-            let downloader = new download();
-            let totsize = this.jsonversion.getTotalSize(todownload);
+    async GetJsonVersion() {
+        let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
+        if (InfoVersion.error) {
+            return InfoVersion;
+        }
+        let json = await nodeFetch(InfoVersion.url).then(res => res.json());
+        return { InfoVersion: InfoVersion, json: json };
+    }
+
+    async DownloadGame() {
+        let gameJson = await this.GetJsonVersion();
+        let gameModdeFiles = await new gameModde(this.config).filesGameModde();
+        let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
+        let gameLibraries = await new gameLibrariesMinecraft(gameJson).Getlibraries();
+        let gameJava = this.config.java ? await gameJavaMinecraft.GetJsonJava(gameJson.json) : [];
+        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameModdeFiles, ...gameJava.files ? gameJava.files : []];
+        let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
+        
+        if (gameDownloadListe.length > 0) {
+            let downloader = new gameDownloadMinecraft();
+            let totsize = await new gameVerifyMinecraft().getTotalSize(gameDownloadListe);
 
             downloader.on("progress", (DL, totDL) => {
                 this.emit("progress", DL, totDL);
@@ -42,84 +102,12 @@ class Launch {
 
             await new Promise((ret) => {
                 downloader.on("finish", ret);
-                downloader.multiple(todownload, totsize, 10);
+                downloader.multiple(gameDownloadListe, totsize, 10);
             });
         }
-
-        if (this.options.verify) this.jsonversion.removeNonIgnoredFiles(this.files);
-        this.jsonversion.natives(this.files);
-        this.startgame();
-    }
-
-    async startgame() {
-        this.path = (`${path.resolve(this.options.path)}`).replace(/\\/g, "/")
-        this.natives = `${this.path}/versions/${this.options.version}/natives`
-
-        this.vanilla = require(this.files.filter(mod => mod.type == "VERSION").map(mod => `${this.path}/${mod.path}`)[0])
-        if (this.options.custom === true) this.custom = require(this.files.filter(mod => mod.type == "VERIONSCUSTOM").map(mod => `${this.path}/${mod.path}`)[0])
-
-        this.json = this.vanilla
-        this.json.id = this.files.filter(mod => mod.type == "JARVERSION").map(mod => `${this.path}/${mod.path}`)[0]
-        this.json.mainClass = this.vanilla.mainClass
-        if (this.options.custom === true) {
-            this.json.custom = this.custom
-            this.json.mainClass = this.custom.mainClass
-        }
-
-        let source = {
-            natives: this.natives,
-            json: this.json,
-            authenticator: this.options.authenticator,
-            root: this.path,
-        }
-
-        this.start = new start(this.options, source);
-
-        let args = await this.start.agrs();
-
-        let jvm = args.jvm
-        let classPaths = args.classPaths
-        let launchOptions = args.launchOptions
-
-        let launchargs = [].concat(jvm, classPaths, launchOptions)
-        let java;
-
-        if (this.options.java) {
-            java = `${this.path}/runtime/${this.java_version}/bin/java`;
-        } else if (this.options.javapath) {
-            java = (`${path.resolve(this.options.javapath)}`).replace(/\\/g, "/");
-        } else {
-            java = "java";
-        }
-
-        if (this.start.isold()) {
-            const legacyDirectory = `${this.path}/resources`;
-            const index = require(`${this.path}/assets/indexes/${this.json.assets}`);
-            if (!fs.existsSync(legacyDirectory)) fs.mkdirSync(legacyDirectory, { recursive: true });
-
-            await Promise.all(Object.keys(index.objects).map(async asset => {
-                const hash = index.objects[asset].hash
-                const subhash = hash.substring(0, 2)
-                const subAsset = `${this.path}/assets/objects/${subhash}`
-
-                const legacyAsset = asset.split('/')
-                legacyAsset.pop()
-
-                if (!fs.existsSync(path.join(legacyDirectory, legacyAsset.join('/')))) {
-                    fs.mkdirSync(path.join(legacyDirectory, legacyAsset.join('/')), { recursive: true })
-                }
-
-                if (!fs.existsSync(path.join(legacyDirectory, asset))) {
-                    fs.copyFileSync(path.join(subAsset, hash), path.join(legacyDirectory, asset))
-                }
-            }))
-        }
-
-        this.emit('data', `Launching with arguments ${launchargs.join(' ')}`)
-        let game = this.start.start(launchargs, java)
-        game.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
-        game.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
-        game.on('close', (code) => this.emit('close', code))
+        if(this.config.verify) new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles();
+        new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
+        return [gameJson, gameAssets, gameLibraries, gameJava];
     }
 
     on(event, func) {
@@ -130,5 +118,4 @@ class Launch {
         if (this[event]) this[event](...args);
     }
 }
-
-module.exports = new Launch;
+module.exports = Launch;

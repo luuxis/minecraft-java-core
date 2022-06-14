@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const nodeFetch = require("node-fetch");
 const fs = require('fs');
 const FormData = require("form-data");
 
@@ -8,7 +8,7 @@ class skin {
         body.append("variant", data.slim ? 'slim' : 'Classic');
         body.append("file", data.data_skin, { contentType: "image/png", filename: "skin.png" });
 
-        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
+        let skin = await nodeFetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
             headers: { 'Authorization': `Bearer ${data.access_token}` },
             body: body,
@@ -18,7 +18,7 @@ class skin {
     }
 
     async SkinChangeURL(data) {
-        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins", {
+        let skin = await nodeFetch("https://api.minecraftservices.com/minecraft/profile/skins", {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`,
@@ -34,7 +34,7 @@ class skin {
     }
 
     async SkinDelete(data) {
-        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/skins/active", {
+        let skin = await nodeFetch("https://api.minecraftservices.com/minecraft/profile/skins/active", {
             method: "DELETE",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`
@@ -45,7 +45,7 @@ class skin {
     }
 
     async CapeChange(data) {
-        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
+        let skin = await nodeFetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
             method: "PUT",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`,
@@ -60,7 +60,7 @@ class skin {
     }
 
     async CapeDelete(data) {
-        let skin = await fetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
+        let skin = await nodeFetch("https://api.minecraftservices.com/minecraft/profile/capes/active", {
             method: "DELETE",
             headers: {
                 'Authorization': `Bearer ${data.access_token}`

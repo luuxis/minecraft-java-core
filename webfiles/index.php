@@ -12,7 +12,7 @@ function dirToArray($dir) {
             $path = str_replace("files/", "", $dir . "/" . $value);
             $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $dir . "/" . $value;
             if (strpos($path, "libraries") !== false) {
-               $type = "LIBRARY";
+               $type = "MODDELIBRARY";
             } else if (strpos($path, "mods") !== false) {
                $type = "MOD";
             } else if (strpos($path, "versions") !== false) {

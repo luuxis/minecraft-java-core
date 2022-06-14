@@ -1,13 +1,13 @@
 'use strict';
 
-const fetch = require("node-fetch");
+const nodeFetch = require("node-fetch");
 const fs = require("fs");
 
 module.exports = class Downloader {
     async start(url) {
-        let size = await fetch(url, { method: "HEAD" }).then(res => parseInt(res.headers.get("content-length")));
+        let size = await nodeFetch(url, { method: "HEAD" }).then(res => parseInt(res.headers.get("content-length")));
         this.emit("progress", 0, size);
-        let res = await fetch(url);
+        let res = await nodeFetch(url);
 
         let data = Buffer.allocUnsafe(size);
         let downloaded = 0;
@@ -102,7 +102,7 @@ module.exports = class Downloader {
             let flag = fs.openSync(file.path, "w", 0o777);
             let position = 0;
 
-            let res = await fetch(file.url);
+            let res = await nodeFetch(file.url);
             res.body.on('data', (chunk) => {
                 downloaded += chunk.length;
                 position += chunk.length;

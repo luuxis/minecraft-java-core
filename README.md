@@ -8,8 +8,6 @@ NodeJS Module for Minecraft launcher
 [![size](https://img.shields.io/github/languages/code-size/luuxis/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
 <br>
 [![sizeinstall](https://badgen.net/packagephobia/install/minecraft-java-core)](https://npmjs.com/minecraft-java-core)
----
-**Minecraft-Java-Core** is based of [minecraft-launcher-core](https://www.npmjs.com/package/minecraft-launcher-core) *dev by Pierce01* **and based of** [pharuxtan](https://github.com/pharuxtan)
 
 ---
 ## Avantages :dizzy:
@@ -36,17 +34,18 @@ npm i minecraft-java-core
 ## Usage :triangular_flag_on_post:
 Require library
 ```javascript
-const { launch, mojang } = require('minecraft-java-core');
+const { Launch, Mojang } = require('minecraft-java-core');
 ```
 
 ## Launch :rocket:
 ### Options
 ```javascript
 const { launch, mojang } = require('minecraft-java-core');
+const launch = new Launch();
 
     let opts = {
         url: "http://launcher.selvania.fr/files",
-        authenticator: mojang.getAuth('luuxis'),
+        authenticator: Mojang.getAuth('luuxis'),
         path: "./.Minecraft",
         version: "1.18.2",
         detached: false,
@@ -62,7 +61,7 @@ const { launch, mojang } = require('minecraft-java-core');
         }
     }
 
-launch.launch(opts)
+launch.Launch(opts)
 
 launch.on('progress', (DL, totDL) => {
     console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
