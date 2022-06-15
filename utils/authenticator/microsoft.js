@@ -82,9 +82,7 @@ class Microsoft {
             body: JSON.stringify({
                 Properties: {
                     SandboxId: "RETAIL",
-                    UserTokens: [
-                        xbl.Token
-                    ]
+                    UserTokens: [ xbl.Token ]
                 },
                 RelyingParty: "rp://api.minecraftservices.com/",
                 TokenType: "JWT"
@@ -134,11 +132,11 @@ class Microsoft {
         let capes = profile.capes;
 
         for(let skin of skins) {
-            skin.base64 = await getBuffer(skin.url)
+            skin.base64 = await getBass64(skin.url)
             skin.dataType = 'data:image/png;base64'
         }
         for(let cape of capes) {
-            cape.base64 = await getBuffer(cape.url)
+            cape.base64 = await getBass64(cape.url)
             cape.dataType = 'data:image/png;base64'
         }
 
@@ -150,10 +148,10 @@ class Microsoft {
         }
     }
 }
-async function getBuffer(url) {
+async function getBass64(url) {
     let response = await nodeFetch(url);
     let buffer = await response.buffer();
-    return `data:image/png;base64,${buffer.toString('base64')}`;
+    return buffer.toString('base64');
 }
 
 function getUUID() {
