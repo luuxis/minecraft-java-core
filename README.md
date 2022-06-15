@@ -20,8 +20,8 @@ NodeJS Module for Minecraft launcher
 
 ## Quick Start :zap:
 ```npm
-git clone https://github.com/luuxis/Uzurion-Launcher.git
-cd Uzurion-Launcher
+git clone https://github.com/luuxis/Selvania-Launcher.git
+cd Selvania-Launcher
 npm install
 npm start
 ```
@@ -40,18 +40,18 @@ const { Launch, Mojang } = require('minecraft-java-core');
 ## Launch :rocket:
 ### Options
 ```javascript
-const { launch, mojang } = require('minecraft-java-core');
+const { Launch, Mojang } = require('minecraft-java-core');
 const launch = new Launch();
 
     let opts = {
         url: "http://launcher.selvania.fr/files",
         authenticator: Mojang.getAuth('luuxis'),
         path: "./.Minecraft",
-        version: "1.18.2",
+        version: "1.19",
         detached: false,
         java: true,
         args: [],
-        custom: true,
+        modde: true,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
 

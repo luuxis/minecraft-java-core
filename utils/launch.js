@@ -24,7 +24,7 @@ class Launch {
             version: config.version ? config.version : 'latest_release',
             detached: config.detached ? config.detached : false,
 
-            custom: config.custom ? config.custom : false,
+            modde: config.modde ? config.modde : false,
             verify: config.verify ? config.verify : false,
             ignored: config.ignored ? config.ignored : [],
             args: config.args ? config.args : [],

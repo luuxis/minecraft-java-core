@@ -9,12 +9,12 @@ class modde {
     }
 
     async filesGameModde() {
-        if(this.config.custom) return new moddeFiles(this.config).filesGameModde();
+        if(this.config.modde) return new moddeFiles(this.config).filesGameModde();
         else return [];
     }
 
     async jsonModde() {
-        if(this.config.custom) return new moddeJson(this.config).jsonModde(await this.filesGameModde());
+        if(this.config.modde) return new moddeJson(this.config).jsonModde(await this.filesGameModde());
         else return false;
     }
 }
