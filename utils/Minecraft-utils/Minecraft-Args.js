@@ -20,7 +20,7 @@ class Args {
 
     GetGame() {
         let game = this.json.minecraftArguments ? this.json.minecraftArguments.split(' ') : this.json.arguments.game;
-        if (this.config.custom) {
+        if (this.config.modde) {
             let gamemodde = this.gameModdeJson.minecraftArguments ? this.gameModdeJson.minecraftArguments.split(' ') : this.gameModdeJson.arguments
             if (!gamemodde.game) {
                 game.push(...gamemodde)
