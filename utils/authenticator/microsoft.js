@@ -135,9 +135,11 @@ class Microsoft {
 
         for(let skin of skins) {
             skin.base64 = await getBuffer(skin.url)
+            skin.dataType = 'data:image/png;base64'
         }
         for(let cape of capes) {
             cape.base64 = await getBuffer(cape.url)
+            cape.dataType = 'data:image/png;base64'
         }
 
         return {
