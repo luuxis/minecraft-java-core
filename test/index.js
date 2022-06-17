@@ -13,14 +13,14 @@ async function main() {
             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
-        }
-
-        if (!mc.refresh_token) {
-            mc = await new Microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
-        } else {
-            mc = await new Microsoft(client_id).refresh(mc, null, 4);
-            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            
+            if (!mc.refresh_token) {
+                mc = await new Microsoft(client_id).getAuth();
+                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            } else {
+                mc = await new Microsoft(client_id).refresh(mc);
+                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            }
         }
     } else {
         mc = await new Microsoft(client_id).getAuth();
@@ -30,11 +30,11 @@ async function main() {
         url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "latest_snapshot",
+        version: "1.16.1",
         detached: false,
         java: true,
         args: [],
-        modde: true,
+        modde: false,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
