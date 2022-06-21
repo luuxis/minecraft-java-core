@@ -53,7 +53,7 @@ class Microsoft {
             },
             body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
         }).then(res => res.json());
-        if (oauth2.error) return oauth2.error;
+        if (oauth2.error) return oauth2;
         return await this.getAccount(oauth2)
     }
 
@@ -71,7 +71,7 @@ class Microsoft {
             }),
             headers: { "Content-Type": "application/json", Accept: "application/json" },
         }).then(res => res.json());
-        if (xbl.error) return xbl.error;
+        if (xbl.error) return xbl;
 
         let xsts = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
             method: "POST",
@@ -88,7 +88,7 @@ class Microsoft {
                 TokenType: "JWT"
             })
         }).then(res => res.json());
-        if (xsts.error) return xsts.error;
+        if (xsts.error) return xsts;
 
         let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
@@ -98,7 +98,13 @@ class Microsoft {
             },
             body: JSON.stringify({ "identityToken": `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}` })
         }).then(res => res.json());
-        if (mcLogin.error) return mcLogin.error;
+        if (mcLogin.error) return mcLogin;    
+        
+        let mcstore = await nodeFetch("https://api.minecraftservices.com/entitlements/mcstore", {
+            method: "get",
+            headers: { 'Authorization': `Bearer ${mcLogin.access_token}` }
+        }).then(res => res.json());
+        if (mcstore.error) return mcstore;
 
         let profile = await this.getProfile(mcLogin);
 
