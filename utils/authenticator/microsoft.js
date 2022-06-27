@@ -149,8 +149,8 @@ class Microsoft {
         return {
             id: profile.id,
             name: profile.name,
-            skins: profile.skins,
-            capes: profile.capes
+            skins: profile.skins || [],
+            capes: profile.capes || []
         }
     }
 }
