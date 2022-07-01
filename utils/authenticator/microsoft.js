@@ -154,6 +154,7 @@ class Microsoft {
         }
     }
 }
+
 async function getBass64(url) {
     let response = await nodeFetch(url);
     let buffer = await response.buffer();
