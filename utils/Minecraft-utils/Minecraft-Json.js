@@ -7,7 +7,7 @@ class Json {
     }
 
     async GetInfoVersion() {
-        let data = await nodeFetch('https://launchermeta.mojang.com/mc/game/version_manifest_v2.json');
+        let data = await nodeFetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
         data = await data.json();
 
         if (this.version == 'latest_release' || this.version == 'r' || this.version == 'lr') {
