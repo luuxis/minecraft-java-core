@@ -32,6 +32,12 @@ module.exports = class Launch {
             javaPath: config.javaPath ? config.javaPath : null,
             java: config.java ? config.java : true,
 
+            screen: config.screen ? {
+                width: config.screen ? config.screen.width : null,
+                height: config.screen ? config.screen.height : null,
+                fullscreen: config.screen ? config.screen.fullscreen : null,
+            } : false,
+
             memory: {
                 min: config.memory?.min ? config.memory.min : '1G',
                 max: config.memory?.max ? config.memory.max : '2G'
@@ -108,7 +114,7 @@ module.exports = class Launch {
         }
         if(this.config.verify) new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles();
         new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
-        return [gameJson, gameAssets, gameLibraries, gameJava];
+        return [gameJson, gameLibraries, gameJava];
     }
 
     on(event, func) {
