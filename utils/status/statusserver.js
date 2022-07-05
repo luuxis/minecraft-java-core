@@ -1,6 +1,6 @@
 const net = require('net');
 
-class status {
+module.exports = class status {
     constructor(ip = '0.0.0.0', port = 25565) {
         this.ip = ip
         this.port = port
@@ -42,5 +42,3 @@ class status {
         })
     }
 }
-
-module.exports = status

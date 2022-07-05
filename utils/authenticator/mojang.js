@@ -4,7 +4,7 @@ const { v3: uuidv3 } = require('uuid')
 const nodeFetch = require("node-fetch")
 let api_url = 'https://authserver.mojang.com'
 
-class Mojang {
+module.exports = new class Mojang {
     async getAuth(username, password) {
         let UUID = uuidv3(username, uuidv3.DNS)
         if (!password) {
@@ -125,5 +125,3 @@ class Mojang {
         api_url = url
     }
 }
-
-module.exports = new Mojang;

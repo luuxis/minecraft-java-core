@@ -1,7 +1,7 @@
 const os = require("os");
 const nodeFetch = require("node-fetch");
 
-class java {
+module.exports = new class java {
     async GetJsonJava(jsonversion) {
         let files = [];
         let version
@@ -46,5 +46,3 @@ class java {
         return { files: files, version: version };
     }
 }
-
-module.exports = new java;

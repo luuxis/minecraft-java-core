@@ -1,6 +1,6 @@
 const jimp = require('jimp');
 
-class skin2D {
+module.exports = class skin2D {
     constructor(buffer, slim = false) {
         this.buffer = buffer;
         this.slim = slim;
@@ -58,5 +58,3 @@ class skin2D {
         return await jimp.read(this.buffer);
     }
 }
-
-module.exports = skin2D;

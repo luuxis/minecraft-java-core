@@ -2,7 +2,7 @@
 const fs = require('fs');
 const child = require("child_process");
 
-class start {
+module.exports = class start {
     constructor(config, args, json) {
         this.config = config;
         this.args = args;
@@ -40,4 +40,3 @@ class start {
         return this.json.assets === 'legacy' || this.json.assets === 'pre-1.6'
     }
 }
-module.exports = start;

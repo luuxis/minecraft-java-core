@@ -1,6 +1,6 @@
 'use strict';
 
-class Args {
+module.exports = class Args {
     constructor(json, librariesMinecraft, gameModdeJson, config) {
         this.json = json;
         this.librariesMinecraft = librariesMinecraft;
@@ -125,5 +125,3 @@ class Args {
         return opts[process.platform]
     }
 }
-
-module.exports = Args;

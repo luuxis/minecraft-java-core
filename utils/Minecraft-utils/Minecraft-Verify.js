@@ -3,7 +3,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 
-class Verify {
+module.exports = class Verify {
     constructor(bundle, config) {
         this.bundle = bundle;
         this.config = config;
@@ -100,4 +100,3 @@ class Verify {
         return todownload;
     }
 }
-module.exports = Verify;

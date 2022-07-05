@@ -1,6 +1,6 @@
 const nodeFetch = require('node-fetch');
 
-class Microsoft {
+module.exports = class Microsoft {
     constructor(client_id) {
         if (client_id === "" || !client_id) client_id = "00000000402b5328";
         this.client_id = client_id;
@@ -169,5 +169,3 @@ function getUUID() {
     }
     return result;
 }
-
-module.exports = Microsoft;

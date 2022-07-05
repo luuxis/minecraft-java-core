@@ -1,8 +1,7 @@
 'use strict';
 const nodeFetch = require("node-fetch");
-const fs = require('fs');
 
-class moddeFiles {
+module.exports = class moddeFiles {
     constructor(config) {
         this.config = config;
     }
@@ -26,4 +25,3 @@ class moddeFiles {
         return files;
     }
 }
-module.exports = moddeFiles;

@@ -1,7 +1,7 @@
 'use strict';
 const fs = require('fs');
 
-class moddeFiles {
+module.exports = class moddeFiles {
     constructor(config) {
         this.config = config;
     }
@@ -12,4 +12,3 @@ class moddeFiles {
         return JSON.parse(json)
     }
 }
-module.exports = moddeFiles;

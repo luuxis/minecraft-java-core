@@ -3,7 +3,7 @@
 const moddeFiles = require('./Modde/Minecraft-Modde-Files');
 const moddeJson = require('./Modde/Minecraft-Modde-Json');
 
-class modde {
+module.exports = class modde {
     constructor(config) {
         this.config = config;
     }
@@ -18,4 +18,3 @@ class modde {
         else return false;
     }
 }
-module.exports = modde;

@@ -2,7 +2,7 @@ const nodeFetch = require("node-fetch");
 const fs = require('fs');
 const FormData = require("form-data");
 
-class skin {
+module.exports = new class skin {
     async SkinChangeUpload(data) {
         const body = new FormData();
         body.append("variant", data.slim ? 'slim' : 'Classic');
@@ -82,4 +82,3 @@ class skin {
         return Buffer.from(base64, 'base64');
     }
 }
-module.exports = new skin;

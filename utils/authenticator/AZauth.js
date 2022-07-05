@@ -1,6 +1,6 @@
 const nodeFetch = require('node-fetch');
 
-class AZauth {
+module.exports = new class AZauth {
     constructor(url) {
         this.url = `${url}/api/auth`;
     }
@@ -75,5 +75,3 @@ function getUUID() {
     }
     return result;
 }
-
-module.exports = AZauth;

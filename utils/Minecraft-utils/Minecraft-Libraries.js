@@ -6,7 +6,7 @@ const AdmZip = require('adm-zip');
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
 let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
-class Libraries {
+module.exports = class Libraries {
     constructor(version, config) {
         this.version = version.json;
         this.infoVersion = version.InfoVersion;
@@ -79,5 +79,3 @@ class Libraries {
         return natives;
     }
 }
-
-module.exports = Libraries;

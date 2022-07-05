@@ -14,7 +14,7 @@ const gameStartMinecraft = require('./Minecraft-utils/Minecraft-Start');
 const gameJavaMinecraft = require('./java/Java-json');
 const gameDownloadMinecraft = require('./download');
 
-class Launch {
+module.exports = class Launch {
     Launch(config = {}) {
         // set variables config
         this.config = {
@@ -44,7 +44,9 @@ class Launch {
 
     async start() {
         // download files
-        let [gameJson, gameAssets, gameLibraries, gameJava] = await this.DownloadGame();
+        let [gameJson, gameLibraries, gameJava] = await this.DownloadGame();
+        if (gameJson.error) return console.log(gameJson.message);
+    
         let gameModdeJson = await new gameModde(this.config).jsonModde();
         let args = new gameArgumentsMinecraft(gameJson.json, gameLibraries, gameModdeJson, this.config).GetArgs();
         args = [...args.jvm, ...args.classpath, ...args.game];
@@ -68,15 +70,14 @@ class Launch {
 
     async GetJsonVersion() {
         let InfoVersion = await new gameJsonMinecraft(this.config.version).GetInfoVersion();
-        if (InfoVersion.error) {
-            return InfoVersion;
-        }
+        if (InfoVersion.error) return InfoVersion;
         let json = await nodeFetch(InfoVersion.url).then(res => res.json());
         return { InfoVersion: InfoVersion, json: json };
     }
 
     async DownloadGame() {
         let gameJson = await this.GetJsonVersion();
+        if (gameJson.error) return [gameJson];
         let gameModdeFiles = await new gameModde(this.config).filesGameModde();
         let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
         let gameLibraries = await new gameLibrariesMinecraft(gameJson).Getlibraries();
@@ -118,4 +119,3 @@ class Launch {
         if (this[event]) this[event](...args);
     }
 }
-module.exports = Launch;

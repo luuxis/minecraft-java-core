@@ -1,7 +1,7 @@
 'use strict';
 const nodeFetch = require("node-fetch");
 
-class Assets {
+module.exports = class Assets {
     constructor(assetIndex) {
         this.assetIndex = assetIndex;
     }
@@ -28,5 +28,3 @@ class Assets {
         return { assetIndex: data, assets: assets };
     }
 }
-
-module.exports = Assets;
