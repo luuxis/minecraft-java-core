@@ -30,10 +30,15 @@ async function main() {
         url: 'https://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.16.1",
+        version: "1.16.5",
         detached: false,
         java: true,
         args: [],
+        screen: {
+            width: 1280,
+            height: 720,
+            fullscreen: false
+        },
         modde: false,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
@@ -59,6 +64,10 @@ async function main() {
 
     launch.on('data', (e) => {
         console.log(e)
+    })
+
+    launch.on('close', (e) => {
+        console.log('Game closed with code')
     })
 }
 main();
