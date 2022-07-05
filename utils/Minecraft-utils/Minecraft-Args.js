@@ -50,6 +50,11 @@ module.exports = class Args {
             if (Object.keys(table).includes(game[i])) game[i] = table[game[i]]
         }
 
+        if (this.config.screen) {
+            if (this.config.screen.fullscreen) game.push('--fullscreen')
+            else game.push('--width', this.config.screen.width, '--height', this.config.screen.height)
+        }
+
         return game;
     }
 
@@ -66,7 +71,7 @@ module.exports = class Args {
             `-Xms${this.config.memory.min}`,
             `-Xmx${this.config.memory.max}`
         ]
-        return jvm;
+        return [...jvm, ...this.config.args];
     }
 
     GetArgumentsModde() {
