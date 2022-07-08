@@ -83,10 +83,8 @@ module.exports = class Verify {
             if (files.length == 0) file.push(path);
             for (let i in files) {
                 let name = `${path}/${files[i]}`;
-                if (fs.statSync(name).isDirectory())
-                    this.getFiles(name, file);
-                else
-                    file.push(name);
+                if (fs.statSync(name).isDirectory()) this.getFiles(name, file);
+                else file.push(name);
             }
         }
         return file;

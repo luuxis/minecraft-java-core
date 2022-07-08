@@ -4,6 +4,6 @@ module.exports = {
     Java: require('./utils/java/Java-json.js'),
     AZauth: require('./utils/authenticator/AZauth.js'),
     Launch: require('./utils/launch.js'),
-    Status: require('./utils/status/statusserver.js'),
+    Status: require('./utils/status/statusServer.js'),
     Skin: require('./utils/skin/skin.js')
 }
