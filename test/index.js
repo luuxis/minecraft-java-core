@@ -3,7 +3,7 @@ const launch = new Launch();
 const fs = require('fs');
 
 let save = true;
-let client_id = ''
+let client_id = '13f589e1-e2fc-443e-a68a-63b0092b8eeb'
 let mc
 
 async function main() {
@@ -27,10 +27,10 @@ async function main() {
     }
 
     let opts = {
-        url: 'https://launcher.selvania.fr/files',
+        url: 'https://launcher.selvania.fr/1.8',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.16.5",
+        version: "1.8.9",
         detached: false,
         java: true,
         args: [],
@@ -39,7 +39,7 @@ async function main() {
             height: 720,
             fullscreen: false
         },
-        modde: false,
+        modde: true,
         verify: false,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 

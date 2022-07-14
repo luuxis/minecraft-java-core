@@ -53,7 +53,10 @@ module.exports = class Microsoft {
             },
             body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
         }).then(res => res.json());
-        if (oauth2.error) return oauth2;
+        if (oauth2.error) {
+            oauth2.errorType = "oauth2";
+            return oauth2
+        };
         return await this.getAccount(oauth2)
     }
 
@@ -71,7 +74,10 @@ module.exports = class Microsoft {
             }),
             headers: { "Content-Type": "application/json", Accept: "application/json" },
         }).then(res => res.json());
-        if (xbl.error) return xbl;
+        if (xbl.error) {
+            xbl.errorType = "xbl";
+            return xbl
+        }
 
         let xsts = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
             method: "POST",
@@ -88,7 +94,10 @@ module.exports = class Microsoft {
                 TokenType: "JWT"
             })
         }).then(res => res.json());
-        if (xsts.error) return xsts;
+        if (xsts.error) {
+            xsts.errorType = "xsts";
+            return xsts
+        }
 
         let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
@@ -98,15 +107,25 @@ module.exports = class Microsoft {
             },
             body: JSON.stringify({ "identityToken": `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}` })
         }).then(res => res.json());
-        if (mcLogin.error) return mcLogin;    
+        if (mcLogin.error) {
+            mcLogin.errorType = "mcLogin";
+            return mcLogin
+        }
         
         let mcstore = await nodeFetch("https://api.minecraftservices.com/entitlements/mcstore", {
             method: "get",
             headers: { 'Authorization': `Bearer ${mcLogin.access_token}` }
         }).then(res => res.json());
-        if (mcstore.error) return mcstore;
+        if (mcstore.error) {
+            mcstore.errorType = "mcstore";
+            return mcstore
+        }
 
         let profile = await this.getProfile(mcLogin);
+        if (profile.error) {
+            profile.errorType = "profile";
+            return profile
+        }
 
         return {
             access_token: mcLogin.access_token,
@@ -133,7 +152,8 @@ module.exports = class Microsoft {
                 'Authorization': `Bearer ${mcLogin.access_token}`
             }
         }).then(res => res.json());
-        if (profile.error) return profile;
+        if (profile.error) return profile
+
         let skins = profile.skins;
         let capes = profile.capes;
 
