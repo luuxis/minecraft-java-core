@@ -73,7 +73,8 @@ module.exports = class Libraries {
                     fs.mkdirSync(`${nativeFolder}/${entry.entryName}`, { recursive: true, mode: 0o777 });
                     continue
                 }
-                fs.writeFileSync(`${nativeFolder}/${entry.entryName}`, entry.getData(), { encoding: "utf8", mode: 0o777 });
+                fs.writeFile( `${nativeFolder}/${entry.entryName}`, zip.readFile(entry), { encoding: "utf8", mode: 0o777 }, (err) => {
+                });
             }
         }
         return natives;

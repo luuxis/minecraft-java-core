@@ -61,15 +61,15 @@ module.exports = class Args {
     GetJVM() {
         let jvm = [
             this.getjvm(),
+            `-Xms${this.config.memory.min}`,
+            `-Xmx${this.config.memory.max}`,
             '-XX:+UnlockExperimentalVMOptions',
             '-XX:G1NewSizePercent=20',
             '-XX:G1ReservePercent=20',
             '-XX:MaxGCPauseMillis=50',
             '-XX:G1HeapRegionSize=32M',
             '-Dfml.ignoreInvalidMinecraftCertificates=true',
-            `-Djava.library.path=${this.config.path}/versions/${this.version}/natives`,
-            `-Xms${this.config.memory.min}`,
-            `-Xmx${this.config.memory.max}`
+            `-Djava.library.path=${this.config.path}/versions/${this.version}/natives`
         ]
         return [...jvm, ...this.config.args];
     }
