@@ -62,19 +62,18 @@ module.exports = class Libraries {
     async natives(bundle) {
         let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${mod.path}`);
         let nativeFolder = (`${this.config.path}/versions/${this.version.id}/natives`).replace(/\\/g, "/");
-        if(!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
-    
-        for(let native of natives){
+        if (!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
+
+        for (let native of natives) {
             let zip = new AdmZip(native);
             let entries = zip.getEntries();
-            for(let entry of entries){
-                if(entry.entryName.startsWith("META-INF")) continue;
-                if(entry.isDirectory){
+            for (let entry of entries) {
+                if (entry.entryName.startsWith("META-INF")) continue;
+                if (entry.isDirectory) {
                     fs.mkdirSync(`${nativeFolder}/${entry.entryName}`, { recursive: true, mode: 0o777 });
                     continue
                 }
-                fs.writeFile( `${nativeFolder}/${entry.entryName}`, zip.readFile(entry), { encoding: "utf8", mode: 0o777 }, (err) => {
-                });
+                fs.writeFile(`${nativeFolder}/${entry.entryName}`, zip.readFile(entry), { encoding: "utf8", mode: 0o777 }, () => {});
             }
         }
         return natives;
