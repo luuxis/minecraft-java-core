@@ -5,5 +5,5 @@ module.exports = {
     AZauth: require('./utils/authenticator/AZauth.js'),
     Launch: require('./utils/launch.js'),
     Status: require('./utils/status/statusServer.js'),
-    Skin: require('./utils/skin/skin.js')
+    // Skin: require('./utils/skin/skin.js')
 }
