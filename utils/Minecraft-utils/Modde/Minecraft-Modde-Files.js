@@ -1,3 +1,8 @@
+/**
+ * @author Luuxis
+ * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 'use strict';
 const nodeFetch = require("node-fetch");
 
@@ -22,6 +27,7 @@ module.exports = class moddeFiles {
             file.type = modde.type
             files.push(file);
         }
+        
         return files;
     }
 }

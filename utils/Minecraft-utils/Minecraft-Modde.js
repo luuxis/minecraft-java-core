@@ -1,3 +1,8 @@
+/**
+ * @author Luuxis
+ * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
 'use strict';
 
 const moddeFiles = require('./Modde/Minecraft-Modde-Files');
