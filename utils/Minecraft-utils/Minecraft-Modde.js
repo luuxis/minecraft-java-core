@@ -5,8 +5,7 @@
 
 'use strict';
 
-const moddeFiles = require('./Modde/Minecraft-Modde-Files');
-const moddeJson = require('./Modde/Minecraft-Modde-Json');
+const nodeFetch = require('node-fetch');
 
 module.exports = class modde {
     constructor(config) {
@@ -14,13 +13,31 @@ module.exports = class modde {
     }
 
     async filesGameModde() {
-        if(this.config.modde) return new moddeFiles(this.config).filesGameModde();
-        else return [];
+        if (this.config.modde) {
+            if (this.config.url == null) return [];
+            let json = await nodeFetch(this.config.url).then(res => res.json());
+            let files = [];
+            for (let modde of json) {
+                if (!modde.url) continue;
+                let file = {}
+                file.path = modde.path,
+                    file.size = modde.size,
+                    file.sha1 = modde.sha1,
+                    file.url = modde.url,
+                    file.type = modde.type
+                files.push(file);
+            }
+            return files;
+        } else return [];
     }
 
     async jsonModde() {
-        if(this.config.modde) return new moddeJson(this.config).jsonModde(await this.filesGameModde());
-        else return false;
+        if (this.config.modde) {
+            let files = await this.filesGameModde();
+            let urlModdejson = files.filter(file => file.type == 'VERIONSCUSTOM').map(file => file.url)[0];
+            let jsonModde = await nodeFetch(urlModdejson);
+            return jsonModde.json();
+        } else return false;
     }
 
     async GameModde() {
