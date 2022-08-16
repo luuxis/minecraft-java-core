@@ -5,6 +5,7 @@
 
 'use strict';
 const fs = require('fs');
+const nodeFetch = require('node-fetch');
 
 module.exports = class moddeFiles {
     constructor(config) {
@@ -12,8 +13,8 @@ module.exports = class moddeFiles {
     }
 
     async jsonModde(files) {
-        let pathModdejson = files.filter(file => file.type == 'VERIONSCUSTOM').map(file => file.path)[0];
-        let json = fs.readFileSync(`${this.config.path}/${pathModdejson}`, 'utf8');
-        return JSON.parse(json)
+        let urlModdejson = files.filter(file => file.type == 'VERIONSCUSTOM').map(file => file.url)[0];
+        let jsonModde = await nodeFetch(urlModdejson);
+        return jsonModde.json();
     }
 }

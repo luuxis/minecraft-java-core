@@ -55,22 +55,20 @@ module.exports = class Launch {
 
     async start() {
         // download files
-        let [gameJson, gameLibraries, gameJava] = await this.DownloadGame();
+        let [gameJson, gameLibraries, gameJava, gameModdeJson] = await this.DownloadGame();
         if (gameJson.error) return console.log(gameJson.message);
     
-        let gameModdeJson = await new gameModde(this.config).jsonModde();
         let args = new gameArgumentsMinecraft(gameJson.json, gameLibraries, gameModdeJson, this.config).GetArgs();
         args = [...args.jvm, ...args.classpath, ...args.game];
         
         // set java path
-        let java = ''
+        let java = 'java'
         if (this.config.javaPath) {
             java = this.config.javaPath;
         } else if (this.config.java) {
             java = `${this.config.path}/runtime/${gameJava.version}/bin/java`
-        } else {
-            java = 'java';
         }
+        
         // start game
         this.emit('data', `Launching with arguments ${args.join(' ')}`)
         let minecraft = new gameStartMinecraft(this.config, args, gameJson.json).start(java);
@@ -89,11 +87,11 @@ module.exports = class Launch {
     async DownloadGame() {
         let gameJson = await this.GetJsonVersion();
         if (gameJson.error) return [gameJson];
-        let gameModdeFiles = await new gameModde(this.config).filesGameModde();
+        let gameModdeConf = await new gameModde(this.config).GameModde();
         let gameAssets = await new gameAssetsMinecraft(gameJson.json.assetIndex).Getassets();
         let gameLibraries = await new gameLibrariesMinecraft(gameJson).Getlibraries();
         let gameJava = this.config.java ? await gameJavaMinecraft.GetJsonJava(gameJson.json) : [];
-        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameModdeFiles, ...gameJava.files ? gameJava.files : []];
+        let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameModdeConf.gameModdeFiles, ...gameJava.files ? gameJava.files : []];
         let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
         
         if (gameDownloadListe.length > 0) {
@@ -119,7 +117,7 @@ module.exports = class Launch {
         }
         if(this.config.verify) new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles();
         new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);
-        return [gameJson, gameLibraries, gameJava];
+        return [gameJson, gameLibraries, gameJava, gameModdeConf.gameModdeJson];
     }
 
     on(event, func) {

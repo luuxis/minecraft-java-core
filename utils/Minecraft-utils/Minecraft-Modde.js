@@ -22,4 +22,11 @@ module.exports = class modde {
         if(this.config.modde) return new moddeJson(this.config).jsonModde(await this.filesGameModde());
         else return false;
     }
+
+    async GameModde() {
+        return {
+            gameModdeFiles: await this.filesGameModde(),
+            gameModdeJson: await this.jsonModde()
+        }
+    }
 }
