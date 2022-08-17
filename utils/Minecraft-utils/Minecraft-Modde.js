@@ -28,9 +28,10 @@ module.exports = class modde {
         let response = await nodeFetch(url);
         if(response.status == 200) {
             let size = response.headers.get('content-length');
+            console.log(response)
             return {
                 size: parseInt(size),
-                sha1: response.headers.get('x-minecraft-sha1')
+                sha1: ''
             }
         } else {
             return {
@@ -41,7 +42,7 @@ module.exports = class modde {
     }
 
     async filesList(ModdeJson, filesServer) {
-        let forgeURL = 'https://files.minecraftforge.net/maven';
+        let forgeURL = 'https://libraries.minecraft.net';
         let librairiesModde = await this.librairiesModdeJson(ModdeJson);
         let LibrairiesServer = filesServer.filter(file => file.type == 'MODDELIBRARY');
         LibrairiesServer = LibrairiesServer.map(file => file.path);
@@ -59,8 +60,7 @@ module.exports = class modde {
             filesList.push(file);
         }
 
-        console.log(filesList)
-        return []//filesList;
+        return filesList;
     }
 
     async filesGame() {
