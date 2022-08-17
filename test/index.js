@@ -27,10 +27,10 @@ async function main() {
     }
 
     let opts = {
-        url: 'https://launcher.selvania.fr/1.8',
+        url: 'http://91.121.45.6',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.8.9",
+        version: "1.7.10",
         detached: false,
         java: true,
         args: [],
@@ -40,7 +40,7 @@ async function main() {
             fullscreen: false
         },
         modde: true,
-        verify: false,
+        verify: true,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
         memory: {
