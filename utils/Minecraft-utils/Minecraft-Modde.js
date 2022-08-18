@@ -28,7 +28,6 @@ module.exports = class modde {
         let response = await nodeFetch(url);
         if(response.status == 200) {
             let size = response.headers.get('content-length');
-            console.log(response)
             return {
                 size: parseInt(size),
                 sha1: ''
