@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "2.2.1-alpha.3",
+    "version": "2.3.0",
     "description": "A library starting minecraft game NW.js and Electron.js (premium and crack)",
     "main": "index.js",
     "scripts": {
@@ -29,6 +29,7 @@
         "form-data": "^4.0.0",
         "node-fetch": "^2.6.7",
         "prompt": "^1.2.1",
+        "sharp": "^0.30.7",
         "uuid": "^8.3.2"
     },
     "bugs": {
