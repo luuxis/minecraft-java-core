@@ -43,7 +43,6 @@ module.exports = class skin2D {
 
         let head = await this.getHead()
 
-
         let body_inner = await sharp(this.buffer)
             .extract({ left: 20, top: 20, width: 8, height: 12 }).toBuffer();
 
@@ -87,7 +86,6 @@ module.exports = class skin2D {
             { input: legsLeft_inner, left: 8, top: 20 },
             { input: legsLeft_outer, left: 8, top: 20 }
         ])
-
 
         return await body.png().toBuffer();
     }
