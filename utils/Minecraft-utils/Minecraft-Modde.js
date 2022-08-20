@@ -27,17 +27,12 @@ module.exports = class modde {
     async fileInfo(url) {
         let response = await nodeFetch(url);
         if(response.status == 200) {
-            let size = response.headers.get('content-length');
             return {
-                size: parseInt(size),
+                size: parseInt(response.headers.get('content-length')),
                 sha1: ''
             }
-        } else {
-            return {
-                size: '',
-                sha1: ''
-            }
-        }
+        } else return {status: 404}
+        
     }
 
     async filesList(ModdeJson, filesServer) {
@@ -50,6 +45,7 @@ module.exports = class modde {
         let filesList = [];
         for (let lib of missing) {
             let fileProperties = await this.fileInfo(`${forgeURL}/${lib}`);
+            if (fileProperties.status == 404) continue;
             let file = {}
             file.path = `libraries/${lib}`,
             file.size = fileProperties.size,
