@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-const jimp = require('jimp');
+const sharp = require('sharp');
 
 module.exports = class skin2D {
     constructor(buffer, slim = false) {
@@ -13,53 +13,87 @@ module.exports = class skin2D {
 
     async getSkin() {
         return {
-            head: await (await this.getHead()).getBase64Async(jimp.MIME_PNG),
-            body: await (await this.getBody()).getBase64Async(jimp.MIME_PNG),
-            original: await (await this.getOriginal()).getBase64Async(jimp.MIME_PNG)
+            head: `data:image/png;base64,${await this.base64(await this.getHead())}`,
+            body: `data:image/png;base64,${await this.base64(await this.getBody())}` ,
+            original: `data:image/png;base64,${await this.base64(this.buffer)}`
         };
     }
 
     async getHead() {
-        let head_inner_crop = (await jimp.read(this.buffer)).crop(8, 8, 8, 8);
-        let head_outer_crop = (await jimp.read(this.buffer)).crop(40, 8, 8, 8);
-        let head = head_inner_crop.composite(head_outer_crop, 0, 0);
-        return head;
+        let firstLayer = await sharp(this.buffer)
+            .extract({ left: 8, top: 8, width: 8, height: 8 }).toBuffer();
+
+        let lastLayer = await sharp(this.buffer)
+            .extract({ left: 40, top: 8, width: 8, height: 8 }).toBuffer();
+
+        let head = sharp(firstLayer).composite([{ input: lastLayer }])
+
+        return await head.png().toBuffer();
     }
 
     async getBody() {
-        let calque = await jimp.create(16, 32);
-        let head = await this.getHead();
-        calque = calque.composite(head, 4, 0).clone();
+        let calque = await sharp({
+            create: {
+                width: 16,
+                height: 32,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            }
+        }).png().toBuffer();
 
-        let body_inner_crop = (await jimp.read(this.buffer)).crop(20, 20, 8, 12);
-        let body_outer_crop = (await jimp.read(this.buffer)).crop(20, 36, 8, 12);
-        let body = body_inner_crop.composite(body_outer_crop, 0, 0);
-        calque = calque.composite(body, 4, 8).clone();
+        let head = await this.getHead()
 
-        let armsRight_inner_crop = (await jimp.read(this.buffer)).crop(44, 20, 4, 12);
-        let armsRight_outer_crop = (await jimp.read(this.buffer)).crop(44, 36, 4, 12);
-        let arms = armsRight_inner_crop.composite(armsRight_outer_crop, 0, 0);
-        calque = calque.composite(arms, 0, 8).clone();
 
-        let armsLeft_inner_crop = (await jimp.read(this.buffer)).crop(36, 52, 4, 12);
-        let armsLeft_outer_crop = (await jimp.read(this.buffer)).crop(52, 52, 4, 12);
-        arms = armsLeft_inner_crop.composite(armsLeft_outer_crop, 0, 0);
-        calque = calque.composite(arms, 12, 8).clone();
+        let body_inner = await sharp(this.buffer)
+            .extract({ left: 20, top: 20, width: 8, height: 12 }).toBuffer();
 
-        let legsRight_inner_crop = (await jimp.read(this.buffer)).crop(4, 20, 4, 12);
-        let legsRight_outer_crop = (await jimp.read(this.buffer)).crop(4, 36, 4, 12);
-        let legs = legsRight_inner_crop.composite(legsRight_outer_crop, 0, 0);
-        calque = calque.composite(legs, 4, 20).clone();
+        let body_outer = await sharp(this.buffer)
+            .extract({ left: 20, top: 36, width: 8, height: 12 }).toBuffer();
 
-        let legsLeft_inner_crop = (await jimp.read(this.buffer)).crop(20, 52, 4, 12);
-        let legsLeft_outer_crop = (await jimp.read(this.buffer)).crop(4, 52, 4, 12);
-        legs = legsLeft_inner_crop.composite(legsLeft_outer_crop, 0, 0);
-        calque = calque.composite(legs, 8, 20).clone();
+        let armsRight_inner = await sharp(this.buffer)
+            .extract({ left: 44, top: 20, width: 4, height: 12 }).toBuffer();
 
-        return calque;
+        let armsRight_outer = await sharp(this.buffer)
+            .extract({ left: 44, top: 36, width: 4, height: 12 }).toBuffer();
+
+        let armsLeft_inner = await sharp(this.buffer)
+            .extract({ left: 36, top: 52, width: 4, height: 12 }).toBuffer();
+
+        let armsLeft_outer = await sharp(this.buffer)
+            .extract({ left: 52, top: 52, width: 4, height: 12 }).toBuffer();
+
+        let legsRight_inner = await sharp(this.buffer)
+            .extract({ left: 4, top: 20, width: 4, height: 12 }).toBuffer();
+
+        let legsRight_outer = await sharp(this.buffer)
+            .extract({ left: 4, top: 36, width: 4, height: 12 }).toBuffer();
+
+        let legsLeft_inner = await sharp(this.buffer)
+            .extract({ left: 20, top: 52, width: 4, height: 12 }).toBuffer();
+
+        let legsLeft_outer = await sharp(this.buffer)
+            .extract({ left: 4, top: 52, width: 4, height: 12 }).toBuffer();
+
+        let body = sharp(calque).composite([
+            { input: head, left: 4, top: 0 },
+            { input: body_inner, left: 4, top: 8 },
+            { input: body_outer, left: 4, top: 8 },
+            { input: armsRight_inner, left: 0, top: 8 },
+            { input: armsRight_outer, left: 0, top: 8 },
+            { input: armsLeft_inner, left: 12, top: 8 },
+            { input: armsLeft_outer, left: 12, top: 8 },
+            { input: legsRight_inner, left: 4, top: 20 },
+            { input: legsRight_outer, left: 4, top: 20 },
+            { input: legsLeft_inner, left: 8, top: 20 },
+            { input: legsLeft_outer, left: 8, top: 20 }
+        ])
+
+
+        return await body.png().toBuffer();
     }
 
-    async getOriginal() {
-        return await jimp.read(this.buffer);
+    async base64(buffer) {
+        if (buffer == undefined) return;
+        return buffer.toString('base64');
     }
 }
