@@ -32,7 +32,6 @@ module.exports = class modde {
                 sha1: ''
             }
         } else return {status: 404}
-        
     }
 
     async filesList(ModdeJson, filesServer) {
@@ -47,10 +46,10 @@ module.exports = class modde {
             let fileProperties = await this.fileInfo(`${forgeURL}/${lib}`);
             if (fileProperties.status == 404) continue;
             let file = {}
-            file.path = `libraries/${lib}`,
-            file.size = fileProperties.size,
-            file.sha1 = fileProperties.sha1,
-            file.url = `${forgeURL}/${lib}`,
+            file.path = `libraries/${lib}`
+            file.size = fileProperties.size
+            file.sha1 = fileProperties.sha1
+            file.url = `${forgeURL}/${lib}`
             file.type = 'MODDELIBRARY'
             filesList.push(file);
         }
@@ -70,10 +69,10 @@ module.exports = class modde {
             for (let modde of [...filesServer, ...filesList]) {
                 if (!modde.url) continue;
                 let file = {}
-                file.path = modde.path,
-                file.size = modde.size,
-                file.sha1 = modde.sha1,
-                file.url = modde.url,
+                file.path = modde.path
+                file.size = modde.size
+                file.sha1 = modde.sha1
+                file.url = modde.url
                 file.type = modde.type
                 files.push(file);
             }

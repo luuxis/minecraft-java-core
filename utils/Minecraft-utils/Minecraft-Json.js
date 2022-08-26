@@ -24,6 +24,7 @@ module.exports = class Json {
             error: true,
             message: `Minecraft ${this.version} is not found.`
         };
+        
         return data;
     }
 }

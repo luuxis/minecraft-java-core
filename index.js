@@ -10,5 +10,6 @@ module.exports = {
     AZauth: require('./utils/authenticator/AZauth.js'),
     Launch: require('./utils/launch.js'),
     Status: require('./utils/status/statusServer.js'),
-    Skin: require('./utils/skin/skin.js')
+    SkinAPI: require('./utils/skin/API/getSkin.js'),
+    SkinTexture2D: require('./utils/skin/Texture/skin2D.js'),
 }
