@@ -187,7 +187,7 @@ async function getBass64(url) {
 }
 
 function getUUID() {
-    var result = ""
+    let result = ""
     for (var i = 0; i <= 4; i++) {
         result += (Math.floor(Math.random() * 16777216) + 1048576).toString(16);
         if (i < 4) result += "-"
