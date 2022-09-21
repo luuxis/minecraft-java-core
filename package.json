@@ -15,6 +15,7 @@
         "assets/**",
         "utils/**",
         "index.js",
+        "index.mjs",
         "LICENSE",
         "README.md"
     ],
