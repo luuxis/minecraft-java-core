@@ -38,7 +38,7 @@ module.exports = class Args {
             '${auth_session}': this.authenticator.access_token,
             '${auth_player_name}': this.authenticator.name,
             '${auth_uuid}': this.authenticator.uuid,
-            '${auth_xuid}': this.authenticator.xuid || this.authenticator.access_token,
+            '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
             '${user_properties}': this.authenticator.user_properties,
             '${user_type}': this.authenticator.meta.type,
             '${version_name}': this.version,

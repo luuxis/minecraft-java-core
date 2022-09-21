@@ -104,6 +104,26 @@ module.exports = class Microsoft {
             return xsts
         }
 
+        let xboxAccount = await nodeFetch("https://xsts.auth.xboxlive.com/xsts/authorize", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                Properties: {
+                    SandboxId: "RETAIL",
+                    UserTokens: [ xbl.Token ]
+                },
+                RelyingParty: "http://xboxlive.com",
+                TokenType: "JWT"
+            })
+        }).then(res => res.json());
+        if (xsts.error) {
+            xsts.errorType = "xboxAccount";
+            return xsts
+        }
+
         let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
             headers: {
@@ -140,6 +160,7 @@ module.exports = class Microsoft {
             refresh_token: oauth2.refresh_token,
             user_properties: '{}',
             meta: {
+                xuid: xboxAccount.DisplayClaims.xui[0].xid,
                 type: "Xbox",
                 demo: profile.error ? true : false
             },
