@@ -16,7 +16,6 @@ async function main() {
         let code2FA = result['2FA code'];
         mc = await azAuth.getAuth(username, password, code2FA);
     }
-
     console.log(mc);
 }
 

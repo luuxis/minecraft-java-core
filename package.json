@@ -1,8 +1,13 @@
 {
     "name": "minecraft-java-core",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "A library starting minecraft game NW.js and Electron.js (premium and crack)",
-    "main": "index.js",
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "require": "./index.js"
+        }
+    },
     "scripts": {
         "test": "echo No command is set. && echo Aucune commande n'est definie."
     },

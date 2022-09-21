@@ -27,10 +27,10 @@ async function main() {
     }
 
     let opts = {
-        url: 'http://91.121.45.6',
+        url: 'http://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.7.10",
+        version: "1.19",
         detached: false,
         java: true,
         args: [],
