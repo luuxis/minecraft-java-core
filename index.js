@@ -4,8 +4,8 @@
  */
 
 module.exports = {
-    Mojang: require('./utils/authenticator/mojang.js'),
-    Microsoft: require('./utils/authenticator/microsoft.js'),
+    Mojang: require('./utils/authenticator/Mojang.js'),
+    Microsoft: require('./utils/authenticator/Microsoft.js'),
     Java: require('./utils/java/Java-json.js'),
     AZauth: require('./utils/authenticator/AZauth.js'),
     Launch: require('./utils/launch.js'),
