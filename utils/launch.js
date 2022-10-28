@@ -35,7 +35,7 @@ module.exports = class Launch {
             args: config.args ? config.args : [],
 
             javaPath: config.javaPath ? config.javaPath : null,
-            java: config.java ? config.java : true,
+            java: config.java ? config.java : false,
 
             screen: config.screen ? {
                 width: config.screen ? config.screen.width : null,
