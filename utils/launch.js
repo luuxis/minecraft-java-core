@@ -28,6 +28,7 @@ module.exports = class Launch {
             path: path.resolve(config.path ? config.path : './Minecraft').replace(/\\/g, '/'),
             version: config.version ? config.version : 'latest_release',
             detached: config.detached ? config.detached : false,
+            downloadFileMultiple: config.downloadFileMultiple ? config.downloadFileMultiple : 1,
 
             modde: config.modde ? config.modde : false,
             verify: config.verify ? config.verify : false,
@@ -93,7 +94,7 @@ module.exports = class Launch {
         let gameJava = this.config.java ? await gameJavaMinecraft.GetJsonJava(gameJson.json) : [];
         let Bundle = [...gameLibraries, ...gameAssets.assets, ...gameModdeConf.gameModdeFiles, ...gameJava.files ? gameJava.files : []];
         let gameDownloadListe = await new gameVerifyMinecraft(Bundle, this.config).checkBundle();
-        
+
         if (gameDownloadListe.length > 0) {
             let downloader = new gameDownloadMinecraft();
             let totsize = await new gameVerifyMinecraft().getTotalSize(gameDownloadListe);
@@ -109,11 +110,8 @@ module.exports = class Launch {
             downloader.on("estimated", (time) => {
                 this.emit("estimated", time);
             });
-
-            await new Promise((ret) => {
-                downloader.on("finish", ret);
-                downloader.multiple(gameDownloadListe, totsize, 10);
-            });
+            
+            await downloader.downloadFileMultiple(gameDownloadListe, totsize, this.config.downloadFileMultiple);
         }
         if(this.config.verify) new gameVerifyMinecraft(Bundle, this.config).removeNonIgnoredFiles();
         new gameLibrariesMinecraft(gameJson, this.config).natives(Bundle);

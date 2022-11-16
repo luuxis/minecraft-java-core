@@ -30,8 +30,9 @@ async function main() {
         url: 'http://launcher.selvania.fr/files',
         authenticator: mc,
         path: "./.Minecraft",
-        version: "1.19",
+        version: "s",
         detached: false,
+        downloadFileMultiple: 10,
         java: true,
         args: [],
         screen: {
@@ -39,8 +40,8 @@ async function main() {
             height: 720,
             fullscreen: false
         },
-        modde: true,
-        verify: true,
+        // modde: true,
+        // verify: true,
         ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
 
         memory: {

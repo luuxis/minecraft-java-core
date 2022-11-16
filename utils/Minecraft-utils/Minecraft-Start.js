@@ -16,8 +16,7 @@ module.exports = class start {
 
     start(java) {
         if(this.isold()) this.copyAssets()
-        let minecraft = child.spawn(java, this.args, { cwd: this.config.path, detached: this.config.detached })
-        return minecraft
+        return child.spawn(java, this.args, { cwd: this.config.path, detached: this.config.detached })
     }
 
     copyAssets() {
