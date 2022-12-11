@@ -8,42 +8,46 @@ let client_id = '13f589e1-e2fc-443e-a68a-63b0092b8eeb'
 let mc
 
 async function main() {
-    // if (save) {
-    //     if (!fs.existsSync('./account.json')) {
-    //         mc = await new Microsoft(client_id).getAuth();
-    //         fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
-    //     } else {
-    //         mc = JSON.parse(fs.readFileSync('./account.json'));
+    if (save) {
+        if (!fs.existsSync('./account.json')) {
+            mc = await new Microsoft(client_id).getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+        } else {
+            mc = JSON.parse(fs.readFileSync('./account.json'));
 
-    //         if (!mc.refresh_token) {
-    //             mc = await new Microsoft(client_id).getAuth();
-    //             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
-    //         } else {
-    //             mc = await new Microsoft(client_id).refresh(mc);
-    //             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
-    //         }
-    //     }
-    // } else {
-    //     mc = await new Microsoft(client_id).getAuth();
-    // }
+            if (!mc.refresh_token) {
+                mc = await new Microsoft(client_id).getAuth();
+                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            } else {
+                mc = await new Microsoft(client_id).refresh(mc);
+                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            }
+        }
+    } else {
+        mc = await new Microsoft(client_id).getAuth();
+    }
 
     let opt = {
         url: null,
-        authenticator: null,
-        path: './Minecraft',
-        version: 'latest_release',
+        authenticator: mc,
+        timeout: 10000,
+        path: './.Minecraft',
+        version: '1.12.2',
         detached: false,
-        downloadFileMultiple: 1,
+        downloadFileMultiple: 30,
 
-        modde: false,
-        loader: false,
+        modde: true,
+        loader: {
+            type: 'forge',
+            build: '1.12.2-14.23.5.2860'
+        },
 
         verify: false,
         ignored: [],
         args: [],
 
         javaPath: null,
-        java: false,
+        java: true,
 
         screen: {
             width: null,
@@ -52,14 +56,12 @@ async function main() {
         },
 
         memory: {
-            min: '1G',
-            max: '2G'
+            min: '2G',
+            max: '4G'
         }
     }
 
-    let test = await launch.start(opt)
-
-    console.log(test);
+    await launch.Launch(opt);
 }
 
 main()

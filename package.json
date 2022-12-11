@@ -17,7 +17,7 @@
         "assets/**",
         "dist/**",
         "LICENSE",
-        "README.md"
+        "docs/**"
     ],
     "keywords": [
         "Minecraft",

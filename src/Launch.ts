@@ -3,10 +3,32 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
+import { EventEmitter } from 'events';
+
+import gameJsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
+// import gameModde from './Minecraft-utils/Minecraft-Modde.js';
+// import gameAssetsMinecraft from'./Minecraft-utils/Minecraft-Assets.js';
+// import gameLibrariesMinecraft from'./Minecraft-utils/Minecraft-Libraries.js';
+// import gameVerifyMinecraft from'./Minecraft-utils/Minecraft-Verify.js';
+// import gameArgumentsMinecraft from'./Minecraft-utils/Minecraft-Args.js';
+// import gameStartMinecraft from'./Minecraft-utils/Minecraft-Start.js';
 
 interface launchOptions {
     url: string | null,
-    authenticator: object | null,
+    authenticator: {
+        access_token: string | null,
+        client_token: string | null,
+        uuid: string | null,
+        name: string | null,
+        user_properties: string | null,
+        meta: {
+            xuid: string | null,
+            type: string | null,
+            demo: boolean | null,
+        }
+    },
+    
+    timeout: number | 10000,
     path: string | '.Minecraft',
     version: string | 'latest_release',
     detached: boolean | false,
@@ -14,13 +36,8 @@ interface launchOptions {
 
     modde: boolean | false,
     loader: {
-        type: string 
+        type: string
         build: string | 'latest'
-        config: {
-            javaPath: string | null,
-            minecraftJar: string | null,
-            minecraftJson: string | null,
-        }
     },
 
     verify: boolean | false,
@@ -33,18 +50,75 @@ interface launchOptions {
     screen: {
         width: number | null,
         height: number | null,
-        fullscreen: boolean | false,
+        fullscreen: boolean | false
     },
 
     memory: {
         min: string | '1G',
-        max: string | '2G',
+        max: string | '2G'
     }
 }
 
 
 export default class Launch {
-    async start(opt: launchOptions) {
-        return opt
+    options: launchOptions;
+    on: any;
+    emit: any;
+
+    constructor() {
+        this.on = EventEmitter.prototype.on;
+        this.emit = EventEmitter.prototype.emit;
+    }
+
+    async Launch(opt: launchOptions) {
+        this.options = {
+            url: opt?.url || null,
+            authenticator: opt?.authenticator || null,
+            timeout: opt?.timeout || 10000,
+            path: opt?.path || '.Minecraft',
+            version: opt?.version || 'latest_release',
+            detached: opt?.detached || false,
+            downloadFileMultiple: opt?.downloadFileMultiple || 3,
+
+            modde: opt?.modde || false,
+            loader: {
+                type: opt?.loader?.type || null,
+                build: opt?.loader?.build || 'latest'
+            },
+
+            verify: opt?.verify || false,
+            ignored: opt?.ignored || [],
+            args: opt?.args || [],
+
+            javaPath: opt?.javaPath || null,
+            java: opt?.java || false,
+
+            screen: {
+                width: opt?.screen?.width || null,
+                height: opt?.screen?.height || null,
+                fullscreen: opt?.screen?.fullscreen || false,
+            },
+
+            memory: {
+                min: opt?.memory?.min || '1G',
+                max: opt?.memory?.max || '2G'
+            }
+        }
+
+        if (this.options.javaPath) this.options.java = false;
+        if (this.options.loader.type == null) this.options.loader = null;
+        this.start();
+    }
+
+    async start() {
+        // donload files if nessesary
+        await this.DownloadGame();
+    }
+
+    async DownloadGame() {
+        let InfoVersion = await new gameJsonMinecraft(this.options.version).GetInfoVersion();
+        if (InfoVersion.error) InfoVersion
+        let { json, version } = InfoVersion;
+
     }
 }
