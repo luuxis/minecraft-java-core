@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import Microsoft from './authenticator/Microsoft.js';
+import Microsoft from './Authenticator/Microsoft.js';
 import Launch from './Launch.js';
 
 export {
