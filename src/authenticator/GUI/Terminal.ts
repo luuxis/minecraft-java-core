@@ -3,9 +3,9 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-const prompt = require('prompt');
+import prompt from 'prompt';
 
-module.exports = async function(url) {
+export default async function (url: string) {
     console.log(`Open brosser ${url}`);
     prompt.start();
     let result = await prompt.get(['copy-URL']);

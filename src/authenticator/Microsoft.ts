@@ -3,11 +3,14 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-const nodeFetch = require('node-fetch');
+import nodeFetch from 'node-fetch';
 
-module.exports = class Microsoft {
-    constructor(client_id) {
-        if (client_id === "" || !client_id) client_id = "00000000402b5328";
+export default class Microsoft {
+    client_id: string;
+    type: 'electron' | 'nwjs' | 'terminal';
+
+    constructor(client_id: string) {
+        if (client_id === '' || !client_id) client_id = '00000000402b5328';
         this.client_id = client_id;
 
         if (!!process && !!process.versions && !!process.versions.electron) {
@@ -19,26 +22,26 @@ module.exports = class Microsoft {
         }
     }
 
-    async getAuth(type, url) {
+    async getAuth(type: string, url: string) {
         if (!url) url = `https://login.live.com/oauth20_authorize.srf?client_id=${this.client_id}&response_type=code&redirect_uri=https://login.live.com/oauth20_desktop.srf&scope=XboxLive.signin%20offline_access&cobrandid=8058f65d-ce06-4c30-9559-473c9275a65d&prompt=select_account`;
         if (!type) type = this.type;
 
         if (type == "electron") {
-            let usercode = await require("./GUI/electron.js")(url)
+            let usercode = await (require('./GUI/Electron.js')).default(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         } else if (type == "nwjs") {
-            let usercode = await require("./GUI/nwjs.js")(url)
+            let usercode = await (require('./GUI/NW.js')).default(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         } else if (type == "terminal") {
-            let usercode = await require("./GUI/terminal.js")(url)
+            let usercode = await (require('./GUI/Terminal.js')).default(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         }
     }
 
-    async url(code) {
+    async url(code: string) {
         let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
@@ -50,7 +53,7 @@ module.exports = class Microsoft {
         return await this.getAccount(oauth2)
     }
 
-    async refresh(acc) {
+    async refresh(acc: any) {
         let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
@@ -65,7 +68,7 @@ module.exports = class Microsoft {
         return await this.getAccount(oauth2)
     }
 
-    async getAccount(oauth2) {
+    async getAccount(oauth2: any) {
         let xbl = await nodeFetch("https://user.auth.xboxlive.com/user/authenticate", {
             method: "post",
             body: JSON.stringify({
@@ -93,7 +96,7 @@ module.exports = class Microsoft {
             body: JSON.stringify({
                 Properties: {
                     SandboxId: "RETAIL",
-                    UserTokens: [ xbl.Token ]
+                    UserTokens: [xbl.Token]
                 },
                 RelyingParty: "rp://api.minecraftservices.com/",
                 TokenType: "JWT"
@@ -113,7 +116,7 @@ module.exports = class Microsoft {
             body: JSON.stringify({
                 Properties: {
                     SandboxId: "RETAIL",
-                    UserTokens: [ xbl.Token ]
+                    UserTokens: [xbl.Token]
                 },
                 RelyingParty: "http://xboxlive.com",
                 TokenType: "JWT"
@@ -136,7 +139,7 @@ module.exports = class Microsoft {
             mcLogin.errorType = "mcLogin";
             return mcLogin
         }
-        
+
         let mcstore = await nodeFetch("https://api.minecraftservices.com/entitlements/mcstore", {
             method: "get",
             headers: { 'Authorization': `Bearer ${mcLogin.access_token}` }
@@ -171,7 +174,7 @@ module.exports = class Microsoft {
         }
     }
 
-    async getProfile(mcLogin) {
+    async getProfile(mcLogin: any) {
         let profile = await nodeFetch("https://api.minecraftservices.com/minecraft/profile", {
             method: "GET",
             headers: {
@@ -183,11 +186,11 @@ module.exports = class Microsoft {
         let skins = profile.skins;
         let capes = profile.capes;
 
-        for(let skin of skins) {
+        for (let skin of skins) {
             skin.base64 = await getBass64(skin.url)
             skin.dataType = 'data:image/png;base64'
         }
-        for(let cape of capes) {
+        for (let cape of capes) {
             cape.base64 = await getBass64(cape.url)
             cape.dataType = 'data:image/png;base64'
         }
@@ -201,7 +204,7 @@ module.exports = class Microsoft {
     }
 }
 
-async function getBass64(url) {
+async function getBass64(url: string) {
     let response = await nodeFetch(url);
     let buffer = await response.buffer();
     return buffer.toString('base64');
