@@ -7,6 +7,7 @@ import { EventEmitter } from 'events';
 
 import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
 import librariesMinecraft from './Minecraft-utils/Minecraft-Libraries.js';
+import assetsMinecraft from './Minecraft-utils/Minecraft-Assets.js';
 
 interface launchOptions {
     url: string | null,
@@ -114,5 +115,6 @@ export default class Launch {
         let { json, version } = InfoVersion;
 
         let gameLibraries: any = await new librariesMinecraft(json, this.options).Getlibraries();
+        let gameAssets: any = await new assetsMinecraft(json).GetAssets();
     }
 }
