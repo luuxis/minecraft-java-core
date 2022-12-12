@@ -5,13 +5,8 @@
 
 import { EventEmitter } from 'events';
 
-import gameJsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
-// import gameModde from './Minecraft-utils/Minecraft-Modde.js';
-// import gameAssetsMinecraft from'./Minecraft-utils/Minecraft-Assets.js';
-// import gameLibrariesMinecraft from'./Minecraft-utils/Minecraft-Libraries.js';
-// import gameVerifyMinecraft from'./Minecraft-utils/Minecraft-Verify.js';
-// import gameArgumentsMinecraft from'./Minecraft-utils/Minecraft-Args.js';
-// import gameStartMinecraft from'./Minecraft-utils/Minecraft-Start.js';
+import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
+import librariesMinecraft from './Minecraft-utils/Minecraft-Libraries.js';
 
 interface launchOptions {
     url: string | null,
@@ -27,7 +22,7 @@ interface launchOptions {
             demo: boolean | null,
         }
     },
-    
+
     timeout: number | 10000,
     path: string | '.Minecraft',
     version: string | 'latest_release',
@@ -105,8 +100,6 @@ export default class Launch {
             }
         }
 
-        if (this.options.javaPath) this.options.java = false;
-        if (this.options.loader.type == null) this.options.loader = null;
         this.start();
     }
 
@@ -116,9 +109,10 @@ export default class Launch {
     }
 
     async DownloadGame() {
-        let InfoVersion = await new gameJsonMinecraft(this.options.version).GetInfoVersion();
+        let InfoVersion = await new jsonMinecraft(this.options.version).GetInfoVersion();
         if (InfoVersion.error) InfoVersion
         let { json, version } = InfoVersion;
 
+        let gameLibraries: any = await new librariesMinecraft(json, this.options).Getlibraries();
     }
 }
