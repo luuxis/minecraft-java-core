@@ -12,7 +12,7 @@ export default class Json {
     }
 
     async GetInfoVersion() {
-        let data = await nodeFetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
+        let data: any = await nodeFetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
         data = await data.json();
 
         if (this.version == 'latest_release' || this.version == 'r' || this.version == 'lr') this.version = data.latest.release;
@@ -25,7 +25,7 @@ export default class Json {
             message: `Minecraft ${this.version} is not found.`
         };
 
-        return { 
+        return {
             InfoVersion: data,
             json: await nodeFetch(data.url).then(res => res.json()),
             version: this.version

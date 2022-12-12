@@ -62,6 +62,26 @@ async function main() {
     }
 
     await launch.Launch(opt);
+
+    launch.on('extract', extract => {
+        console.log(extract);
+    });
+
+    launch.on('progress', (progress, size, element) => {
+        console.log(`Downloading ${element} ${Math.round((progress / size) * 100)}%`);
+    });
+
+    launch.on('check', (progress, size, element) => {
+        console.log(`Checking ${element} ${Math.round((progress / size) * 100)}%`);
+    });
+
+    launch.on('patch', patch => {
+        console.log(patch);
+    });
+
+    launch.on('error', err => {
+        console.log(err);
+    });
 }
 
 main()
