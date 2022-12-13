@@ -19,8 +19,8 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                mc = await new Microsoft(client_id).refresh(mc);
-                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+                // mc = await new Microsoft(client_id).refresh(mc);
+                // fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             }
         }
     } else {
@@ -34,7 +34,7 @@ async function main() {
         path: './.Minecraft',
         version: '1.12.2',
         detached: false,
-        downloadFileMultiple: 30,
+        downloadFileMultiple: 10,
 
         modde: true,
         loader: {
@@ -81,6 +81,10 @@ async function main() {
 
     launch.on('error', err => {
         console.log(err);
+    });
+
+    launch.on('close', code => {
+        console.log(code);
     });
 }
 

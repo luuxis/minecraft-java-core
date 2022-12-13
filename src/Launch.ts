@@ -6,9 +6,14 @@
 import { EventEmitter } from 'events';
 
 import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
+
 import librariesMinecraft from './Minecraft-utils/Minecraft-Libraries.js';
 import assetsMinecraft from './Minecraft-utils/Minecraft-Assets.js';
 import javaMinecraft from './Minecraft-utils/Minecraft-Java.js';
+
+import bundleMinecraft from './Minecraft-utils/Minecraft-Bundle.js';
+
+import Downloader from './utils/Downloader.js';
 
 interface launchOptions {
     url: string | null,
@@ -106,17 +111,47 @@ export default class Launch {
     }
 
     async start() {
-        // donload files if nessesary
-        await this.DownloadGame();
+        let data: any = await this.DownloadGame();
+        if (data.error) return this.emit('error', data);
+
+        this.emit('download', data);
     }
 
     async DownloadGame() {
         let InfoVersion = await new jsonMinecraft(this.options.version).GetInfoVersion();
-        if (InfoVersion.error) InfoVersion
+        if (InfoVersion.error) return InfoVersion
         let { json, version } = InfoVersion;
 
-        let gameLibraries: any = await new librariesMinecraft(json, this.options).Getlibraries();
-        let gameAssets: any = await new assetsMinecraft(json).GetAssets();
-        let gameJava: any = await new javaMinecraft().GetJsonJava(json);
+        let gameLibraries: any = await new librariesMinecraft(this.options).Getlibraries(json);
+        let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
+        let gameJava: any = await new javaMinecraft(this.options).GetJsonJava(json);
+
+        let bundle: any = [...gameLibraries, ...gameAssets, ...gameJava.files]
+        let filesList: any = await new bundleMinecraft(this.options).checkBundle(bundle);
+
+        if (filesList.length > 0) {
+            let downloader = new Downloader();
+            let totsize = await new bundleMinecraft(this.options).getTotalSize(filesList);
+
+            downloader.on("progress", (DL: any, totDL: any, element: any) => {
+                this.emit("progress", DL, totDL, element);
+            });
+
+            downloader.on("speed", (speed: any) => {
+                this.emit("speed", speed);
+            });
+
+            downloader.on("estimated", (time: any) => {
+                this.emit("estimated", time);
+            });
+            
+            await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple);
+        }
+
+        return {
+            minecraftVersion: version,
+            minecraftJson: json,
+            minecraftJava: gameJava
+        }
     }
 }

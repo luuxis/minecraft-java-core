@@ -7,6 +7,11 @@ import os from 'os';
 import nodeFetch from 'node-fetch';
 
 export default class java {
+    options: any;
+    constructor(options: any) {
+        this.options = options;
+    }
+
     async GetJsonJava(jsonversion: any) {
         let version: any;
         let files: any = [];
@@ -41,7 +46,7 @@ export default class java {
             file.sha1 = info.downloads.raw.sha1;
             file.size = info.downloads.raw.size;
             file.url = info.downloads.raw.url;
-            file.type = "JAVA";
+            file.type = "Java";
             files.push(file);
         }
         return { files: files, version: version };

@@ -2,6 +2,7 @@
  * @author Luuxis
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
+
 import os from 'os';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
@@ -12,23 +13,23 @@ let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 export default class Libraries {
     json: any;
     options: any;
-    constructor(json: any, options: any) {
-        this.json = json;
+    constructor(options: any) {
         this.options = options;
     }
 
-    async Getlibraries() {
+    async Getlibraries(json: any) {
+        this.json = json;
         let libraries = [];
 
         for (let lib of this.json.libraries) {
             let artifact: any;
-            let type = "LIBRARY";
+            let type = "Libraries";
 
             if (lib.natives) {
                 let classifiers = lib.downloads.classifiers;
                 let native = lib.natives[MojangLib[process.platform]];
                 if (!native) native = lib.natives[process.platform];
-                type = "NATIVE";
+                type = "Native";
                 if (native) artifact = classifiers[native.replace("${arch}", Arch[os.arch()])];
                 else continue;
             } else {
@@ -52,10 +53,10 @@ export default class Libraries {
             sha1: clientjar.sha1,
             size: clientjar.size,
             path: `versions/${this.json.id}/${this.json.id}.jar`,
-            type: "LIBRARY",
+            type: "Libraries",
             url: clientjar.url
         });
-        
+
         libraries.push({
             path: `versions/${this.json.id}/${this.json.id}.json`,
             type: "CFILE",
@@ -65,7 +66,7 @@ export default class Libraries {
     }
 
     async natives(bundle: any) {
-        let natives = bundle.filter(mod => mod.type == "NATIVE").map(mod => `${mod.path}`);
+        let natives = bundle.filter(mod => mod.type === "Native").map(mod => `${mod.path}`);
         let nativeFolder = (`${this.options.path}/versions/${this.json.id}/natives`).replace(/\\/g, "/");
         if (!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
 

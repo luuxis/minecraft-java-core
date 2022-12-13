@@ -57,7 +57,7 @@ export default class download {
                 const response = await nodeFetch(file.url);
                 response.body.on('data', (chunk: any) => {
                     downloaded += chunk.length;
-                    this.emit('progress', downloaded, size);
+                    this.emit('progress', downloaded, size, file.type);
                     writer.write(chunk);
                 });
 
