@@ -12,6 +12,7 @@ import assetsMinecraft from './Minecraft-utils/Minecraft-Assets.js';
 import javaMinecraft from './Minecraft-utils/Minecraft-Java.js';
 
 import bundleMinecraft from './Minecraft-utils/Minecraft-Bundle.js';
+import argumentsMinecraft from './Minecraft-utils/Minecraft-Arguments.js';
 
 import Downloader from './utils/Downloader.js';
 
@@ -113,18 +114,23 @@ export default class Launch {
     async start() {
         let data: any = await this.DownloadGame();
         if (data.error) return this.emit('error', data);
+        let { minecraftVersion, minecraftJson, minecraftJava } = data;
 
-        this.emit('download', data);
+        let args: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson);
+
+        let java: any = this.options.java ? minecraftJava.path : 'java';
     }
 
     async DownloadGame() {
-        let InfoVersion = await new jsonMinecraft(this.options.version).GetInfoVersion();
+        let InfoVersion = await new jsonMinecraft(this.options).GetInfoVersion();
         if (InfoVersion.error) return InfoVersion
         let { json, version } = InfoVersion;
 
-        let gameLibraries: any = await new librariesMinecraft(this.options).Getlibraries(json);
+        let libraries = new librariesMinecraft(this.options)
+
+        let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
-        let gameJava: any = await new javaMinecraft(this.options).GetJsonJava(json);
+        let gameJava: any = this.options.java ? await new javaMinecraft(this.options).GetJsonJava(json) : { files: [] };
 
         let bundle: any = [...gameLibraries, ...gameAssets, ...gameJava.files]
         let filesList: any = await new bundleMinecraft(this.options).checkBundle(bundle);
@@ -144,9 +150,11 @@ export default class Launch {
             downloader.on("estimated", (time: any) => {
                 this.emit("estimated", time);
             });
-            
+
             await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple);
         }
+
+        await libraries.natives(bundle);
 
         return {
             minecraftVersion: version,

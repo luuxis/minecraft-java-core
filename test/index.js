@@ -19,8 +19,13 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                // mc = await new Microsoft(client_id).refresh(mc);
-                // fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+                mc = await new Microsoft(client_id).refresh(mc);
+                if (mc.error) {
+                    mc = await new Microsoft(client_id).getAuth();
+                }
+                fs.writeFileSync('./account.json', JSON.stringify({
+                    refresh_token: mc.refresh_token,
+                }, null, 4));
             }
         }
     } else {
@@ -34,12 +39,12 @@ async function main() {
         path: './.Minecraft',
         version: '1.12.2',
         detached: false,
-        downloadFileMultiple: 10,
+        downloadFileMultiple: 30,
 
         modde: true,
         loader: {
             type: 'forge',
-            build: '1.12.2-14.23.5.2860'
+            build: '1.12.2-14.23.5.2838'
         },
 
         verify: false,

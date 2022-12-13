@@ -5,6 +5,7 @@
 
 import os from 'os';
 import nodeFetch from 'node-fetch';
+import path from 'path';
 
 export default class java {
     options: any;
@@ -49,6 +50,8 @@ export default class java {
             file.type = "Java";
             files.push(file);
         }
-        return { files: files, version: version };
+        return {
+            files: files,
+            path: path.resolve(this.options.path, `runtime/${version}/bin/java${process.platform == "win32" ? ".exe" : ""}`).replace(/\\/g, "/"),};
     }
 }

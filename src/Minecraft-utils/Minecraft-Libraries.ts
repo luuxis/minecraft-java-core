@@ -67,6 +67,7 @@ export default class Libraries {
 
     async natives(bundle: any) {
         let natives = bundle.filter(mod => mod.type === "Native").map(mod => `${mod.path}`);
+        if (natives.length === 0) return natives;
         let nativeFolder = (`${this.options.path}/versions/${this.json.id}/natives`).replace(/\\/g, "/");
         if (!fs.existsSync(nativeFolder)) fs.mkdirSync(nativeFolder, { recursive: true, mode: 0o777 });
 
