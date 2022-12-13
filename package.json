@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "3.0.0-pre-alpha.2",
+    "version": "3.0.0-pre-alpha.4",
     "types": "./build/Index.d.ts",
     "exports": {
         ".": {
@@ -10,12 +10,12 @@
     },
     "description": "A library starting minecraft game NW.js and Electron.js (premium and crack)",
     "scripts": {
-        "dev": "rimraf ./dist && tsc -w",
-        "prepublishOnly": "rimraf ./dist && tsc"
+        "dev": "rimraf ./build && tsc -w",
+        "prepublishOnly": "rimraf ./build && tsc"
     },
     "files": [
         "assets/**",
-        "dist/**",
+        "build/**",
         "LICENSE",
         "docs/**"
     ],
