@@ -36,6 +36,7 @@ async function main() {
         timeout: 10000,
         path: './.Minecraft',
         version: '1.12.2',
+        instance: 'Aynor',
         detached: false,
         downloadFileMultiple: 30,
 
