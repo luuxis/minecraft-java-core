@@ -35,7 +35,7 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.19.2',
+        version: '1.12.2',
         detached: false,
         downloadFileMultiple: 30,
 
@@ -82,12 +82,16 @@ async function main() {
         console.log(patch);
     });
 
-    launch.on('error', err => {
-        console.log(err);
-    });
+    launch.on('data', (e) => {
+        console.log(e)
+    })
 
     launch.on('close', code => {
         console.log(code);
+    });
+
+    launch.on('error', err => {
+        console.log(err);
     });
 }
 

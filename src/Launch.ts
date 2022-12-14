@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import path from 'path';
+import { spawn } from 'child_process';
 
 import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
 
@@ -118,8 +119,17 @@ export default class Launch {
         let { minecraftVersion, minecraftJson, minecraftJava } = data;
 
         let args: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson);
+        if (args.error) return this.emit('error', args);
+        args = [...args.jvm, ...args.classpath, ...args.game]
 
         let java: any = this.options.java ? minecraftJava.path : 'java';
+
+        let minecraftDebug = spawn(java, args, { cwd: this.options.path, detached: this.options.detached })
+
+        this.emit('data', `Launching with arguments ${args.join(' ')}`)
+        minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
+        minecraftDebug.on('close', (code) => this.emit('close', code))
     }
 
     async DownloadGame() {
@@ -155,7 +165,9 @@ export default class Launch {
             await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple);
         }
 
-        await libraries.natives(bundle);
+        let natives = await libraries.natives(bundle);
+        if (natives.length == 0) json.nativesList = false;
+        else json.nativesList = true;
 
         return {
             minecraftVersion: version,

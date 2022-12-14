@@ -3,6 +3,8 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
+import { getPathLibraries } from '../utils/Index.js';
+
 export default class MinecraftArguments {
     options: any;
     authenticator: any;
@@ -12,10 +14,15 @@ export default class MinecraftArguments {
     }
 
     async GetArguments(json: any) {
-
         let game = await this.GetGameArguments(json);
+        let jvm = await this.GetJVMArguments(json);
+        let classpath = await this.GetClassPath(json);
 
-        console.log(game)
+        return {
+            game: game,
+            jvm: jvm,
+            classpath: classpath
+        }
     }
 
     async GetGameArguments(json: any) {
@@ -31,7 +38,6 @@ export default class MinecraftArguments {
             '${user_type}': this.authenticator.meta.type,
             '${version_name}': json.id,
             '${assets_index_name}': json.assetIndex.id,
-            '${game_directory}': this.options.path,
             '${assets_root}': this.isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
             '${game_assets}': this.isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
             '${version_type}': json.type,
@@ -44,6 +50,48 @@ export default class MinecraftArguments {
         }
 
         return game;
+    }
+
+    async GetJVMArguments(json: any) {
+        let opts = {
+            win32: '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
+            darwin: '-XstartOnFirstThread',
+            linux: '-Xss1M'
+        }
+        let jvm = [
+            opts[process.platform],
+            `-Xms${this.options.memory.min}`,
+            `-Xmx${this.options.memory.max}`,
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:G1NewSizePercent=20',
+            '-XX:G1ReservePercent=20',
+            '-XX:MaxGCPauseMillis=50',
+            '-XX:G1HeapRegionSize=32M',
+            '-Dfml.ignoreInvalidMinecraftCertificates=true'
+        ]
+
+        if (json.nativesList) {
+            jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
+        }
+
+        return jvm;
+    }
+
+    async GetClassPath(json: any) {
+        let libraries: any = []
+        for (let lib of json.libraries) {
+            if (lib.natives) continue;
+            let path = getPathLibraries(lib.name)
+            libraries.push(`${this.options.path}/libraries/${path.path}/${path.name}`)
+        }
+
+        libraries.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
+
+        return [
+            `-cp`,
+            libraries.join(process.platform === 'win32' ? ';' : ':'),
+            json.mainClass
+        ]
     }
 
     isold(json: any) {
