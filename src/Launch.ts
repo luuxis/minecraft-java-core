@@ -36,6 +36,7 @@ interface launchOptions {
     timeout: number | 10000,
     path: string | '.Minecraft',
     version: string | 'latest_release',
+    instance: string | '',
     detached: boolean | false,
     downloadFileMultiple: number | 3,
 
@@ -82,6 +83,7 @@ export default class Launch {
             timeout: opt?.timeout || 10000,
             path: path.resolve(opt?.path || '.Minecraft').replace(/\\/g, '/'),
             version: opt?.version || 'latest_release',
+            instance: opt?.instance || '',
             detached: opt?.detached || false,
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
 
