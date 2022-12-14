@@ -13,7 +13,7 @@ export default class MinecraftArguments {
         this.authenticator = options.authenticator;
     }
 
-    async GetArguments(json: any) {
+    async GetArguments(json: any, type?: string) {
         let game = await this.GetGameArguments(json);
         let jvm = await this.GetJVMArguments(json);
         let classpath = await this.GetClassPath(json);
