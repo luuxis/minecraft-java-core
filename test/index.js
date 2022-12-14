@@ -19,13 +19,11 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                mc = await new Microsoft(client_id).refresh(mc);
+                // mc = await new Microsoft(client_id).refresh(mc);
                 if (mc.error) {
                     mc = await new Microsoft(client_id).getAuth();
                 }
-                fs.writeFileSync('./account.json', JSON.stringify({
-                    refresh_token: mc.refresh_token,
-                }, null, 4));
+                fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             }
         }
     } else {
@@ -37,7 +35,7 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.12.2',
+        version: '1.19.2',
         detached: false,
         downloadFileMultiple: 30,
 

@@ -4,6 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
+import path from 'path';
 
 import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
 
@@ -78,7 +79,7 @@ export default class Launch {
             url: opt?.url || null,
             authenticator: opt?.authenticator || null,
             timeout: opt?.timeout || 10000,
-            path: opt?.path || '.Minecraft',
+            path: path.resolve(opt?.path || '.Minecraft').replace(/\\/g, '/'),
             version: opt?.version || 'latest_release',
             detached: opt?.detached || false,
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
