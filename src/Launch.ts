@@ -11,6 +11,7 @@ import jsonMinecraft from './Minecraft/Minecraft-Json.js';
 
 import librariesMinecraft from './Minecraft/Minecraft-Libraries.js';
 import assetsMinecraft from './Minecraft/Minecraft-Assets.js';
+import loaderMinecraft from './Minecraft/Minecraft-Loader.js';
 import javaMinecraft from './Minecraft/Minecraft-Java.js';
 
 import bundleMinecraft from './Minecraft/Minecraft-Bundle.js';
@@ -170,6 +171,30 @@ export default class Launch {
         let natives = await libraries.natives(bundle);
         if (natives.length === 0) json.nativesList = false;
         else json.nativesList = true;
+
+        if (this.options.loader) {
+            let loaderInstall = new loaderMinecraft(this.options)
+
+            loaderInstall.on('extract', (extract: any) => {
+                this.emit('extract', extract);
+            });
+
+            loaderInstall.on('progress', (progress: any, size: any, element: any) => {
+                this.emit('progress', progress, size, element);
+            });
+
+            loaderInstall.on('check', (progress: any, size: any, element: any) => {
+                this.emit('check', progress, size, element);
+            });
+
+            loaderInstall.on('patch', (patch: any) => {
+                this.emit('patch', patch);
+            });
+
+            let jsonLoader = await loaderInstall.GetLoader(version, gameJava.path).then((data: any) => data).catch((err: any) => err);
+
+            console.log(jsonLoader)
+        }
 
         return {
             minecraftJson: json,
