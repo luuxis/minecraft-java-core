@@ -7,14 +7,14 @@ import { EventEmitter } from 'events';
 import path from 'path';
 import { spawn } from 'child_process';
 
-import jsonMinecraft from './Minecraft-utils/Minecraft-Json.js';
+import jsonMinecraft from './Minecraft/Minecraft-Json.js';
 
-import librariesMinecraft from './Minecraft-utils/Minecraft-Libraries.js';
-import assetsMinecraft from './Minecraft-utils/Minecraft-Assets.js';
-import javaMinecraft from './Minecraft-utils/Minecraft-Java.js';
+import librariesMinecraft from './Minecraft/Minecraft-Libraries.js';
+import assetsMinecraft from './Minecraft/Minecraft-Assets.js';
+import javaMinecraft from './Minecraft/Minecraft-Java.js';
 
-import bundleMinecraft from './Minecraft-utils/Minecraft-Bundle.js';
-import argumentsMinecraft from './Minecraft-utils/Minecraft-Arguments.js';
+import bundleMinecraft from './Minecraft/Minecraft-Bundle.js';
+import argumentsMinecraft from './Minecraft/Minecraft-Arguments.js';
 
 import Downloader from './utils/Downloader.js';
 
@@ -118,7 +118,7 @@ export default class Launch {
     async start() {
         let data: any = await this.DownloadGame();
         if (data.error) return this.emit('error', data);
-        let { minecraftVersion, minecraftJson, minecraftJava } = data;
+        let { minecraftJson, minecraftJava } = data;
 
         let args: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson);
         if (args.error) return this.emit('error', args);
@@ -168,11 +168,10 @@ export default class Launch {
         }
 
         let natives = await libraries.natives(bundle);
-        if (natives.length == 0) json.nativesList = false;
+        if (natives.length === 0) json.nativesList = false;
         else json.nativesList = true;
 
         return {
-            minecraftVersion: version,
             minecraftJson: json,
             minecraftJava: gameJava
         }
