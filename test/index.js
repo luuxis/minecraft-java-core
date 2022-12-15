@@ -1,5 +1,5 @@
-import { Microsoft, Launch } from 'minecraft-java-core';
-import fs from 'fs';
+const { Microsoft, Launch } = require('../build/Index');
+const fs = require('fs');
 
 const launch = new Launch();
 
@@ -78,6 +78,17 @@ async function main() {
     launch.on('check', (progress, size, element) => {
         console.log(`Checking ${element} ${Math.round((progress / size) * 100)}%`);
     });
+
+    launch.on('estimated', (time) => {
+        let hours = Math.floor(time / 3600);
+        let minutes = Math.floor((time - hours * 3600) / 60);
+        let seconds = Math.floor(time - hours * 3600 - minutes * 60);
+        console.log(`${hours}h ${minutes}m ${seconds}s`);
+    })
+
+    launch.on('speed', (speed) => {
+        console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+    })
 
     launch.on('patch', patch => {
         console.log(patch);

@@ -1,6 +1,0 @@
-{
-    "type": "module",
-    "dependencies": {
-        "minecraft-java-core": "file:../."
-    }
-}
