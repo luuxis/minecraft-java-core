@@ -33,7 +33,7 @@
     "dependencies": {
         "adm-zip": "^0.5.9",
         "form-data": "^4.0.0",
-        "minecraft-loader": "^1.0.0-beta.5",
+        "minecraft-loader": "^1.0.1",
         "node-fetch": "^2.6.7",
         "prompt": "^1.2.1",
         "sharp": "^0.30.7",
