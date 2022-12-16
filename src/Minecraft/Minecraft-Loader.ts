@@ -39,7 +39,13 @@ export default class MinecraftLoader {
             loader.install();
 
             loader.on('json', (json: any) => {
-                resolve(json);
+                let loaderJson = json;
+                loaderJson.libraries = loaderJson.libraries.map((lib: any) => {
+                    lib.loader = `${this.options.path}/loader/${this.options.loader.type}`;
+                    return lib;
+                });
+
+                resolve(loaderJson);
             });
 
             loader.on('extract', (extract: any) => {
@@ -62,5 +68,31 @@ export default class MinecraftLoader {
                 reject(err);
             });
         })
+    }
+
+    async GetArguments(json: any, version: any) {
+        if (json === null) {
+            return {
+                game: [],
+                jvm: []
+            }
+        }
+
+        let moddeArguments = json.arguments;
+        if (!moddeArguments) return { game: [], jvm: [] };
+        let Arguments: any = {}
+        if (moddeArguments.game) Arguments.game = moddeArguments.game;
+        if (moddeArguments.jvm) Arguments.jvm = moddeArguments.jvm.map(jvm => {
+            return jvm
+                .replace(/\${version_name}/g, version)
+                .replace(/\${library_directory}/g, `${this.options.path}/loader/${this.options.loader.type}/libraries`)
+                .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
+        })
+
+        return {
+            game: Arguments.game || [],
+            jvm: Arguments.jvm || [],
+            mainClass: json.mainClass
+        };
     }
 }

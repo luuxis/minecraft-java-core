@@ -35,15 +35,15 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.12.2',
+        version: '1.19.3',
         instance: 'Aynor',
         detached: false,
         downloadFileMultiple: 30,
 
         modde: true,
         loader: {
-            type: 'forge',
-            build: '1.12.2-14.23.5.2838'
+            type: 'quilt',
+            build: 'recommended'
         },
 
         verify: false,

@@ -19,56 +19,9 @@ import argumentsMinecraft from './Minecraft/Minecraft-Arguments.js';
 
 import Downloader from './utils/Downloader.js';
 
-interface launchOptions {
-    url: string | null,
-    authenticator: {
-        access_token: string | null,
-        client_token: string | null,
-        uuid: string | null,
-        name: string | null,
-        user_properties: string | null,
-        meta: {
-            xuid: string | null,
-            type: string | null,
-            demo: boolean | null,
-        }
-    },
-
-    timeout: number | 10000,
-    path: string | '.Minecraft',
-    version: string | 'latest_release',
-    instance: string | '',
-    detached: boolean | false,
-    downloadFileMultiple: number | 3,
-
-    modde: boolean | false,
-    loader: {
-        type: string
-        build: string | 'latest'
-    },
-
-    verify: boolean | false,
-    ignored: any | [],
-    args: any | [],
-
-    javaPath: string | null,
-    java: boolean | false,
-
-    screen: {
-        width: number | null,
-        height: number | null,
-        fullscreen: boolean | false
-    },
-
-    memory: {
-        min: string | '1G',
-        max: string | '2G'
-    }
-}
-
 
 export default class Launch {
-    options: launchOptions;
+    options: any;
     on: any;
     emit: any;
 
@@ -77,7 +30,7 @@ export default class Launch {
         this.emit = EventEmitter.prototype.emit;
     }
 
-    async Launch(opt: launchOptions) {
+    async Launch(opt: any) {
         this.options = {
             url: opt?.url || null,
             authenticator: opt?.authenticator || null,
@@ -113,23 +66,35 @@ export default class Launch {
             }
         }
 
+        if (this.options.loader.type === null) this.options.loader = false;
+
         this.start();
     }
 
     async start() {
         let data: any = await this.DownloadGame();
         if (data.error) return this.emit('error', data);
-        let { minecraftJson, minecraftJava } = data;
+        let { minecraftJson, minecraftLoader, minecraftVersion, minecraftJava } = data;
 
-        let args: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson);
-        if (args.error) return this.emit('error', args);
-        args = [...args.jvm, ...args.classpath, ...args.game]
+        let minecraftArguments: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson, minecraftLoader);
+        if (minecraftArguments.error) return this.emit('error', minecraftArguments);
+
+        let loaderArguments: any = await new loaderMinecraft(this.options).GetArguments(minecraftLoader, minecraftVersion);
+        if (loaderArguments.error) return this.emit('error', loaderArguments);
+
+        let Arguments: any = [
+            ...minecraftArguments.jvm,
+            ...loaderArguments.jvm,
+            ...minecraftArguments.classpath,
+            ...loaderArguments.game,
+            ...minecraftArguments.game
+        ]
 
         let java: any = this.options.java ? minecraftJava.path : 'java';
 
-        let minecraftDebug = spawn(java, args, { cwd: this.options.path, detached: this.options.detached })
+        let minecraftDebug = spawn(java, Arguments, { cwd: this.options.path, detached: this.options.detached })
 
-        this.emit('data', `Launching with arguments ${args.join(' ')}`)
+        this.emit('data', `Launching with arguments ${Arguments.join(' ')}`)
         minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraftDebug.on('close', (code) => this.emit('close', code))
@@ -137,6 +102,7 @@ export default class Launch {
 
     async DownloadGame() {
         let InfoVersion = await new jsonMinecraft(this.options).GetInfoVersion();
+        let loaderJson: any = null;
         if (InfoVersion.error) return InfoVersion
         let { json, version } = InfoVersion;
 
@@ -192,12 +158,14 @@ export default class Launch {
             });
 
             let jsonLoader = await loaderInstall.GetLoader(version, gameJava.path).then((data: any) => data).catch((err: any) => err);
-
-            console.log(jsonLoader)
+            if (jsonLoader.error) return this.emit('error', jsonLoader);
+            loaderJson = jsonLoader;
         }
 
         return {
             minecraftJson: json,
+            minecraftLoader: loaderJson,
+            minecraftVersion: version,
             minecraftJava: gameJava
         }
     }

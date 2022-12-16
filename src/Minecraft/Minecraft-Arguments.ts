@@ -5,6 +5,8 @@
 
 import { getPathLibraries } from '../utils/Index.js';
 
+let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
+
 export default class MinecraftArguments {
     options: any;
     authenticator: any;
@@ -13,10 +15,10 @@ export default class MinecraftArguments {
         this.authenticator = options.authenticator;
     }
 
-    async GetArguments(json: any, type?: string) {
+    async GetArguments(json: any, loaderJson: any) {
         let game = await this.GetGameArguments(json);
         let jvm = await this.GetJVMArguments(json);
-        let classpath = await this.GetClassPath(json);
+        let classpath = await this.GetClassPath(json, loaderJson);
 
         return {
             game: game,
@@ -78,20 +80,36 @@ export default class MinecraftArguments {
         return jvm;
     }
 
-    async GetClassPath(json: any) {
-        let libraries: any = []
-        for (let lib of json.libraries) {
-            if (lib.natives) continue;
-            let path = getPathLibraries(lib.name)
-            libraries.push(`${this.options.path}/libraries/${path.path}/${path.name}`)
-        }
+    async GetClassPath(json: any, loaderJson: any) {
+        let classPath: any = []
+        let libraries: any = json.libraries;
 
-        libraries.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
+        if (loaderJson?.libraries) libraries = libraries.concat(loaderJson.libraries);
+        libraries = libraries.filter((library, index, self) => index === self.findIndex(t => t.name === library.name))
+
+        for (let lib of libraries) {
+            if (lib.natives) {
+                let native = lib.natives[MojangLib[process.platform]];
+                if (!native) native = lib.natives[process.platform];
+                else continue;
+            } else {
+                if (lib.rules && lib.rules[0].os) {
+                    if (lib.rules[0].os.name !== MojangLib[process.platform]) continue;
+                }
+            }
+            let path = getPathLibraries(lib.name)
+            if (lib.loader) {
+                classPath.push(`${lib.loader}/libraries/${path.path}/${path.name}`)
+            } else {
+                classPath.push(`${this.options.path}/libraries/${path.path}/${path.name}`)
+            }
+        }
+        classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
 
         return [
             `-cp`,
-            libraries.join(process.platform === 'win32' ? ';' : ':'),
-            json.mainClass
+            classPath.join(process.platform === 'win32' ? ';' : ':'),
+            loaderJson ? loaderJson.mainClass : json.mainClass
         ]
     }
 
