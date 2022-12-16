@@ -1,5 +1,6 @@
 const { Microsoft, Launch } = require('../build/Index');
 const fs = require('fs');
+const path = require('path');
 
 const launch = new Launch();
 
@@ -35,14 +36,14 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.19.3',
+        version: '1.16.5',
         instance: 'Aynor',
         detached: false,
         downloadFileMultiple: 30,
 
         modde: true,
         loader: {
-            type: 'quilt',
+            type: 'forge',
             build: 'recommended'
         },
 
@@ -95,7 +96,7 @@ async function main() {
     });
 
     launch.on('data', (e) => {
-        console.log(e)
+        console.log(e);
     })
 
     launch.on('close', code => {

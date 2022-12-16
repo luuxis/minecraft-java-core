@@ -4,8 +4,10 @@
  */
 
 import { getPathLibraries } from '../utils/Index.js';
+import os from 'os';
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
+let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
 export default class MinecraftArguments {
     options: any;
@@ -16,7 +18,7 @@ export default class MinecraftArguments {
     }
 
     async GetArguments(json: any, loaderJson: any) {
-        let game = await this.GetGameArguments(json);
+        let game = await this.GetGameArguments(json, loaderJson);
         let jvm = await this.GetJVMArguments(json);
         let classpath = await this.GetClassPath(json, loaderJson);
 
@@ -27,8 +29,13 @@ export default class MinecraftArguments {
         }
     }
 
-    async GetGameArguments(json: any) {
+    async GetGameArguments(json: any, loaderJson: any) {
         let game = json.minecraftArguments ? json.minecraftArguments.split(' ') : json.arguments.game;
+        if (loaderJson) {
+            let gameLoader = loaderJson.minecraftArguments ? loaderJson.minecraftArguments.split(' ') : [];
+            game = game.concat(gameLoader);
+            game = game.filter((item, index, self) => index === self.findIndex(t => t === item))
+        }
 
         let table = {
             '${auth_access_token}': this.authenticator.access_token,
@@ -84,19 +91,21 @@ export default class MinecraftArguments {
         let classPath: any = []
         let libraries: any = json.libraries;
 
-        if (loaderJson?.libraries) libraries = libraries.concat(loaderJson.libraries);
+        if (loaderJson?.libraries) libraries = loaderJson.libraries.concat(libraries);
         libraries = libraries.filter((library, index, self) => index === self.findIndex(t => t.name === library.name))
 
         for (let lib of libraries) {
             if (lib.natives) {
                 let native = lib.natives[MojangLib[process.platform]];
                 if (!native) native = lib.natives[process.platform];
-                else continue;
+                if (!native) continue;
             } else {
                 if (lib.rules && lib.rules[0].os) {
                     if (lib.rules[0].os.name !== MojangLib[process.platform]) continue;
                 }
             }
+
+
             let path = getPathLibraries(lib.name)
             if (lib.loader) {
                 classPath.push(`${lib.loader}/libraries/${path.path}/${path.name}`)
