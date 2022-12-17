@@ -67,6 +67,7 @@ export default class Launch {
         }
 
         if (!this.options.loader.enable) this.options.loader = false;
+        if (this.options.javaPath) this.options.java = false;
 
         this.start();
     }
@@ -135,10 +136,6 @@ export default class Launch {
             await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple);
         }
 
-        let natives = await libraries.natives(bundle);
-        if (natives.length === 0) json.nativesList = false;
-        else json.nativesList = true;
-
         if (this.options.loader) {
             let loaderInstall = new loaderMinecraft(this.options)
 
@@ -158,10 +155,18 @@ export default class Launch {
                 this.emit('patch', patch);
             });
 
-            let jsonLoader = await loaderInstall.GetLoader(version, gameJava.path).then((data: any) => data).catch((err: any) => err);
-            if (jsonLoader.error) return this.emit('error', jsonLoader);
+            let jsonLoader = await loaderInstall.GetLoader(version, gameJava.path)
+                .then((data: any) => data)
+                .catch((err: any) => err);
+            if (jsonLoader.error) return jsonLoader;
             loaderJson = jsonLoader;
         }
+
+        if (this.options.verify) await libraries.checkFiles(bundle);
+        
+        let natives = await libraries.natives(bundle);
+        if (natives.length === 0) json.nativesList = false;
+        else json.nativesList = true;
 
         return {
             minecraftJson: json,
