@@ -2,4 +2,3 @@ node_modules
 build
 .Minecraft
 account.json
-test/package-lock.json
