@@ -41,10 +41,10 @@ export default class Launch {
             detached: opt?.detached || false,
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
 
-            modde: opt?.modde || false,
             loader: {
                 type: opt?.loader?.type || null,
-                build: opt?.loader?.build || 'latest'
+                build: opt?.loader?.build || 'latest',
+                enable: opt?.loader?.enable || false,
             },
 
             verify: opt?.verify || false,
@@ -66,7 +66,7 @@ export default class Launch {
             }
         }
 
-        if (this.options.loader.type === null) this.options.loader = false;
+        if (!this.options.loader.enable) this.options.loader = false;
 
         this.start();
     }
@@ -109,10 +109,11 @@ export default class Launch {
         let libraries = new librariesMinecraft(this.options)
 
         let gameLibraries: any = await libraries.Getlibraries(json);
+        let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
         let gameJava: any = this.options.java ? await new javaMinecraft(this.options).GetJsonJava(json) : { files: [] };
 
-        let bundle: any = [...gameLibraries, ...gameAssets, ...gameJava.files]
+        let bundle: any = [...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]
         let filesList: any = await new bundleMinecraft(this.options).checkBundle(bundle);
 
         if (filesList.length > 0) {

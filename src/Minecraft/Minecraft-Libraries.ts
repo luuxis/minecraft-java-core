@@ -6,6 +6,7 @@
 import os from 'os';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
+import nodeFetch from 'node-fetch';
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
 let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
@@ -63,6 +64,25 @@ export default class Libraries {
             content: JSON.stringify(this.json)
         });
         return libraries;
+    }
+
+    async GetAssetsOthers(url: any) {
+        if (!url) return [];
+        let data = await nodeFetch(url).then(res => res.json());
+
+        let assets = [];
+        for (let asset of data) {
+            if (!asset.path) continue
+            let path = asset.path;
+            assets.push({
+                sha1: asset.hash,
+                size: asset.size,
+                type: path.split("/")[0],
+                path: path,
+                url: asset.url
+            });
+        }
+        return assets
     }
 
     async natives(bundle: any) {
