@@ -18,7 +18,7 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                mc = await new Microsoft(client_id).refresh(mc);
+                // mc = await new Microsoft(client_id).refresh(mc);
                 if (mc.error) {
                     mc = await new Microsoft(client_id).getAuth();
                 }
@@ -45,8 +45,8 @@ async function main() {
             enable: true
         },
 
-        verify: false,
-        ignored: [],
+        verify: true,
+        ignored: ['loader', 'options.txt'],
         args: [],
 
         javaPath: null,
