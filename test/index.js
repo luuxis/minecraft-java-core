@@ -1,8 +1,6 @@
 const { Microsoft, Launch } = require('../build/Index');
-const fs = require('fs');
-const path = require('path');
-
 const launch = new Launch();
+const fs = require('fs');
 
 let save = true;
 let client_id = '13f589e1-e2fc-443e-a68a-63b0092b8eeb'
@@ -20,7 +18,7 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                // mc = await new Microsoft(client_id).refresh(mc);
+                mc = await new Microsoft(client_id).refresh(mc);
                 if (mc.error) {
                     mc = await new Microsoft(client_id).getAuth();
                 }
@@ -32,7 +30,7 @@ async function main() {
     }
 
     let opt = {
-        url: null,
+        url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
@@ -41,10 +39,10 @@ async function main() {
         detached: false,
         downloadFileMultiple: 30,
 
-        modde: true,
         loader: {
             type: 'forge',
-            build: 'recommended'
+            build: 'recommended',
+            enable: true
         },
 
         verify: false,
