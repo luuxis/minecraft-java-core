@@ -18,7 +18,7 @@ async function main() {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
-                // mc = await new Microsoft(client_id).refresh(mc);
+                mc = await new Microsoft(client_id).refresh(mc);
                 if (mc.error) {
                     mc = await new Microsoft(client_id).getAuth();
                 }
@@ -37,7 +37,7 @@ async function main() {
         version: '1.16.5',
         instance: 'Aynor',
         detached: false,
-        downloadFileMultiple: 30,
+        downloadFileMultiple: 300,
 
         loader: {
             type: 'forge',
@@ -45,7 +45,7 @@ async function main() {
             enable: true
         },
 
-        verify: true,
+        verify: false,
         ignored: ['loader', 'options.txt'],
         args: [],
 
