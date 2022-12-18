@@ -3,10 +3,13 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import Microsoft from './Authenticator/Microsoft.js';
 import Launch from './Launch.js';
+import Microsoft from './Authenticator/Microsoft.js';
+import Mojang from './Authenticator/Mojang.js';
+
 
 export {
+    Launch as Launch,
     Microsoft as Microsoft,
-    Launch as Launch
+    Mojang as Mojang
 };
