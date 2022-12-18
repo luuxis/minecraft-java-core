@@ -17,6 +17,8 @@ import javaMinecraft from './Minecraft/Minecraft-Java.js';
 import bundleMinecraft from './Minecraft/Minecraft-Bundle.js';
 import argumentsMinecraft from './Minecraft/Minecraft-Arguments.js';
 
+import { isold } from './utils/Index.js';
+
 import Downloader from './utils/Downloader.js';
 
 
@@ -163,10 +165,12 @@ export default class Launch {
         }
 
         if (this.options.verify) await libraries.checkFiles(bundle);
-        
+
         let natives = await libraries.natives(bundle);
         if (natives.length === 0) json.nativesList = false;
         else json.nativesList = true;
+
+        if (isold(json)) new assetsMinecraft(this.options).copyAssets(json);
 
         return {
             minecraftJson: json,

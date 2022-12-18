@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-export function getPathLibraries(main: any, nativeString?: any, forceExt?: any) {
+function getPathLibraries(main: any, nativeString?: any, forceExt?: any) {
     let libSplit = main.split(':')
     let fileName = libSplit[3] ? `${libSplit[2]}-${libSplit[3]}` : libSplit[2];
     let finalFileName = fileName.includes('@') ? fileName.replace('@', '.') : `${fileName}${nativeString || ''}${forceExt || '.jar'}`;
@@ -13,3 +13,9 @@ export function getPathLibraries(main: any, nativeString?: any, forceExt?: any) 
         name: `${libSplit[1]}-${finalFileName}`
     };
 }
+
+function isold(json: any) {
+    return json.assets === 'legacy' || json.assets === 'pre-1.6'
+}
+
+export { getPathLibraries, isold };

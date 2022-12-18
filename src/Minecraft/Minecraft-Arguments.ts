@@ -3,11 +3,9 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { getPathLibraries } from '../utils/Index.js';
-import os from 'os';
+import { getPathLibraries, isold } from '../utils/Index.js';
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
-let Arch = { x32: "32", x64: "64", arm: "32", arm64: "64" };
 
 export default class MinecraftArguments {
     options: any;
@@ -48,8 +46,8 @@ export default class MinecraftArguments {
             '${version_name}': json.id,
             '${assets_index_name}': json.assetIndex.id,
             '${game_directory}': this.options.path,
-            '${assets_root}': this.isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
-            '${game_assets}': this.isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
+            '${assets_root}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
+            '${game_assets}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
             '${version_type}': json.type,
             '${clientid}': this.authenticator.clientId || (this.authenticator.client_token || this.authenticator.access_token)
         }
@@ -120,9 +118,5 @@ export default class MinecraftArguments {
             classPath.join(process.platform === 'win32' ? ';' : ':'),
             loaderJson ? loaderJson.mainClass : json.mainClass
         ]
-    }
-
-    isold(json: any) {
-        return json.assets === 'legacy' || json.assets === 'pre-1.6'
     }
 }
