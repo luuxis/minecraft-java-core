@@ -27,15 +27,15 @@ export default class Microsoft {
         if (!type) type = this.type;
 
         if (type == "electron") {
-            let usercode = await (require('./GUI/Electron.js')).default(url)
+            let usercode = await (require('./GUI/Electron.js'))(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         } else if (type == "nwjs") {
-            let usercode = await (require('./GUI/NW.js')).default(url)
+            let usercode = await (require('./GUI/NW.js'))(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         } else if (type == "terminal") {
-            let usercode = await (require('./GUI/Terminal.js')).default(url)
+            let usercode = await (require('./GUI/Terminal.js'))(url)
             if (usercode === "cancel") return false;
             else return await this.url(usercode);
         }

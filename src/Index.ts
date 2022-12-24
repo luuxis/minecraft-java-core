@@ -5,11 +5,13 @@
 
 import Launch from './Launch.js';
 import Microsoft from './Authenticator/Microsoft.js';
-import Mojang from './Authenticator/Mojang.js';
+import * as Mojang from './Authenticator/Mojang.js';
+import Status from './StatusServer/status.js';
 
 
 export {
     Launch as Launch,
     Microsoft as Microsoft,
-    Mojang as Mojang
+    Mojang as Mojang,
+    Status as Status
 };

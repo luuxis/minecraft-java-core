@@ -161,10 +161,10 @@ function ChangeAuthApi(url: string) {
     api_url = url
 }
 
-export default {
-    login: login,
-    refresh: refresh,
-    validate: validate,
-    signout: signout,
-    ChangeAuthApi: ChangeAuthApi
+export {
+    login as login,
+    refresh as refresh,
+    validate as validate,
+    signout as signout,
+    ChangeAuthApi as ChangeAuthApi
 }

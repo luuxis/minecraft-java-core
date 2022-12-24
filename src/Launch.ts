@@ -100,7 +100,7 @@ export default class Launch {
         this.emit('data', `Launching with arguments ${Arguments.join(' ')}`)
         minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
-        minecraftDebug.on('close', (code) => this.emit('close', code))
+        minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))
     }
 
     async DownloadGame() {

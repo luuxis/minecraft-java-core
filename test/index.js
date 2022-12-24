@@ -30,18 +30,18 @@ async function main() {
     }
 
     let opt = {
-        url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
+        // url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.16.5',
+        version: '1.19.3',
         instance: 'Aynor',
         detached: false,
         downloadFileMultiple: 300,
 
         loader: {
             type: 'forge',
-            build: 'recommended',
+            build: 'latest',
             enable: true
         },
 
