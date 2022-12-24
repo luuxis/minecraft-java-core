@@ -11,13 +11,13 @@ const defaultProperties = {
     height: 650,
     resizable: false,
     center: true,
-    icon: path.join(__dirname, '../../../assets/icons', `microsoft.${(process.platform === 'win32') ? 'ico' : 'png'}`),
+    icon: path.join(__dirname, '../../../assets/icons', `Microsoft.${(process.platform === 'win32') ? 'ico' : 'png'}`),
 }
 
-module.exports = async function(url) {
-    await new Promise((resolve) => {
+module.exports = async function (url: string) {
+    await new Promise((resolve: any) => {
         app.whenReady().then(() => {
-            session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies) => {
+            session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies: any) => {
                 for (let cookie of cookies) {
                     let urlcookie = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
                     session.defaultSession.cookies.remove(urlcookie, cookie.name)

@@ -3,11 +3,27 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-const fs = require('fs');
-const nodeFetch = require('node-fetch');
+import fs from 'fs';
+import nodeFetch from 'node-fetch';
+import { EventEmitter } from 'events';
 
-module.exports = class download {
-    async downloadFileMultiple(files, size, limit = 1) {
+interface downloadOptions {
+    url: string,
+    path: string,
+    length: number,
+    folder: string
+}
+
+export default class download {
+    on: any;
+    emit: any;
+
+    constructor() {
+        this.on = EventEmitter.prototype.on;
+        this.emit = EventEmitter.prototype.emit;
+    }
+
+    async downloadFileMultiple(files: downloadOptions, size: number, limit: number = 1) {
         if (limit > files.length) limit = files.length;
         let completed = 0;
         let downloaded = 0;
@@ -32,16 +48,16 @@ module.exports = class download {
             before = downloaded;
         }, 500);
 
-        const downloadNext = async() => {
+        const downloadNext = async () => {
             if (queued < files.length) {
                 let file = files[queued];
                 queued++;
-                if (!fs.existsSync(file.foler)) fs.mkdirSync(file.folder, { recursive: true });
-                const writer = fs.createWriteStream(file.path);
+                if (!fs.existsSync(file.foler)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
+                const writer = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
                 const response = await nodeFetch(file.url);
-                response.body.on('data', (chunk) => {
+                response.body.on('data', (chunk: any) => {
                     downloaded += chunk.length;
-                    this.emit('progress', downloaded, size);
+                    this.emit('progress', downloaded, size, file.type);
                     writer.write(chunk);
                 });
 
@@ -51,7 +67,7 @@ module.exports = class download {
                     downloadNext();
                 });
 
-                response.body.on('error', (err) => {
+                response.body.on('error', (err: Error) => {
                     this.emit('error', err);
                 });
             }
@@ -61,7 +77,7 @@ module.exports = class download {
             downloadNext();
         }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve: any) => {
             const interval = setInterval(() => {
                 if (completed === files.length) {
                     clearInterval(estimated);
@@ -70,13 +86,5 @@ module.exports = class download {
                 }
             }, 100);
         });
-    }
-
-    on(event, func) {
-        this[event] = func;
-    }
-
-    emit(event, ...args) {
-        if (this[event]) this[event](...args);
     }
 }

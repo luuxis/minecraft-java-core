@@ -3,19 +3,21 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-'use strict';
+import crypto from 'crypto';
+import nodeFetch from 'node-fetch';
 
-const { v3: uuidv3 } = require('uuid')
-const nodeFetch = require("node-fetch")
-let api_url = 'https://authserver.mojang.com'
+let api_url = 'https://authserver.mojang.com';
+let auth: any
 
-module.exports = new class Mojang {
-    async getAuth(username, password) {
-        let UUID = uuidv3(username, uuidv3.DNS)
+
+function login(username: string, password?: string) {
+    let UUID = crypto.randomBytes(16).toString('hex');
+
+    new Promise(async (resolve, reject) => {
         if (!password) {
-            let user = {
-                access_token: 'null',
-                client_token: 'null',
+            auth = {
+                access_token: UUID,
+                client_token: UUID,
                 uuid: UUID,
                 name: username,
                 user_properties: '{}',
@@ -24,7 +26,7 @@ module.exports = new class Mojang {
                     type: 'Mojang'
                 }
             }
-            return user
+            return resolve(auth);
         }
 
         let post = {
@@ -46,7 +48,10 @@ module.exports = new class Mojang {
             body: JSON.stringify(post)
         }).then(res => res.json());
 
-        if (message.error) throw (`error: ${message.errorMessage}`);
+        if (message.error) {
+            auth = message;
+            return reject(message);
+        };
         let user = {
             access_token: message.accessToken,
             client_token: message.clientToken,
@@ -58,10 +63,14 @@ module.exports = new class Mojang {
                 type: 'Mojang'
             }
         }
-        return user
-    }
+        auth = user;
+        return resolve(user);
+    });
+    return auth;
+}
 
-    async refresh(acc) {
+async function refresh(acc: any) {
+    new Promise(async (resolve, reject) => {
         let post = {
             accessToken: acc.access_token,
             clientToken: acc.client_token,
@@ -75,7 +84,11 @@ module.exports = new class Mojang {
             body: JSON.stringify(post)
         }).then(res => res.json());
 
-        if (message.error) return message;
+        if (message.error) {
+            auth = message;
+            return reject(message);
+        };
+
         let user = {
             access_token: message.accessToken,
             client_token: message.clientToken,
@@ -87,10 +100,14 @@ module.exports = new class Mojang {
                 type: 'Mojang'
             }
         }
-        return user
-    }
+        auth = user;
+        return resolve(user);
+    });
+    return auth;
+}
 
-    async validate(acc) {
+async function validate(acc: any) {
+    new Promise(async (resolve, reject) => {
         let post = {
             accessToken: acc.access_token,
             clientToken: acc.client_token,
@@ -103,11 +120,19 @@ module.exports = new class Mojang {
             body: JSON.stringify(post)
         });
 
-        if (message.status == 204) return true
-        else return false
-    }
+        if (message.status == 204) {
+            auth = true
+            return resolve(true);
+        } else {
+            auth = false
+            return reject(false);
+        }
+    });
+    return auth;
+}
 
-    async invalidate(acc) {
+async function signout(acc: any) {
+    new Promise(async (resolve, reject) => {
         let post = {
             accessToken: acc.access_token,
             clientToken: acc.client_token,
@@ -122,11 +147,24 @@ module.exports = new class Mojang {
         }).then(res => res.text());
 
         if (message == "") {
-            return true;
-        } else return false;
-    }
+            auth = true
+            return resolve(true);
+        } else {
+            auth = false
+            return reject(false);
+        }
+    });
+    return auth;
+}
 
-    ChangeAuthApi(url) {
-        api_url = url
-    }
+function ChangeAuthApi(url: string) {
+    api_url = url
+}
+
+export {
+    login as login,
+    refresh as refresh,
+    validate as validate,
+    signout as signout,
+    ChangeAuthApi as ChangeAuthApi
 }

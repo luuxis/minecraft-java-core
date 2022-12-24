@@ -1,21 +1,21 @@
 {
     "name": "minecraft-java-core",
-    "version": "2.5.1",
-    "description": "A library starting minecraft game NW.js and Electron.js (premium and crack)",
+    "version": "3.0.1",
+    "types": "./build/Index.d.ts",
     "exports": {
         ".": {
-            "import": "./index.mjs",
-            "require": "./index.js"
+            "import": "./build/Index.js",
+            "require": "./build/Index.js"
         }
     },
+    "description": "A library starting minecraft game NW.js and Electron.js",
     "scripts": {
-        "test": "echo No command is set. && echo Aucune commande n'est definie."
+        "dev": "rimraf ./build && tsc -w",
+        "build": "rimraf ./build && tsc"
     },
     "files": [
         "assets/**",
-        "utils/**",
-        "index.js",
-        "index.mjs",
+        "build/**",
         "LICENSE",
         "README.md"
     ],
@@ -32,11 +32,17 @@
     "license": "CCANC",
     "dependencies": {
         "adm-zip": "^0.5.9",
-        "form-data": "^4.0.0",
+        "minecraft-loader": "^1.0.1",
         "node-fetch": "^2.6.7",
         "prompt": "^1.2.1",
-        "sharp": "^0.30.7",
-        "uuid": "^8.3.2"
+        "three": "^0.147.0",
+        "tslib": "^2.4.1"
+    },
+    "devDependencies": {
+        "@types/node": "^18.11.13",
+        "@types/node-fetch": "^2.6.2",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.9.4"
     },
     "bugs": {
         "url": "https://github.com/luuxis/minecraft-java-core/issues"

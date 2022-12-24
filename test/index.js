@@ -1,4 +1,4 @@
-const { Launch, Microsoft } = require('../index');
+const { Microsoft, Launch } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
 
@@ -13,12 +13,15 @@ async function main() {
             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
         } else {
             mc = JSON.parse(fs.readFileSync('./account.json'));
-            
+
             if (!mc.refresh_token) {
                 mc = await new Microsoft(client_id).getAuth();
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             } else {
                 mc = await new Microsoft(client_id).refresh(mc);
+                if (mc.error) {
+                    mc = await new Microsoft(client_id).getAuth();
+                }
                 fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
             }
         }
@@ -26,34 +29,53 @@ async function main() {
         mc = await new Microsoft(client_id).getAuth();
     }
 
-    let opts = {
-        url: 'http://launcher.selvania.fr/files',
+    let opt = {
+        // url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
         authenticator: mc,
-        path: "./.Minecraft",
-        version: "s",
+        timeout: 10000,
+        path: './.Minecraft',
+        version: '1.19.3',
+        instance: 'Aynor',
         detached: false,
-        downloadFileMultiple: 10,
-        java: true,
-        args: [],
-        screen: {
-            width: 1280,
-            height: 720,
-            fullscreen: false
+        downloadFileMultiple: 300,
+
+        loader: {
+            type: 'forge',
+            build: 'latest',
+            enable: true
         },
-        // modde: true,
-        // verify: true,
-        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt", 'servers.dat'],
+
+        verify: false,
+        ignored: ['loader', 'options.txt'],
+        args: [],
+
+        javaPath: null,
+        java: true,
+
+        screen: {
+            width: null,
+            height: null,
+            fullscreen: null,
+        },
 
         memory: {
-            min: `2G`,
-            max: `4G`
+            min: '2G',
+            max: '4G'
         }
     }
 
-    launch.Launch(opts)
+    await launch.Launch(opt);
 
-    launch.on('progress', (DL, totDL) => {
-        console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
+    launch.on('extract', extract => {
+        console.log(extract);
+    });
+
+    launch.on('progress', (progress, size, element) => {
+        console.log(`Downloading ${element} ${Math.round((progress / size) * 100)}%`);
+    });
+
+    launch.on('check', (progress, size, element) => {
+        console.log(`Checking ${element} ${Math.round((progress / size) * 100)}%`);
     });
 
     launch.on('estimated', (time) => {
@@ -63,12 +85,25 @@ async function main() {
         console.log(`${hours}h ${minutes}m ${seconds}s`);
     })
 
-    launch.on('data', (e) => {
-        console.log(e)
+    launch.on('speed', (speed) => {
+        console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
     })
 
-    launch.on('close', (e) => {
-        console.log('Game closed with code')
+    launch.on('patch', patch => {
+        console.log(patch);
+    });
+
+    launch.on('data', (e) => {
+        console.log(e);
     })
+
+    launch.on('close', code => {
+        console.log(code);
+    });
+
+    launch.on('error', err => {
+        console.log(err);
+    });
 }
-main();
+
+main()

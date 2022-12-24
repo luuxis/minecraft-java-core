@@ -1,0 +1,14 @@
+{
+    "include": [
+        "src/**/*"
+    ],
+    "compilerOptions": {
+        "sourceMap": false,
+        "target": "ES2020",
+        "module": "CommonJS",
+        "lib": ["ES2021"], 
+        "declaration": true, 
+        "outDir": "build",
+        "esModuleInterop": true
+    }
+}
