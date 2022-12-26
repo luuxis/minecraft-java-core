@@ -34,7 +34,7 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '1.19.3',
+        version: '1.16.5',
         instance: 'Aynor',
         detached: false,
         downloadFileMultiple: 300,
