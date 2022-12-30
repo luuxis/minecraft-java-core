@@ -30,7 +30,7 @@ async function main() {
     }
 
     let opt = {
-        // url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
+        url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
@@ -42,7 +42,7 @@ async function main() {
         loader: {
             type: 'forge',
             build: 'latest',
-            enable: true
+            enable: true,
         },
 
         verify: false,
@@ -104,6 +104,6 @@ async function main() {
     launch.on('error', err => {
         console.log(err);
     });
-}
+} 
 
 main()
