@@ -21,17 +21,16 @@ export default class MinecraftLoader {
         let loader = new loaderDownloader({
             path: `${this.options.path}/loader/${this.options.loader.type}`,
             timeout: this.options.timeout,
+            downloadFileMultiple: this.options.downloadFileMultiple,
             autoClean: true,
             loader: {
                 type: this.options.loader.type,
                 version: version,
                 build: this.options.loader.build,
                 config: {
-
                     javaPath: javaPath,
                     minecraftJar: `${this.options.path}/versions/${version}/${version}.jar`,
                     minecraftJson: `${this.options.path}/versions/${version}/${version}.json`
-
                 }
             }
         });
