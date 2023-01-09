@@ -45,7 +45,8 @@ export default class AZauth {
             meta: {
                 offline: false,
                 type: 'Mojang'
-            }
+            },
+            role: response.role.name
         }
     }
 
@@ -77,7 +78,8 @@ export default class AZauth {
             meta: {
                 offline: false,
                 type: 'Mojang'
-            }
+            },
+            role: response.role.name
         }
     }
 
