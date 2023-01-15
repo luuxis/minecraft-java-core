@@ -1,26 +1,45 @@
-const { Microsoft, Launch } = require('../build/Index');
+const prompt = require('prompt')
+const { AZauth, Launch } = require('../build/Index');
 const launch = new Launch();
+const auth = new AZauth('http://craftdium.ml/test');
 const fs = require('fs');
 
-let client_id = '13f589e1-e2fc-443e-a68a-63b0092b8eeb'
 let mc
+async function login() {
+    console.log('set your email or username');
+    prompt.start();
+    let { email } = await prompt.get(['email']);
+    console.log('set your password');
+    let { password } = await prompt.get(['password']);
+    let azauth = await auth.login(email, password);
+
+    if (azauth.A2F) {
+        console.log('set your 2FA code');
+        let { code } = await prompt.get(['code']);
+        azauth = await auth.login(email, password, code);
+    }
+
+    if (azauth.error) {
+        console.log(azauth);
+        process.exit(1);
+    }
+    return azauth;
+}
 
 async function main() {
-    if (!fs.existsSync('./account.json')) {
-        mc = await new Microsoft(client_id).getAuth();
-        fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+    if (!fs.existsSync('./AZauth.json')) {
+        mc = await login();
+        fs.writeFileSync('./AZauth.json', JSON.stringify(mc, null, 4));
     } else {
-        mc = JSON.parse(fs.readFileSync('./account.json'));
+        mc = JSON.parse(fs.readFileSync('./AZauth.json'));
 
-        if (!mc.refresh_token) {
-            mc = await new Microsoft(client_id).getAuth();
-            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+        if (!mc.access_token) {
+            mc = await login();
+            fs.writeFileSync('./AZauth.json', JSON.stringify(mc, null, 4));
         } else {
-            mc = await new Microsoft(client_id).refresh(mc);
-            if (mc.error) {
-                mc = await new Microsoft(client_id).getAuth();
-            }
-            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            mc = await auth.verify(mc);
+            if (mc.error) mc = await login();
+            fs.writeFileSync('./AZauth.json', JSON.stringify(mc, null, 4));
         }
     }
 

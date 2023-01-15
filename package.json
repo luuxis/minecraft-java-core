@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "3.1.2",
+    "version": "3.2.3",
     "types": "./build/Index.d.ts",
     "exports": {
         ".": {
@@ -33,9 +33,8 @@
     "dependencies": {
         "adm-zip": "^0.5.9",
         "minecraft-loader": "^1.1.4",
-        "node-fetch": "^2.6.7",
+        "node-fetch": "^2.6.8",
         "prompt": "^1.2.1",
-        "three": "^0.147.0",
         "tslib": "^2.4.1"
     },
     "devDependencies": {
