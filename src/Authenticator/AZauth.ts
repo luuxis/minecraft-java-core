@@ -42,9 +42,14 @@ export default class AZauth {
             uuid: response.uuid,
             name: response.username,
             user_properties: '{}',
+            user_info: {
+                banned: response.banned,
+                money: response.money,
+                role: response.role
+            },
             meta: {
                 offline: false,
-                type: 'Mojang'
+                type: 'AZauth',
             }
         }
     }
@@ -74,9 +79,14 @@ export default class AZauth {
             uuid: response.uuid,
             name: response.username,
             user_properties: '{}',
+            user_info: {
+                banned: response.banned,
+                money: response.money,
+                role: response.role
+            },
             meta: {
                 offline: false,
-                type: 'Mojang'
+                type: 'AZauth',
             }
         }
     }

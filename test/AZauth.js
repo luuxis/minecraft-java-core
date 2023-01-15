@@ -1,7 +1,7 @@
 const prompt = require('prompt')
 const { AZauth, Launch } = require('../build/Index');
 const launch = new Launch();
-const auth = new AZauth('web site url azuriom');
+const auth = new AZauth('http://craftdium.ml/test');
 const fs = require('fs');
 
 let mc
