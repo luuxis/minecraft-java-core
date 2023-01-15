@@ -48,7 +48,7 @@ export default class AZauth {
                 role: response.role
             },
             meta: {
-                offline: false,
+                online: false,
                 type: 'AZauth',
             }
         }
@@ -85,7 +85,7 @@ export default class AZauth {
                 role: response.role
             },
             meta: {
-                offline: false,
+                online: false,
                 type: 'AZauth',
             }
         }

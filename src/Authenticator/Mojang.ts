@@ -19,7 +19,7 @@ async function login(username: string, password?: string) {
             name: username,
             user_properties: '{}',
             meta: {
-                offline: true,
+                online: false,
                 type: 'Mojang'
             }
         }
@@ -54,7 +54,7 @@ async function login(username: string, password?: string) {
         name: message.selectedProfile.name,
         user_properties: '{}',
         meta: {
-            offline: false,
+            online: true,
             type: 'Mojang'
         }
     }
@@ -86,7 +86,7 @@ async function refresh(acc: any) {
         name: message.selectedProfile.name,
         user_properties: '{}',
         meta: {
-            offline: false,
+            online: true,
             type: 'Mojang'
         }
     }
