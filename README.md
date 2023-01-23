@@ -40,52 +40,86 @@ const { Launch, Mojang } = require('minecraft-java-core');
 ## Launch :rocket:
 ### Options
 ```javascript
-const { Launch, Mojang } = require('minecraft-java-core');
+const { Mojang, Launch } = require('minecraft-java-core');
 const launch = new Launch();
 
-    let opts = {
-        url: "http://launcher.selvania.fr/files",
-        authenticator: Mojang.getAuth('luuxis'),
-        path: "./.Minecraft",
-        version: "1.19",
+async function main() {
+    let opt = {
+        authenticator: await Mojang.login('Luuxis'),
+        timeout: 10000,
+        path: './.Minecraft test',
+        version: '1.19.3',
         detached: false,
-        java: true,
-        args: [],
-        modde: true,
+        downloadFileMultiple: 100,
+
+        loader: {
+            type: 'forge',
+            build: 'latest',
+            enable: true
+        },
+
         verify: false,
-        ignored: ["crash-reports", "logs", "resourcepacks", "resources", "saves", "shaderpacks", "options.txt", "optionsof.txt"],
+        ignored: ['loader', 'options.txt'],
+        args: [],
+
+        javaPath: null,
+        java: true,
+
+        screen: {
+            width: null,
+            height: null,
+            fullscreen: null,
+        },
 
         memory: {
-            min: `1G`,
-            max: `2G`
+            min: '2G',
+            max: '4G'
         }
     }
 
-launch.Launch(opts)
+    await launch.Launch(opt);
 
-launch.on('progress', (DL, totDL) => {
-    console.log(`${(DL / 1067008).toFixed(2)} Mb to ${(totDL / 1067008).toFixed(2)} Mb`);
-});
+    launch.on('extract', extract => {
+        console.log(extract);
+    });
 
-launch.on('speed', (speed) => {
-    console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
-})
+    launch.on('progress', (progress, size, element) => {
+        console.log(`Downloading ${element} ${Math.round((progress / size) * 100)}%`);
+    });
 
-launch.on('estimated', (time) => {
-    let hours = Math.floor(time / 3600);
-    let minutes = Math.floor((time - hours * 3600) / 60);
-    let seconds = Math.floor(time - hours * 3600 - minutes * 60);
-    console.log(`${hours}h ${minutes}m ${seconds}s`);
-})
+    launch.on('check', (progress, size, element) => {
+        console.log(`Checking ${element} ${Math.round((progress / size) * 100)}%`);
+    });
 
-launch.on('data', (e) => {
-    console.log(e)
-})
+    launch.on('estimated', (time) => {
+        let hours = Math.floor(time / 3600);
+        let minutes = Math.floor((time - hours * 3600) / 60);
+        let seconds = Math.floor(time - hours * 3600 - minutes * 60);
+        console.log(`${hours}h ${minutes}m ${seconds}s`);
+    })
 
-launch.on('close', () => {
-    console.clear();
-    console.log("game closed");
-})
+    launch.on('speed', (speed) => {
+        console.log(`${(speed / 1067008).toFixed(2)} Mb/s`)
+    })
+
+    launch.on('patch', patch => {
+        console.log(patch);
+    });
+
+    launch.on('data', (e) => {
+        console.log(e);
+    })
+
+    launch.on('close', code => {
+        console.log(code);
+    });
+
+    launch.on('error', err => {
+        console.log(err);
+    });
+}
+
+main()
 ```
 ---
 <br>
