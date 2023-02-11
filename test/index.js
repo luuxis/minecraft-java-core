@@ -29,14 +29,14 @@ async function main() {
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        version: '23w04a',
+        version: '1.16.5',
         detached: false,
-        downloadFileMultiple: 10,
+        downloadFileMultiple: 300,
 
         loader: {
             type: 'forge',
             build: 'latest',
-            enable: false
+            enable: true
         },
 
         verify: false,

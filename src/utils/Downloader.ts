@@ -23,7 +23,7 @@ export default class download {
         this.emit = EventEmitter.prototype.emit;
     }
 
-    async downloadFileMultiple(files: downloadOptions, size: number, limit: number = 1) {
+    async downloadFileMultiple(files: downloadOptions, size: number, limit: number = 1, timeout: number = 10000) {
         if (limit > files.length) limit = files.length;
         let completed = 0;
         let downloaded = 0;
@@ -52,9 +52,12 @@ export default class download {
             if (queued < files.length) {
                 let file = files[queued];
                 queued++;
+
                 if (!fs.existsSync(file.foler)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
-                const writer = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
-                const response = await nodeFetch(file.url);
+                const writer: any = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
+
+                const response = await nodeFetch(file.url, { timeout: timeout });
+
                 response.body.on('data', (chunk: any) => {
                     downloaded += chunk.length;
                     this.emit('progress', downloaded, size, file.type);
@@ -65,10 +68,6 @@ export default class download {
                     writer.end();
                     completed++;
                     downloadNext();
-                });
-
-                response.body.on('error', (err: Error) => {
-                    this.emit('error', err);
                 });
             }
         };

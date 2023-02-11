@@ -135,7 +135,7 @@ export default class Launch {
                 this.emit("estimated", time);
             });
 
-            await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple);
+            await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple, this.options.timeout);
         }
 
         if (this.options.loader) {
