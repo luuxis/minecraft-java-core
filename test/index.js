@@ -25,7 +25,7 @@ async function main() {
     }
 
     let opt = {
-        // url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
+        url: 'http://192.168.1.146',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
@@ -44,12 +44,10 @@ async function main() {
         args: [],
 
         javaPath: null,
-        java: true,
 
         screen: {
-            width: null,
-            height: null,
-            fullscreen: null,
+            width: 1600,
+            height: 900
         },
 
         memory: {
