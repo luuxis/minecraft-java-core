@@ -39,7 +39,7 @@ export default class Launch {
             timeout: opt?.timeout || 10000,
             path: path.resolve(opt?.path || '.Minecraft').replace(/\\/g, '/'),
             version: opt?.version || 'latest_release',
-            instance: opt?.instance || '',
+            instance: opt?.instance || null,
             detached: opt?.detached || false,
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
 
@@ -54,7 +54,7 @@ export default class Launch {
             args: opt?.args || [],
 
             javaPath: opt?.javaPath || null,
-            java: opt?.java || false,
+            java: true,
 
             screen: {
                 width: opt?.screen?.width || null,
@@ -93,7 +93,7 @@ export default class Launch {
             ...minecraftArguments.game
         ]
 
-        let java: any = this.options.java ? minecraftJava.path : 'java';
+        let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;
 
         let minecraftDebug = spawn(java, Arguments, { cwd: this.options.path, detached: this.options.detached })
 
@@ -157,7 +157,7 @@ export default class Launch {
                 this.emit('patch', patch);
             });
 
-            let jsonLoader = await loaderInstall.GetLoader(version, gameJava.path)
+            let jsonLoader = await loaderInstall.GetLoader(version, this.options.javaPath ? this.options.javaPath : gameJava.path)
                 .then((data: any) => data)
                 .catch((err: any) => err);
             if (jsonLoader.error) return jsonLoader;
