@@ -3,3 +3,4 @@ build
 files
 .Minecraft
 test/*.json
+webfiles/instances/*

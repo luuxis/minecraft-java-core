@@ -15,6 +15,18 @@ function scanAllDir($dir) {
     return $result;
 }
 
+function scanFolder($dir) {
+    $result = [];
+    foreach(scandir($dir) as $filename) {
+        if ($filename[0] === '.') continue;
+        $filePath = $dir . '/' . $filename;
+        if ($filename == "php") continue;
+        if (is_dir($filePath)) $result[] = $filename;
+        
+    }
+    return $result;
+}
+
 function dirToArray($dir) {
     $res = [];
     $cdir = scanAllDir($dir);

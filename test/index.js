@@ -25,7 +25,7 @@ async function main() {
     }
 
     let opt = {
-        url: 'http://192.168.1.146',
+        url: 'http://127.0.0.1/webfiles',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
