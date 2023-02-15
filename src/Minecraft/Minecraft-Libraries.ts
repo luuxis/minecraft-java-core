@@ -78,7 +78,7 @@ export default class Libraries {
                 sha1: asset.hash,
                 size: asset.size,
                 type: path.split("/")[0],
-                path: path,
+                path: this.options.instance ? `${this.options.path}/instances/${this.options.instance}/${path}` : path,
                 url: asset.url
             });
         }
