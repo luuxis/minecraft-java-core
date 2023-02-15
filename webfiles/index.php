@@ -7,9 +7,14 @@ $instance = $_GET['instance'];
 if ($instance == '/' || $instance[0] == '.') {
     echo json_encode([]);
     exit;
+} elseif (!file_exists('instances')) {
+    echo dirToArray("files");
+    exit;
+} elseif ($instance == '') {
+    echo json_encode(scanfolder("instances"));
+    exit;
+} else {
+    echo dirToArray("instances/$instance");
+    exit;
 }
-
-echo json_encode(scanfolder("instances"));
-
-// echo dirToArray($instance);
 ?>
