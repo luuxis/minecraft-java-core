@@ -45,7 +45,7 @@ export default class MinecraftArguments {
             '${user_type}': this.authenticator.meta.type,
             '${version_name}': json.id,
             '${assets_index_name}': json.assetIndex.id,
-            '${game_directory}': this.options.path,
+            '${game_directory}': this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path,
             '${assets_root}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
             '${game_assets}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
             '${version_type}': json.type,

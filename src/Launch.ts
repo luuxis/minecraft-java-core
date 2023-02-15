@@ -94,8 +94,9 @@ export default class Launch {
         ]
 
         let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;
+        let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
 
-        let minecraftDebug = spawn(java, Arguments, { cwd: this.options.path, detached: this.options.detached })
+        let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
 
         this.emit('data', `Launching with arguments ${Arguments.join(' ')}`)
         minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
