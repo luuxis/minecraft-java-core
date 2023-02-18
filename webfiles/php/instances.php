@@ -14,4 +14,12 @@ $instance['hypixel'] = array_merge($instance['hypixel'], array(
         "loadder_version" => "latest"
     )
 ));
+
+$instance['selvania'] = array_merge($instance['selvania'], array(
+    "loadder" => array(
+        "minecraft_version" => "latest_release",
+        "loadder_type" => "none",
+        "loadder_version" => "latest"
+    )
+));
 ?>

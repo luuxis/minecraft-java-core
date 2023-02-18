@@ -18,7 +18,10 @@ if ($instance_param == '') {
     $instances_list = scanFolder("instances");
     $instance = array();
     foreach ($instances_list as $value) {
-        $_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], 0, -1); 
+        if (substr($_SERVER['REQUEST_URI'], -1) == '/') {
+            $_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], 0, -1);
+        }
+
         $url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?instance=$value";
         $instance[$value] = array("name" => $value, "url" => $url);
     }
