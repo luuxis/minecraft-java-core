@@ -54,7 +54,6 @@ export default class Launch {
             args: opt?.args || [],
 
             javaPath: opt?.javaPath || null,
-            java: true,
 
             screen: {
                 width: opt?.screen?.width || null,
@@ -69,7 +68,6 @@ export default class Launch {
         }
 
         if (!this.options.loader.enable) this.options.loader = false;
-        if (this.options.javaPath) this.options.java = false;
 
         this.start();
     }
@@ -115,7 +113,7 @@ export default class Launch {
         let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
-        let gameJava: any = this.options.java ? await new javaMinecraft(this.options).GetJsonJava(json) : { files: [] };
+        let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).GetJsonJava(json);
 
         let bundle: any = [...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]
         let filesList: any = await new bundleMinecraft(this.options).checkBundle(bundle);
