@@ -25,12 +25,12 @@ async function main() {
     }
 
     let opt = {
-        url: 'http://127.0.0.1/webfiles/?instance=hypixel',
+        // url: 'http://127.0.0.1/webfiles?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'hypixel',
-        version: '1.8.9',
+        version: '1.19.3',
         detached: false,
         downloadFileMultiple: 300,
 

@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import path from 'path';
+import fs from 'fs';
 import { spawn } from 'child_process';
 
 import jsonMinecraft from './Minecraft/Minecraft-Json.js';
@@ -93,6 +94,8 @@ export default class Launch {
 
         let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;
         let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
+        if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
+
 
         let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
 
