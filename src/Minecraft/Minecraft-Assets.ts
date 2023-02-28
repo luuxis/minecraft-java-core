@@ -24,7 +24,7 @@ export default class MinecraftAssets {
             path: `assets/indexes/${this.assetIndex.id}.json`,
             content: JSON.stringify(data)
         });
-        
+
         data = Object.values(data.objects);
 
         for (let asset of data) {
