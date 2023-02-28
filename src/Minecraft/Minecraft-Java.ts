@@ -52,6 +52,7 @@ export default class java {
         }
         return {
             files: files,
-            path: path.resolve(this.options.path, `runtime/${version}/bin/java${process.platform == "win32" ? ".exe" : ""}`).replace(/\\/g, "/"),};
+            path: path.resolve(this.options.path, `runtime/${version}/bin/java${process.platform == "win32" ? ".exe" : ""}`).replace(/\\/g, "/"),
+        };
     }
 }

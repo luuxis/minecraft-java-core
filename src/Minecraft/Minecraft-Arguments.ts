@@ -57,7 +57,7 @@ export default class MinecraftArguments {
             if (Object.keys(table).includes(game[i])) game[i] = table[game[i]]
         }
 
-        if(this.options.screen) {
+        if (this.options.screen) {
             game.push('--width')
             game.push(this.options.screen.width)
             game.push('--height')

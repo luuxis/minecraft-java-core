@@ -108,9 +108,14 @@ export default class Libraries {
 
     async checkFiles(bundle: any) {
         let instancePath = ''
+        let instanceFolder = fs.readdirSync(`${this.options.path}/instances`).filter(dir => dir != this.options.instance)
         if (this.options.instance) instancePath = `/instances/${this.options.instance}`
         let files = this.getFiles(this.options.path);
         let ignoredfiles = [...this.getFiles(`${this.options.path}/loader`)]
+
+        for (let instances of instanceFolder) {
+            ignoredfiles.push(...this.getFiles(`${this.options.path}/instances/${instances}`));
+        }
 
         for (let file of this.options.ignored) {
             file = (`${this.options.path}${instancePath}/${file}`)
