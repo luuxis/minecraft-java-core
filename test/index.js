@@ -25,12 +25,12 @@ async function main() {
     }
 
     let opt = {
-        // url: 'http://127.0.0.1/webfiles?instance=hypixel',
+        url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'hypixel',
-        version: '1.19.3',
+        version: '1.8.9',
         detached: false,
         downloadFileMultiple: 300,
 
@@ -40,8 +40,19 @@ async function main() {
             enable: true
         },
 
-        verify: false,
-        ignored: ['loader', 'options.txt'],
+        verify: true,
+        ignored: [
+            'config',
+            'essential',
+            'logs',
+            'resourcepacks',
+            'saves',
+            'screenshots',
+            'shaderpacks',
+            'W-OVERFLOW',
+            'options.txt',
+            'optionsof.txt'
+        ],
         args: [],
 
         javaPath: null,
