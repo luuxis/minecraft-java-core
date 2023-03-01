@@ -110,6 +110,7 @@ export default class Libraries {
         let instancePath = ''
         let instanceFolder = []
         if (this.options.instance) {
+            if (!fs.existsSync(`${this.options.path}/instances`)) fs.mkdirSync(`${this.options.path}/instances`, { recursive: true });
             instancePath = `/instances/${this.options.instance}`
             instanceFolder = fs.readdirSync(`${this.options.path}/instances`).filter(dir => dir != this.options.instance)
         }
