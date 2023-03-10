@@ -25,12 +25,12 @@ async function main() {
     }
 
     let opt = {
-        url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
+        // url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        instance: 'hypixel',
-        version: '1.8.9',
+        instance: '1.19.3',
+        version: '1.19.3',
         detached: false,
         downloadFileMultiple: 300,
 
@@ -40,7 +40,7 @@ async function main() {
             enable: true
         },
 
-        verify: true,
+        verify: false,
         ignored: [
             'config',
             'essential',
@@ -63,8 +63,8 @@ async function main() {
         },
 
         memory: {
-            min: '2G',
-            max: '4G'
+            min: '4G',
+            max: '6G'
         }
     }
 

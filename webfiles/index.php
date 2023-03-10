@@ -2,7 +2,7 @@
 header("Content-Type: application/json; charset=UTF-8");
 include 'php/scandir.php';
 
-$instance_param = $_GET['instance'];
+$instance_param = $_GET['instance'] ?? 'null';
 
 if ($instance_param == '/' || $instance_param[0] == '.') {
     echo json_encode([]);
@@ -14,7 +14,7 @@ if (!file_exists('instances')) {
     exit;
 } 
 
-if ($instance_param == '') {
+if ($instance_param == 'null') {
     $instances_list = scanFolder("instances");
     $instance = array();
     foreach ($instances_list as $value) {
