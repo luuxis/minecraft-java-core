@@ -58,10 +58,12 @@ export default class MinecraftArguments {
         }
 
         if (this.options.screen) {
-            game.push('--width')
-            game.push(this.options.screen.width)
-            game.push('--height')
-            game.push(this.options.screen.height)
+            if (this.options.screen.width !== null && this.options.screen.height !== null) {
+                game.push('--width')
+                game.push(this.options.screen.width)
+                game.push('--height')
+                game.push(this.options.screen.height)
+            }
         }
 
         return game;
