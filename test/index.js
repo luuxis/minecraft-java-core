@@ -53,7 +53,8 @@ async function main() {
             'options.txt',
             'optionsof.txt'
         ],
-        args: [],
+        JVM_ARGS: [],
+        GLOBAL_ARGS: [],
 
         javaPath: null,
 

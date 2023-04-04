@@ -52,7 +52,8 @@ export default class Launch {
 
             verify: opt?.verify || false,
             ignored: opt?.ignored || [],
-            args: opt?.args || [],
+            JVM_ARGS: opt?.JVM_ARGS || [],
+            GLOBAL_ARGS: opt?.GLOBAL_ARGS || [],
 
             javaPath: opt?.javaPath || null,
 
@@ -95,7 +96,6 @@ export default class Launch {
         let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;
         let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
-
 
         let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
 

@@ -66,6 +66,8 @@ export default class MinecraftArguments {
             }
         }
 
+        game.push(...this.options.GLOBAL_ARGS)
+
         return game;
     }
 
@@ -90,6 +92,8 @@ export default class MinecraftArguments {
         if (json.nativesList) {
             jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
         }
+
+        jvm.push(...this.options.JVM_ARGS)
 
         return jvm;
     }
