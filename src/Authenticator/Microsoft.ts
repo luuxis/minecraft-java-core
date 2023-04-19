@@ -187,12 +187,10 @@ export default class Microsoft {
         let capes = profile.capes;
 
         for (let skin of skins) {
-            skin.base64 = await getBass64(skin.url)
-            skin.dataType = 'data:image/png;base64'
+            skin.base64 = `data:image/png;base64,${await getBass64(skin.url)}`
         }
         for (let cape of capes) {
-            cape.base64 = await getBass64(cape.url)
-            cape.dataType = 'data:image/png;base64'
+            cape.base64 = `data:image/png;base64,${await getBass64(cape.url)}`
         }
 
         return {
