@@ -56,25 +56,31 @@ export default class download {
                 if (!fs.existsSync(file.foler)) fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
                 const writer: any = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
 
-                const response = await nodeFetch(file.url, { timeout: timeout });
+                try {
+                    const response = await nodeFetch(file.url, { timeout: timeout });
 
-                response.body.on('data', (chunk: any) => {
-                    downloaded += chunk.length;
-                    this.emit('progress', downloaded, size, file.type);
-                    writer.write(chunk);
-                });
+                    response.body.on('data', (chunk: any) => {
+                        downloaded += chunk.length;
+                        this.emit('progress', downloaded, size, file.type);
+                        writer.write(chunk);
+                    });
 
-                response.body.on('end', () => {
+                    response.body.on('end', () => {
+                        writer.end();
+                        completed++;
+                        downloadNext();
+                    });
+
+                } catch (e) {
                     writer.end();
                     completed++;
                     downloadNext();
-                });
+                    this.emit('error', e);
+                }
             }
         };
 
-        while (queued < limit) {
-            downloadNext();
-        }
+        while (queued < limit) downloadNext();
 
         return new Promise((resolve: any) => {
             const interval = setInterval(() => {

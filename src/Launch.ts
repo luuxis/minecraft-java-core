@@ -137,6 +137,10 @@ export default class Launch {
                 this.emit("estimated", time);
             });
 
+            downloader.on("error", (e: any) => {
+                this.emit("error", e);
+            });
+
             await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple, this.options.timeout);
         }
 
