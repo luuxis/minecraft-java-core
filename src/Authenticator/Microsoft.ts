@@ -140,15 +140,6 @@ export default class Microsoft {
             return mcLogin
         }
 
-        let mcstore = await nodeFetch("https://api.minecraftservices.com/entitlements/mcstore", {
-            method: "get",
-            headers: { 'Authorization': `Bearer ${mcLogin.access_token}` }
-        }).then(res => res.json());
-        if (mcstore.error) {
-            mcstore.errorType = "mcstore";
-            return mcstore
-        }
-
         let profile = await this.getProfile(mcLogin);
         if (profile.error) {
             profile.errorType = "profile";
