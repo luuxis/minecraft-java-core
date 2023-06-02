@@ -4,6 +4,8 @@
  */
 
 import nodeFetch from 'node-fetch';
+import crypto from 'crypto';
+
 
 export default class Microsoft {
     client_id: string;
@@ -48,24 +50,31 @@ export default class Microsoft {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf`
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });;
         if (oauth2.error) return oauth2;
         return await this.getAccount(oauth2)
     }
 
     async refresh(acc: any) {
+        let timeStamp = Math.floor(Date.now() / 1000)
         let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });;
         if (oauth2.error) {
             oauth2.errorType = "oauth2";
             return oauth2
         };
-        return await this.getAccount(oauth2)
+
+        if (timeStamp < (acc?.meta?.access_token_expires_in - 7200)) {
+            acc.refresh_token = oauth2.refresh_token
+            return acc
+        } else {
+            return await this.getAccount(oauth2)
+        }
     }
 
     async getAccount(oauth2: any) {
@@ -81,7 +90,7 @@ export default class Microsoft {
                 TokenType: "JWT"
             }),
             headers: { "Content-Type": "application/json", Accept: "application/json" },
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });;
         if (xbl.error) {
             xbl.errorType = "xbl";
             return xbl
@@ -91,7 +100,6 @@ export default class Microsoft {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 Properties: {
@@ -111,7 +119,6 @@ export default class Microsoft {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 Properties: {
@@ -121,7 +128,7 @@ export default class Microsoft {
                 RelyingParty: "http://xboxlive.com",
                 TokenType: "JWT"
             })
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });
         if (xsts.error) {
             xsts.errorType = "xboxAccount";
             return xsts
@@ -131,10 +138,9 @@ export default class Microsoft {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
             },
             body: JSON.stringify({ "identityToken": `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}` })
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });
         if (mcLogin.error) {
             mcLogin.errorType = "mcLogin";
             return mcLogin
@@ -148,7 +154,7 @@ export default class Microsoft {
 
         return {
             access_token: mcLogin.access_token,
-            client_token: getUUID(),
+            client_token: crypto.randomBytes(16).toString('hex'),
             uuid: profile.id,
             name: profile.name,
             refresh_token: oauth2.refresh_token,
@@ -156,6 +162,7 @@ export default class Microsoft {
             meta: {
                 xuid: xboxAccount.DisplayClaims.xui[0].xid,
                 type: "Xbox",
+                access_token_expires_in: mcLogin.expires_in + Math.floor(Date.now() / 1000),
                 demo: profile.error ? true : false
             },
             profile: {
@@ -171,7 +178,7 @@ export default class Microsoft {
             headers: {
                 'Authorization': `Bearer ${mcLogin.access_token}`
             }
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err => { return { error: err } });;
         if (profile.error) return profile
 
         let skins = profile.skins;
@@ -197,13 +204,4 @@ async function getBass64(url: string) {
     let response = await nodeFetch(url);
     let buffer = await response.buffer();
     return buffer.toString('base64');
-}
-
-function getUUID() {
-    let result = ""
-    for (var i = 0; i <= 4; i++) {
-        result += (Math.floor(Math.random() * 16777216) + 1048576).toString(16);
-        if (i < 4) result += "-"
-    }
-    return result;
 }

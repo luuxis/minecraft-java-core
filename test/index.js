@@ -5,13 +5,12 @@ const fs = require('fs');
 let client_id = '13f589e1-e2fc-443e-a68a-63b0092b8eeb'
 let mc
 
-async function main() {
+(async () => {
     if (!fs.existsSync('./account.json')) {
         mc = await new Microsoft(client_id).getAuth();
         fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
     } else {
         mc = JSON.parse(fs.readFileSync('./account.json'));
-
         if (!mc.refresh_token) {
             mc = await new Microsoft(client_id).getAuth();
             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
@@ -69,7 +68,7 @@ async function main() {
         }
     }
 
-    await launch.Launch(opt);
+    // await launch.Launch(opt);
 
     launch.on('extract', extract => {
         console.log(extract);
@@ -109,6 +108,4 @@ async function main() {
     launch.on('error', err => {
         console.log(err);
     });
-}
-
-main()
+})()
