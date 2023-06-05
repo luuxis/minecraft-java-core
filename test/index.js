@@ -68,7 +68,7 @@ let mc
         }
     }
 
-    // await launch.Launch(opt);
+    await launch.Launch(opt);
 
     launch.on('extract', extract => {
         console.log(extract);
