@@ -4,6 +4,82 @@
  */
 
 import net from 'net'
+import createBuffer from './buffer.js';
+
+function ping(server: any, port: any, callback: any, timeout: any, protocol: any = '') {
+    let start: any = new Date();
+    let socket = net.connect({
+        port: port,
+        host: server
+    }, () => {
+        let handshakeBuffer = new createBuffer();
+
+        handshakeBuffer.writeletInt(0);
+        handshakeBuffer.writeletInt(protocol);
+        handshakeBuffer.writeString(server);
+        handshakeBuffer.writeUShort(port);
+        handshakeBuffer.writeletInt(1);
+
+        writePCBuffer(socket, handshakeBuffer);
+
+        let setModeBuffer = new createBuffer();
+
+        setModeBuffer.writeletInt(0);
+
+        writePCBuffer(socket, setModeBuffer);
+    });
+
+    socket.setTimeout(timeout, () => {
+        if (callback) callback(new Error("Socket timed out when connecting to " + server + ":" + port), null);
+        socket.destroy();
+    });
+
+    let readingBuffer = Buffer.alloc(0);
+
+    socket.on('data', data => {
+        readingBuffer = Buffer.concat([readingBuffer, data]);
+
+        let buffer = new createBuffer(readingBuffer);
+        let length: any;
+
+        try {
+            length = buffer.readletInt();
+        } catch (err) {
+            return;
+        }
+
+        if (readingBuffer.length < length - buffer.offset()) return;
+
+        buffer.readletInt();
+
+        try {
+            let end: any = new Date()
+            let json = JSON.parse(buffer.readString());
+            callback(null, {
+                error: false,
+                ms: Math.round(end - start),
+                version: json.version.name,
+                playersConnect: json.players.online,
+                playersMax: json.players.max
+            });
+        } catch (err) {
+            return callback(err, null);
+        }
+
+        socket.destroy();
+    });
+
+    socket.once('error', err => {
+        if (callback) callback(err, null);
+        socket.destroy();
+    });
+};
+
+function writePCBuffer(client: any, buffer: any) {
+    let length = new createBuffer();
+    length.writeletInt(buffer.buffer().length);
+    client.write(Buffer.concat([length.buffer(), buffer.buffer()]));
+}
 
 export default class status {
     ip: string
@@ -13,40 +89,12 @@ export default class status {
         this.port = port
     }
 
-    getStatus() {
-        return new Promise((resolve) => {
-            let start: any = new Date();
-            let client = net.connect(this.port, this.ip, () => {
-                client.write(Buffer.from([0xFE, 0x01]))
-            });
-
-            client.setTimeout(5 * 1000)
-
-            client.on('data', (data: any) => {
-                if (data != null && data != '') {
-                    let infos = data.toString().split("\x00\x00\x00")
-                    let end: any = new Date()
-                    resolve({
-                        error: false,
-                        ms: Math.round(end - start),
-                        version: infos[2].replace(/\u0000/g, ''),
-                        nameServer: infos[3].replace(/\u0000/g, ''),
-                        playersConnect: infos[4].replace(/\u0000/g, ''),
-                        playersMax: infos[5].replace(/\u0000/g, '')
-                    })
-                }
-                client.end()
-            });
-
-            client.on('timeout', () => {
-                resolve({ error: true })
-                client.end()
-            });
-
-            client.on('err', (err) => {
-                resolve({ error: true })
-                console.error(err)
-            })
+    async getStatus() {
+        await new Promise((resolve, reject) => {
+            ping(this.ip, this.port, (err: any, res: any) => {
+                if (err) return reject({error: err});
+                return resolve(res);
+            }, 3000);
         })
     }
 }
