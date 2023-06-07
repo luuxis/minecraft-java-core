@@ -90,9 +90,9 @@ export default class status {
     }
 
     async getStatus() {
-        await new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             ping(this.ip, this.port, (err: any, res: any) => {
-                if (err) return reject({error: err});
+                if (err) return reject({ error: err });
                 return resolve(res);
             }, 3000);
         })
