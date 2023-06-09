@@ -32,7 +32,7 @@ export default class MinecraftArguments {
         if (loaderJson) {
             let gameLoader = loaderJson.minecraftArguments ? loaderJson.minecraftArguments.split(' ') : [];
             game = game.concat(gameLoader);
-            game = game.filter((item, index, self) => index === self.findIndex(t => t === item))
+            game = game.filter((item: any, index: any, self: any) => index === self.findIndex((res: any) => res == item))
         }
 
         let table = {
@@ -53,8 +53,12 @@ export default class MinecraftArguments {
         }
 
         for (let i in game) {
-            if (typeof game[i] === 'object') game.splice(i, 2)
-            if (Object.keys(table).includes(game[i])) game[i] = table[game[i]]
+            if (typeof game[i] == 'object') game.splice(i, 2)
+            if (Object.keys(table).includes(game[i])) {
+                if (typeof table[game[i]] == 'string') {
+                    game[i] = table[game[i]]
+                }
+            }
         }
 
         if (this.options.screen) {
@@ -103,7 +107,7 @@ export default class MinecraftArguments {
         let libraries: any = json.libraries;
 
         if (loaderJson?.libraries) libraries = loaderJson.libraries.concat(libraries);
-        libraries = libraries.filter((library, index, self) => index === self.findIndex(t => t.name === library.name))
+        libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name))
 
         for (let lib of libraries) {
             if (lib.natives) {

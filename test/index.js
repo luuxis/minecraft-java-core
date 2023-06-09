@@ -16,25 +16,23 @@ let mc
             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
         } else {
             mc = await new Microsoft(client_id).refresh(mc);
-            if (mc.error) {
-                mc = await new Microsoft(client_id).getAuth();
-            }
+            if (mc.error) mc = await new Microsoft(client_id).getAuth();
             fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
         }
     }
 
     let opt = {
-        url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
+        // url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.8.9',
+        version: '1.20',
         detached: false,
-        downloadFileMultiple: 300,
+        downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'fabric',
             build: 'latest',
             enable: true
         },
