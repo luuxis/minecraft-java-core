@@ -54,11 +54,7 @@ export default class MinecraftArguments {
 
         for (let i in game) {
             if (typeof game[i] == 'object') game.splice(i, 2)
-            if (Object.keys(table).includes(game[i])) {
-                if (typeof table[game[i]] == 'string') {
-                    game[i] = table[game[i]]
-                }
-            }
+            if (Object.keys(table).includes(game[i])) game[i] = table[game[i]]
         }
 
         if (this.options.screen) {
@@ -72,7 +68,7 @@ export default class MinecraftArguments {
 
         game.push(...this.options.GLOBAL_ARGS)
 
-        return game;
+        return game.filter((item: any) => typeof item !== 'object')
     }
 
     async GetJVMArguments(json: any) {
