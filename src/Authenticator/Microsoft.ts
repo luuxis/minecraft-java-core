@@ -70,7 +70,12 @@ export default class Microsoft {
         };
 
         if (timeStamp < (acc?.meta?.access_token_expires_in - 7200)) {
+            let profile = await this.getProfile(acc)
             acc.refresh_token = oauth2.refresh_token
+            acc.profile = {
+                skins: profile.skins,
+                capes: profile.capes
+            }
             return acc
         } else {
             return await this.getAccount(oauth2)
