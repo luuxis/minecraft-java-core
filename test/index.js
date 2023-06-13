@@ -32,7 +32,7 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'quilt',
+            type: 'forge',
             build: 'latest',
             enable: true
         },
