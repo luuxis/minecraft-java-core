@@ -88,8 +88,10 @@ export default class MinecraftArguments {
             '-Dfml.ignoreInvalidMinecraftCertificates=true'
         ]
 
-        if (!json.minecraftArguments) {
-            jvm.push(opts[process.platform])
+        if (process.platform == 'darwin') {
+            if (!json.minecraftArguments) {
+                jvm.push(opts[process.platform])
+            }
         }
 
         if (json.nativesList) {

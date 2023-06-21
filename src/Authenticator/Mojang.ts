@@ -25,23 +25,21 @@ async function login(username: string, password?: string) {
         }
     }
 
-    let post = {
-        agent: {
-            name: "Minecraft",
-            version: 1
-        },
-        username,
-        password,
-        clientToken: UUID,
-        requestUser: true
-    }
-
     let message = await nodeFetch(`${api_url}/authenticate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({
+            agent: {
+                name: "Minecraft",
+                version: 1
+            },
+            username,
+            password,
+            clientToken: UUID,
+            requestUser: true
+        })
     }).then(res => res.json());
 
     if (message.error) {
@@ -62,17 +60,16 @@ async function login(username: string, password?: string) {
 }
 
 async function refresh(acc: any) {
-    let post = {
-        accessToken: acc.access_token,
-        clientToken: acc.client_token,
-        requestUser: true
-    }
     let message = await nodeFetch(`${api_url}/refresh`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({
+            accessToken: acc.access_token,
+            clientToken: acc.client_token,
+            requestUser: true
+        })
     }).then(res => res.json());
 
     if (message.error) {
@@ -94,16 +91,15 @@ async function refresh(acc: any) {
 }
 
 async function validate(acc: any) {
-    let post = {
-        accessToken: acc.access_token,
-        clientToken: acc.client_token,
-    }
     let message = await nodeFetch(`${api_url}/validate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({
+            accessToken: acc.access_token,
+            clientToken: acc.client_token,
+        })
     });
 
     if (message.status == 204) {
@@ -114,17 +110,15 @@ async function validate(acc: any) {
 }
 
 async function signout(acc: any) {
-    let post = {
-        accessToken: acc.access_token,
-        clientToken: acc.client_token,
-    }
-
     let message = await nodeFetch(`${api_url}/invalidate`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify({
+            accessToken: acc.access_token,
+            clientToken: acc.client_token,
+        })
     }).then(res => res.text());
 
     if (message == "") {

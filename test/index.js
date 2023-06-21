@@ -27,7 +27,7 @@ let mc
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.8',
+        version: '1.20.1',
         detached: false,
         downloadFileMultiple: 30,
 
