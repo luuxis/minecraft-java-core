@@ -66,7 +66,7 @@ export default class MinecraftArguments {
             }
         }
 
-        game.push(...this.options.GLOBAL_ARGS)
+        game.push(...this.options.GAME_ARGS)
 
         return game.filter((item: any) => typeof item !== 'object')
     }

@@ -53,7 +53,7 @@ export default class Launch {
             verify: opt?.verify || false,
             ignored: opt?.ignored || [],
             JVM_ARGS: opt?.JVM_ARGS || [],
-            GLOBAL_ARGS: opt?.GLOBAL_ARGS || [],
+            GAME_ARGS: opt?.GAME_ARGS || [],
 
             javaPath: opt?.javaPath || null,
 

@@ -1,4 +1,4 @@
-const { Microsoft, Launch } = require('../build/Index');
+const { Microsoft, Launch, Mojang } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
 
@@ -21,20 +21,22 @@ let mc
         }
     }
 
+    mc = await Mojang.login('minecraft')
+
     let opt = {
         // url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.20',
+        version: '1.20.1',
         detached: false,
         downloadFileMultiple: 30,
 
         loader: {
             type: 'forge',
             build: 'latest',
-            enable: true
+            enable: false
         },
 
         verify: false,
@@ -51,7 +53,7 @@ let mc
             'optionsof.txt'
         ],
         JVM_ARGS: [],
-        GLOBAL_ARGS: [],
+        GAME_ARGS: [],
 
         javaPath: null,
 
