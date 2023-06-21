@@ -36,7 +36,7 @@ let mc
         loader: {
             type: 'forge',
             build: 'latest',
-            enable: false
+            enable: true
         },
 
         verify: false,
