@@ -78,7 +78,6 @@ export default class MinecraftArguments {
             linux: '-Xss1M'
         }
         let jvm = [
-            opts[process.platform],
             `-Xms${this.options.memory.min}`,
             `-Xmx${this.options.memory.max}`,
             '-XX:+UnlockExperimentalVMOptions',
@@ -88,6 +87,10 @@ export default class MinecraftArguments {
             '-XX:G1HeapRegionSize=32M',
             '-Dfml.ignoreInvalidMinecraftCertificates=true'
         ]
+
+        if (!json.minecraftArguments) {
+            jvm.push(opts[process.platform])
+        }
 
         if (json.nativesList) {
             jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
