@@ -21,15 +21,13 @@ let mc
         }
     }
 
-    mc = await Mojang.login('minecraft')
-
     let opt = {
         // url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.20.1',
+        version: '1.8',
         detached: false,
         downloadFileMultiple: 30,
 
