@@ -1,0 +1,144 @@
+/**
+ * @author Luuxis
+ * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ */
+
+import { loader } from '../utils/Index.js';
+import Forge from './loader/forge/forge.js';
+import Fabric from './loader/fabric/fabric.js';
+import Quilt from './loader/quilt/quilt.js';
+
+
+import { EventEmitter } from 'events';
+import fs from 'fs'
+import path from 'path'
+
+export default class Loader {
+    options: any;
+    on: any;
+    emit: any;
+
+    constructor(options) {
+        this.options = options
+        this.on = EventEmitter.prototype.on;
+        this.emit = EventEmitter.prototype.emit;
+    }
+
+    async install() {
+        let Loader = loader(this.options.loader.type);
+        if (!Loader) return this.emit('error', { error: `Loader ${this.options.loader.type} not found` });
+
+        if (this.options.loader.type === 'forge') {
+            let forge = await this.forge(Loader);
+            if (forge.error) return this.emit('error', forge);
+            this.emit('json', forge);
+        } else if (this.options.loader.type === 'fabric') {
+            let fabric = await this.fabric(Loader);
+            if (fabric.error) return this.emit('error', fabric);
+            this.emit('json', fabric);
+        } else if (this.options.loader.type === 'quilt') {
+            let quilt = await this.quilt(Loader);
+            if (quilt.error) return this.emit('error', quilt);
+            this.emit('json', quilt);
+        } else {
+            return this.emit('error', { error: `Loader ${this.options.loader.type} not found` });
+        }
+    }
+
+    async forge(Loader: any) {
+        let forge = new Forge(this.options);
+
+        // set event
+        forge.on('check', (progress, size, element) => {
+            this.emit('check', progress, size, element);
+        });
+
+        forge.on('progress', (progress, size, element) => {
+            this.emit('progress', progress, size, element);
+        });
+
+        forge.on('extract', (element) => {
+            this.emit('extract', element);
+        });
+
+        forge.on('patch', patch => {
+            this.emit('patch', patch);
+        });
+
+        // download installer
+        let installer = await forge.donwloadInstaller(Loader);
+        if (installer.error) return installer;
+
+        // extract install profile
+        let profile: any = await forge.extractProfile(installer.filePath);
+        if (profile.error) return profile
+        let destination = path.resolve(this.options.path, 'versions', profile.version.id)
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+
+        // extract universal jar
+        let universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
+        if (universal.error) return universal;
+
+        // download libraries
+        let libraries: any = await forge.downloadLibraries(profile, universal);
+        if (libraries.error) return libraries;
+
+        // patch forge if nessary
+        let patch: any = await forge.patchForge(profile.install);
+        if (patch.error) return patch;
+
+        return profile.version;
+    }
+
+    async fabric(Loader: any) {
+        let fabric = new Fabric(this.options);
+
+        // set event
+        fabric.on('check', (progress, size, element) => {
+            this.emit('check', progress, size, element);
+        });
+
+        fabric.on('progress', (progress, size, element) => {
+            this.emit('progress', progress, size, element);
+        });
+
+        // download Json
+        let json = await fabric.downloadJson(Loader);
+        if (json.error) return json;
+        let destination = path.resolve(this.options.path, 'versions', json.id)
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+
+        // download libraries
+        await fabric.downloadLibraries(json);
+
+        return json;
+    }
+
+    async quilt(Loader: any) {
+        let quilt = new Quilt(this.options);
+
+        // set event
+        quilt.on('check', (progress, size, element) => {
+            this.emit('check', progress, size, element);
+        });
+
+        quilt.on('progress', (progress, size, element) => {
+            this.emit('progress', progress, size, element);
+        });
+
+        // download Json
+        let json = await quilt.downloadJson(Loader);
+
+        if (json.error) return json;
+        let destination = path.resolve(this.options.path, 'versions', json.id)
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+
+        // // download libraries
+        await quilt.downloadLibraries(json);
+
+        return json;
+    }
+}

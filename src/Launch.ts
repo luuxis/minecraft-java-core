@@ -114,18 +114,18 @@ export default class Launch {
         let { json, version } = InfoVersion;
 
         let libraries = new librariesMinecraft(this.options)
+        let bundle = new bundleMinecraft(this.options)
 
         let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
         let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).GetJsonJava(json);
 
-        let bundle: any = [...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]
-        let filesList: any = await new bundleMinecraft(this.options).checkBundle(bundle);
+        let filesList: any = await bundle.checkBundle([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
 
         if (filesList.length > 0) {
             let downloader = new Downloader();
-            let totsize = await new bundleMinecraft(this.options).getTotalSize(filesList);
+            let totsize = await bundle.getTotalSize(filesList);
 
             downloader.on("progress", (DL: any, totDL: any, element: any) => {
                 this.emit("progress", DL, totDL, element);
@@ -172,9 +172,9 @@ export default class Launch {
             loaderJson = jsonLoader;
         }
 
-        if (this.options.verify) await libraries.checkFiles(bundle);
+        if (this.options.verify) await bundle.checkFiles([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
 
-        let natives = await libraries.natives(bundle);
+        let natives = await libraries.natives(gameLibraries);
         if (natives.length === 0) json.nativesList = false;
         else json.nativesList = true;
 

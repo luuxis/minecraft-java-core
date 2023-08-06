@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-const loaderDownloader = require('minecraft-loader');
+import loaderDownloader from '../Minecraft-Loader/index.js'
 
 
 export default class MinecraftLoader {
@@ -20,9 +20,7 @@ export default class MinecraftLoader {
     async GetLoader(version: any, javaPath: any) {
         let loader = new loaderDownloader({
             path: `${this.options.path}/loader/${this.options.loader.type}`,
-            timeout: this.options.timeout,
             downloadFileMultiple: this.options.downloadFileMultiple,
-            autoClean: true,
             loader: {
                 type: this.options.loader.type,
                 version: version,

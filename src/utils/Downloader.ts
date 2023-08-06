@@ -23,6 +23,31 @@ export default class download {
         this.emit = EventEmitter.prototype.emit;
     }
 
+    async downloadFile(url: string, path: string, fileName: string) {
+        if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+        const writer = fs.createWriteStream(path + '/' + fileName);
+        const response = await nodeFetch(url);
+        const size = response.headers.get('content-length');
+        let downloaded = 0;
+        return new Promise((resolve: any, reject: any) => {
+            response.body.on('data', (chunk) => {
+                downloaded += chunk.length;
+                this.emit('progress', downloaded, size);
+                writer.write(chunk);
+            });
+
+            response.body.on('end', () => {
+                writer.end();
+                resolve();
+            });
+
+            response.body.on('error', (err) => {
+                this.emit('error', err);
+                reject(err);
+            });
+        })
+    }
+
     async downloadFileMultiple(files: downloadOptions, size: number, limit: number = 1, timeout: number = 10000) {
         if (limit > files.length) limit = files.length;
         let completed = 0;
@@ -91,5 +116,36 @@ export default class download {
                 }
             }, 100);
         });
+    }
+
+    async checkURL(url: string, timeout = 10000) {
+        return await new Promise(async (resolve, reject) => {
+            await nodeFetch(url, { method: 'HEAD', timeout: timeout }).then(res => {
+                if (res.status === 200) {
+                    resolve({
+                        size: parseInt(res.headers.get('content-length')),
+                        status: res.status
+                    })
+                }
+            })
+            reject(false);
+        });
+    }
+
+    async checkMirror(baseURL: string, mirrors: any) {
+        for (let mirror of mirrors) {
+            let url = `${mirror}/${baseURL}`;
+            let res: any = await this.checkURL(url).then(res => res).catch(err => false);
+
+            if (res?.status == 200) {
+                return {
+                    url: url,
+                    size: res.size,
+                    status: res.status
+                }
+                break;
+            } continue;
+        }
+        return false;
     }
 }
