@@ -101,10 +101,10 @@ export default class Launch {
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
 
         let argumentsLogs: string = Arguments.join(' ')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '__HIDDEN_TOKEN__')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '__HIDDEN_TOKEN__')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '__HIDDEN_UUID__')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xuid, '__HIDDEN_XUID__')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xuid, '????????')
         argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
         this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
