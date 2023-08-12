@@ -27,8 +27,9 @@ export default class download {
         if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
         const writer = fs.createWriteStream(path + '/' + fileName);
         const response = await nodeFetch(url);
-        const size = response.headers.get('content-length');
+        let size = response.headers.get('content-length');
         let downloaded = 0;
+
         return new Promise((resolve: any, reject: any) => {
             response.body.on('data', (chunk) => {
                 downloaded += chunk.length;

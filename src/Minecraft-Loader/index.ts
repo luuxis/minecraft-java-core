@@ -7,6 +7,7 @@ import { loader } from '../utils/Index.js';
 import Forge from './loader/forge/forge.js';
 import NeoForge from './loader/neoForge/neoForge.js';
 import Fabric from './loader/fabric/fabric.js';
+import LegacyFabric from './loader/legacyfabric/legacyFabric.js';
 import Quilt from './loader/quilt/quilt.js';
 
 
@@ -41,6 +42,10 @@ export default class Loader {
             let fabric = await this.fabric(Loader);
             if (fabric.error) return this.emit('error', fabric);
             this.emit('json', fabric);
+        } else if (this.options.loader.type === 'legacyfabric') {
+            let legacyFabric = await this.legacyFabric(Loader);
+            if (legacyFabric.error) return this.emit('error', legacyFabric);
+            this.emit('json', legacyFabric);
         } else if (this.options.loader.type === 'quilt') {
             let quilt = await this.quilt(Loader);
             if (quilt.error) return this.emit('error', quilt);
@@ -167,7 +172,30 @@ export default class Loader {
         return json;
     }
 
+    async legacyFabric(Loader: any) {
+        let legacyFabric = new LegacyFabric(this.options);
 
+        // set event
+        legacyFabric.on('check', (progress, size, element) => {
+            this.emit('check', progress, size, element);
+        });
+
+        legacyFabric.on('progress', (progress, size, element) => {
+            this.emit('progress', progress, size, element);
+        });
+
+        // download Json
+        let json = await legacyFabric.downloadJson(Loader);
+        if (json.error) return json;
+        let destination = path.resolve(this.options.path, 'versions', json.id)
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+
+        // download libraries
+        await legacyFabric.downloadLibraries(json);
+
+        return json;
+    }
 
     async quilt(Loader: any) {
         let quilt = new Quilt(this.options);
