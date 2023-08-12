@@ -100,9 +100,15 @@ export default class Launch {
         let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
 
-        let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
+        let argumentsLogs: string = Arguments.join(' ')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '__HIDDEN_TOKEN__')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '__HIDDEN_TOKEN__')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '__HIDDEN_UUID__')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xuid, '__HIDDEN_XUID__')
+        argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
+        this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
-        this.emit('data', `Launching with arguments ${Arguments.join(' ')}`)
+        let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
         minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
         minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))

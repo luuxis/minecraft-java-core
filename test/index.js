@@ -28,12 +28,12 @@ let mc
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.12.2',
+        version: '1.20.1',
         detached: false,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'legacyfabric',
+            type: 'Forge',
             build: 'latest',
             enable: true
         },
