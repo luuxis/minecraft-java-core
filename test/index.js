@@ -33,7 +33,7 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'Forge',
+            type: 'neoForge',
             build: 'latest',
             enable: true
         },
