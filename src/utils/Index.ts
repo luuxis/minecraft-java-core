@@ -45,7 +45,11 @@ function loader(type: string) {
             meta: 'https://files.minecraftforge.net/net/minecraftforge/forge/${build}/meta.json',
             promotions: 'https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json',
             install: 'https://maven.minecraftforge.net/net/minecraftforge/forge/${version}/forge-${version}-installer.jar'
-
+        }
+    } else if (type === 'neoforge') {
+        return {
+            metaData: 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge',
+            install: 'https://maven.neoforged.net/net/neoforged/forge/${version}/forge-${version}-installer.jar'
         }
     } else if (type === 'fabric') {
         return {
@@ -63,6 +67,7 @@ function loader(type: string) {
 
 let mirrors = [
     "https://maven.minecraftforge.net",
+    "https://maven.neoforged.net/releases",
     "https://maven.creeperhost.net",
     "https://libraries.minecraft.net"
 ]

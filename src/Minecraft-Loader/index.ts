@@ -5,6 +5,7 @@
 
 import { loader } from '../utils/Index.js';
 import Forge from './loader/forge/forge.js';
+import NeoForge from './loader/neoForge/neoForge.js';
 import Fabric from './loader/fabric/fabric.js';
 import Quilt from './loader/quilt/quilt.js';
 
@@ -18,7 +19,7 @@ export default class Loader {
     on: any;
     emit: any;
 
-    constructor(options) {
+    constructor(options: any) {
         this.options = options
         this.on = EventEmitter.prototype.on;
         this.emit = EventEmitter.prototype.emit;
@@ -32,6 +33,10 @@ export default class Loader {
             let forge = await this.forge(Loader);
             if (forge.error) return this.emit('error', forge);
             this.emit('json', forge);
+        } else if (this.options.loader.type === 'neoforge') {
+            let neoForge = await this.neoForge(Loader);
+            if (neoForge.error) return this.emit('error', neoForge);
+            this.emit('json', neoForge);
         } else if (this.options.loader.type === 'fabric') {
             let fabric = await this.fabric(Loader);
             if (fabric.error) return this.emit('error', fabric);
@@ -66,7 +71,7 @@ export default class Loader {
         });
 
         // download installer
-        let installer = await forge.donwloadInstaller(Loader);
+        let installer = await forge.downloadInstaller(Loader);
         if (installer.error) return installer;
 
         // extract install profile
@@ -86,6 +91,52 @@ export default class Loader {
 
         // patch forge if nessary
         let patch: any = await forge.patchForge(profile.install);
+        if (patch.error) return patch;
+
+        return profile.version;
+    }
+
+    async neoForge(Loader: any) {
+        let neoForge = new NeoForge(this.options);
+
+        // set event
+        neoForge.on('check', (progress, size, element) => {
+            this.emit('check', progress, size, element);
+        });
+
+        neoForge.on('progress', (progress, size, element) => {
+            this.emit('progress', progress, size, element);
+        });
+
+        neoForge.on('extract', (element) => {
+            this.emit('extract', element);
+        });
+
+        neoForge.on('patch', patch => {
+            this.emit('patch', patch);
+        });
+
+        // download installer
+        let installer = await neoForge.downloadInstaller(Loader);
+        if (installer.error) return installer;
+
+        // extract install profile
+        let profile: any = await neoForge.extractProfile(installer.filePath);
+        if (profile.error) return profile
+        let destination = path.resolve(this.options.path, 'versions', profile.version.id)
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+
+        //extract universal jar
+        let universal: any = await neoForge.extractUniversalJar(profile.install, installer.filePath);
+        if (universal.error) return universal;
+
+        // download libraries
+        let libraries: any = await neoForge.downloadLibraries(profile, universal);
+        if (libraries.error) return libraries;
+
+        // patch forge if nessary
+        let patch: any = await neoForge.patchneoForge(profile.install);
         if (patch.error) return patch;
 
         return profile.version;
@@ -115,6 +166,8 @@ export default class Loader {
 
         return json;
     }
+
+
 
     async quilt(Loader: any) {
         let quilt = new Quilt(this.options);

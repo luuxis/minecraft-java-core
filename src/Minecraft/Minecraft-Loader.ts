@@ -82,7 +82,7 @@ export default class MinecraftLoader {
         if (moddeArguments.jvm) Arguments.jvm = moddeArguments.jvm.map(jvm => {
             return jvm
                 .replace(/\${version_name}/g, version)
-                .replace(/\${library_directory}/g, `${this.options.path}/loader/${this.options.loader.type}/libraries`)
+                .replace(/\${library_directory}/g, `${this.options.path}/loader/${this.options.loader.type.toLowerCase()}/libraries`)
                 .replace(/\${classpath_separator}/g, process.platform === 'win32' ? ';' : ':');
         })
 

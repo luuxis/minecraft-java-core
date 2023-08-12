@@ -1,3 +1,4 @@
+const { spawn } = require('child_process');
 const { Microsoft, Launch, Mojang } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
@@ -32,8 +33,8 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'fabric',
-            build: '0.14.22',
+            type: 'neoForge',
+            build: 'latest',
             enable: true
         },
 
@@ -107,3 +108,25 @@ let mc
         console.log(err);
     });
 })()
+
+// const VERSIONS_ENDPOINT = 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge'
+// const DOWNLOAD_URL = 'https://maven.neoforged.net/net/neoforged/forge';
+
+// (async () => {
+//     let versionJson;
+
+//     const response = await fetch(VERSIONS_ENDPOINT);
+//     versionJson = await response.json();
+
+//     if (versionJson) {
+//         let { versions } = versionJson;
+//         console.log(versions);
+
+//         versions = versions[1];
+
+//         const installerUrl = `${DOWNLOAD_URL}/${versions}/forge-${versions}-installer.jar`;
+
+//         console.log(installerUrl);
+
+//     }
+// })()

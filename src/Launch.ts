@@ -45,8 +45,8 @@ export default class Launch {
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
 
             loader: {
-                type: opt?.loader?.type || null,
-                build: opt?.loader?.build || 'latest',
+                type: opt?.loader?.type?.toLowerCase() || null,
+                build: opt?.loader?.build?.toLowerCase() || 'latest',
                 enable: opt?.loader?.enable || false,
             },
 
@@ -89,10 +89,11 @@ export default class Launch {
 
         let Arguments: any = [
             ...minecraftArguments.jvm,
-            ...loaderArguments.jvm,
             ...minecraftArguments.classpath,
-            ...loaderArguments.game,
-            ...minecraftArguments.game
+            ...loaderArguments.jvm,
+            minecraftArguments.mainClass,
+            ...minecraftArguments.game,
+            ...loaderArguments.game
         ]
 
         let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;

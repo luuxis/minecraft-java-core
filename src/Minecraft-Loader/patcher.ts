@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
 
-import { getPathLibraries, getFileFromJar } from '../../../utils/Index.js';
+import { getPathLibraries, getFileFromJar } from '../utils/Index.js';
 
 
 
@@ -101,9 +101,10 @@ export default class forgePatcher {
 
     setArgument(arg: any, profile: any, config: any) {
         let finalArg = arg.replace('{', '').replace('}', '');
-        let universalPath = profile.libraries.find(v =>
-            (v.name || '').startsWith('net.minecraftforge:forge')
-        )
+        let universalPath = profile.libraries.find(v => {
+            if (this.options.loader.type === 'forge') return (v.name || '').startsWith('net.minecraftforge:forge')
+            if (this.options.loader.type === 'neoforge') return (v.name || '').startsWith('net.neoforged:forge')
+        })
 
         if (profile.data[finalArg]) {
             if (finalArg === 'BINPATCH') {

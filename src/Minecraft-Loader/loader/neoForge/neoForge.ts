@@ -5,14 +5,14 @@
 
 import { getPathLibraries, getFileHash, mirrors, getFileFromJar } from '../../../utils/Index.js';
 import download from '../../../utils/Downloader.js';
-import forgePatcher from '../../patcher.js'
+import neoForgePatcher from '../../patcher.js'
 
 import nodeFetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
 
-export default class ForgeMC {
+export default class NeoForgeMC {
     options: any;
     on: any;
     emit: any;
@@ -24,77 +24,60 @@ export default class ForgeMC {
     }
 
     async downloadInstaller(Loader: any) {
-        let metaData = (await nodeFetch(Loader.metaData).then(res => res.json()))[this.options.loader.version];
-        let AvailableBuilds = metaData;
-        let forgeURL = Loader.install
-        if (!metaData) return { error: `Forge ${this.options.loader.version} not supported` };
+        let build: string
+        let neoForgeURL = Loader.install
+        let metaData = await nodeFetch(Loader.metaData).then(res => res.json());
 
-        let build
-        if (this.options.loader.build === 'latest') {
-            let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
-            promotions = promotions.promos[`${this.options.loader.version}-latest`];
-            build = metaData.find(build => build.includes(promotions))
-        } else if (this.options.loader.build === 'recommended') {
-            let promotion = await nodeFetch(Loader.promotions).then(res => res.json());
-            let promotions = promotion.promos[`${this.options.loader.version}-recommended`];
-            if (!promotions) promotions = promotion.promos[`${this.options.loader.version}-latest`];
-            build = metaData.find(build => build.includes(promotions))
-        } else {
-            build = this.options.loader.build;
-        }
+        let versions = metaData.versions.filter(version => version.includes(`${this.options.loader.version}-`));
+        if (!versions.length) return { error: `NeoForge doesn't support Minecraft ${this.options.loader.version}` };
 
-        metaData = metaData.filter(b => b === build)[0];
-        if (!metaData) return { error: `Build ${build} not found, Available builds: ${AvailableBuilds.join(', ')}` };
+        if (this.options.loader.build === 'latest' || this.options.loader.build === 'recommended') {
+            build = versions[versions.length - 1];
+        } else build = versions.find(loader => loader === this.options.loader.build);
 
-        forgeURL = forgeURL.replace(/\${version}/g, metaData);
-        let urlMeta = Loader.meta.replace(/\${build}/g, metaData);
+        if (!build) return { error: `NeoForge Loader ${this.options.loader.build} not found, Available builds: ${versions.join(', ')}` };
 
-        let pathFolder = path.resolve(this.options.path, 'forge');
-        let filePath = path.resolve(pathFolder, `forge-${metaData}-installer.jar`);
-        let meta = await nodeFetch(urlMeta).then(res => res.json());
+        neoForgeURL = neoForgeURL.replaceAll(/\${version}/g, build);
+
+
+        let pathFolder = path.resolve(this.options.path, 'neoForge');
+        let filePath = path.resolve(pathFolder, `forge-${build}-installer.jar`);
 
         if (!fs.existsSync(filePath)) {
             if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
             let downloadForge = new download();
 
             downloadForge.on('progress', (downloaded, size) => {
-                this.emit('progress', downloaded, size, `forge-${metaData}-installer.jar`);
+                this.emit('progress', downloaded, size, `forge-${build}-installer.jar`);
             });
 
-            await downloadForge.downloadFile(forgeURL, pathFolder, `forge-${metaData}-installer.jar`);
+            await downloadForge.downloadFile(neoForgeURL, pathFolder, `forge-${build}-installer.jar`);
         }
 
-        let hashFileDownload = await getFileHash(filePath, 'md5');
-        let hashFileOrigin = meta?.classifiers?.installer?.jar;
-
-        if (hashFileDownload !== hashFileOrigin) {
-            fs.rmSync(filePath);
-            return { error: 'Invalid hash' };
-        }
-        return { filePath, metaData }
+        return { filePath };
     }
 
     async extractProfile(pathInstaller: any) {
-        let forgeJSON: any = {}
+        let neoForgeJSON: any = {}
 
         let file: any = await getFileFromJar(pathInstaller, 'install_profile.json')
-        let forgeJsonOrigin = JSON.parse(file);
+        let neoForgeJsonOrigin = JSON.parse(file);
 
-        if (!forgeJsonOrigin) return { error: { message: 'Invalid forge installer' } };
-        if (forgeJsonOrigin.install) {
-            forgeJSON.install = forgeJsonOrigin.install;
-            forgeJSON.version = forgeJsonOrigin.versionInfo;
+        if (!neoForgeJsonOrigin) return { error: { message: 'Invalid neoForge installer' } };
+        if (neoForgeJsonOrigin.install) {
+            neoForgeJSON.install = neoForgeJsonOrigin.install;
+            neoForgeJSON.version = neoForgeJsonOrigin.versionInfo;
         } else {
-            forgeJSON.install = forgeJsonOrigin;
-            let file: any = await getFileFromJar(pathInstaller, path.basename(forgeJSON.install.json))
-            forgeJSON.version = JSON.parse(file);
+            neoForgeJSON.install = neoForgeJsonOrigin;
+            let file: any = await getFileFromJar(pathInstaller, path.basename(neoForgeJSON.install.json))
+            neoForgeJSON.version = JSON.parse(file);
         }
 
-        return forgeJSON;
+        return neoForgeJSON;
     }
 
     async extractUniversalJar(profile: any, pathInstaller: any) {
-        let skipForgeFilter = true
+        let skipneoForgeFilter = true
 
         if (profile.filePath) {
             let fileInfo = getPathLibraries(profile.path)
@@ -120,12 +103,12 @@ export default class ForgeMC {
                 })
             );
         } else {
-            skipForgeFilter = false
+            skipneoForgeFilter = false
         }
 
         if (profile.processors?.length) {
             let universalPath = profile.libraries.find(v => {
-                return (v.name || '').startsWith('net.minecraftforge:forge')
+                return (v.name || '').startsWith('net.neoforged:forge')
             })
 
             let client: any = await getFileFromJar(pathInstaller, 'data/client.lzma');
@@ -137,10 +120,10 @@ export default class ForgeMC {
             this.emit('extract', `Extracting ${fileInfo.name}...`);
         }
 
-        return skipForgeFilter
+        return skipneoForgeFilter
     }
 
-    async downloadLibraries(profile: any, skipForgeFilter: any) {
+    async downloadLibraries(profile: any, skipneoForgeFilter: any) {
         let { libraries } = profile.version;
         let downloader = new download();
         let check = 0;
@@ -151,13 +134,13 @@ export default class ForgeMC {
 
         libraries = libraries.filter((library, index, self) => index === self.findIndex(t => t.name === library.name))
 
-        let skipForge = [
-            'net.minecraftforge:forge:',
+        let skipneoForge = [
+            'net.minecraftforge:neoforged:',
             'net.minecraftforge:minecraftforge:'
         ]
 
         for (let lib of libraries) {
-            if (skipForgeFilter && skipForge.find(libs => lib.name.includes(libs))) {
+            if (skipneoForgeFilter && skipneoForge.find(libs => lib.name.includes(libs))) {
                 this.emit('check', check++, libraries.length, 'libraries');
                 continue;
             }
@@ -215,9 +198,9 @@ export default class ForgeMC {
         return libraries
     }
 
-    async patchForge(profile: any) {
+    async patchneoForge(profile: any) {
         if (profile?.processors?.length) {
-            let patcher: any = new forgePatcher(this.options);
+            let patcher: any = new neoForgePatcher(this.options);
             let config: any = {}
 
             patcher.on('patch', data => {
@@ -238,7 +221,6 @@ export default class ForgeMC {
                 await patcher.patcher(profile, config);
             }
         }
-
         return true
     }
 }

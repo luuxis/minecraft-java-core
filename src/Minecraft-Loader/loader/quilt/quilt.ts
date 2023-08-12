@@ -39,7 +39,7 @@ export default class Quilt {
             build = metaData.loader.find(loader => loader.version === this.options.loader.build);
         }
 
-        if (!build) return { error: `QuiltMC Loader ${this.options.loader.build} not fond, Available builds: ${AvailableBuilds.join(', ')}` };
+        if (!build) return { error: `QuiltMC Loader ${this.options.loader.build} not found, Available builds: ${AvailableBuilds.join(', ')}` };
 
         let url = Loader.json.replace('${build}', build.version).replace('${version}', this.options.loader.version);
         let json = await nodeFetch(url).then(res => res.json()).catch(err => err);

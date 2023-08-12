@@ -23,7 +23,8 @@ export default class MinecraftArguments {
         return {
             game: game,
             jvm: jvm,
-            classpath: classpath
+            classpath: classpath.classpath,
+            mainClass: classpath.mainClass
         }
     }
 
@@ -88,11 +89,10 @@ export default class MinecraftArguments {
             '-Dfml.ignoreInvalidMinecraftCertificates=true'
         ]
 
-        if (process.platform == 'darwin') {
-            if (!json.minecraftArguments) {
-                jvm.push(opts[process.platform])
-            }
+        if (!json.minecraftArguments) {
+            jvm.push(opts[process.platform])
         }
+
 
         if (json.nativesList) {
             jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
@@ -131,10 +131,11 @@ export default class MinecraftArguments {
         }
         classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
 
-        return [
+        return {classpath:[
             `-cp`,
             classPath.join(process.platform === 'win32' ? ';' : ':'),
-            loaderJson ? loaderJson.mainClass : json.mainClass
-        ]
+            
+        ],
+        mainClass: loaderJson ? loaderJson.mainClass : json.mainClass}
     }
 }
