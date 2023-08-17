@@ -40,7 +40,8 @@ export default class MinecraftAssets {
     }
 
     copyAssets(json: any) {
-        let legacyDirectory = `${this.options.path}/resources`;
+        let legacyDirectory: string = `${this.options.path}/resources`;
+        if (this.options.instance) legacyDirectory = `${this.options.path}/instances/${this.options.instance}/resources`;
         let pathAssets = `${this.options.path}/assets/indexes/${json.assets}.json`;
         if (!fs.existsSync(pathAssets)) return;
         let assets = JSON.parse(fs.readFileSync(pathAssets, 'utf-8'));
