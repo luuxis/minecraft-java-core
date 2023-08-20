@@ -42,7 +42,7 @@ export default class java {
             if (info.type == "directory") continue;
             if (!info.downloads) continue;
             let file: any = {};
-            file.path = `runtime/${version}/${path.replace(toDelete, "")}`;
+            file.path = `runtime/${version}-${process.platform}/${path.replace(toDelete, "")}`;
             file.executable = info.executable;
             file.sha1 = info.downloads.raw.sha1;
             file.size = info.downloads.raw.size;
@@ -52,7 +52,7 @@ export default class java {
         }
         return {
             files: files,
-            path: path.resolve(this.options.path, `runtime/${version}/bin/java${process.platform == "win32" ? ".exe" : ""}`).replace(/\\/g, "/"),
+            path: path.resolve(this.options.path, `runtime/${version}-${process.platform}/bin/java${process.platform == "win32" ? ".exe" : ""}`),
         };
     }
 }
