@@ -2,12 +2,15 @@
 NodeJS Module for Minecraft launcher
 <br>
 [![Number](https://img.shields.io/npm/v/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
-<br>
 [![Install](https://img.shields.io/npm/dm/minecraft-java-core.svg?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
-<br>
 [![size](https://img.shields.io/github/languages/code-size/luuxis/minecraft-java-core?style=social&logo=appveyor)](https://npmjs.com/minecraft-java-core)
-<br>
 [![sizeinstall](https://badgen.net/packagephobia/install/minecraft-java-core)](https://npmjs.com/minecraft-java-core)
+
+<p align="center">
+    <a href="http://discord.luuxis.fr">
+        <img src="https://invidget.switchblade.xyz/e9q7Yr2cuQ">
+    </a>
+</p>
 
 ---
 ## Avantages :dizzy:
@@ -121,9 +124,3 @@ async function main() {
 
 main()
 ```
----
-<p align="center">
-    <a href="http://discord.luuxis.fr">
-        <img src="https://invidget.switchblade.xyz/e9q7Yr2cuQ">
-    </a>
-</p>
