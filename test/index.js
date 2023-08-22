@@ -23,17 +23,17 @@ let mc
     }
 
     let opt = {
-        // url: 'http://craftdium.ml/launcherSelvania/files?instance=hypixel',
+        url: 'http://launcher.luuxis.fr/files=?instance=PokeMoonX',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        instance: 'Hypixel',
-        version: '1.4.7',
+        instance: 'PokeMoonX',
+        version: '1.16.5',
         detached: false,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'legacyFabric',
+            type: 'forge',
             build: 'latest',
             enable: true
         },
