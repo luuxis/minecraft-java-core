@@ -28,16 +28,15 @@ export default class MinecraftBundle {
             }
 
             if (fs.existsSync(file.path)) {
-                if (this.options.ignored.find(ignored => ignored == file.path.split("/").slice(-1)[0])) continue
+                if (this.options.ignored.find(ignored => ignored == file.path.replaceAll(`${this.options.path}/`, ""))) continue
+
                 if (file.sha1) {
                     if (await getFileHash(file.path) != file.sha1) {
                         todownload.push(file);
                     }
                 }
 
-            } else {
-                todownload.push(file);
-            }
+            } else todownload.push(file);
         }
         return todownload;
     }
@@ -52,18 +51,12 @@ export default class MinecraftBundle {
 
     async checkFiles(bundle: any) {
         let instancePath = ''
-        let instanceFolder = []
         if (this.options.instance) {
             if (!fs.existsSync(`${this.options.path}/instances`)) fs.mkdirSync(`${this.options.path}/instances`, { recursive: true });
             instancePath = `/instances/${this.options.instance}`
-            instanceFolder = fs.readdirSync(`${this.options.path}/instances`).filter(dir => dir != this.options.instance)
         }
-        let files = this.getFiles(this.options.path);
+        let files = this.options.instance ? this.getFiles(`${this.options.path}/instances/${this.options.instance}`) : this.getFiles(this.options.path);
         let ignoredfiles = [...this.getFiles(`${this.options.path}/loader`)]
-
-        for (let instances of instanceFolder) {
-            ignoredfiles.push(...this.getFiles(`${this.options.path}/instances/${instances}`));
-        }
 
         for (let file of this.options.ignored) {
             file = (`${this.options.path}${instancePath}/${file}`)
@@ -83,14 +76,14 @@ export default class MinecraftBundle {
         for (let file of files) {
             try {
                 if (fs.statSync(file).isDirectory()) {
-                    fs.rmdirSync(file);
+                    fs.rmSync(file, { recursive: true });
                 } else {
                     fs.unlinkSync(file);
                     let folder = file.split("/").slice(0, -1).join("/");
                     while (true) {
                         if (folder == this.options.path) break;
                         let content = fs.readdirSync(folder);
-                        if (content.length == 0) fs.rmdirSync(folder);
+                        if (content.length == 0) fs.rmSync(folder);
                         folder = folder.split("/").slice(0, -1).join("/");
                     }
                 }

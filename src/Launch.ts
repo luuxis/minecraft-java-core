@@ -71,7 +71,7 @@ export default class Launch {
 
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
-        if (this.options.downloadFileMultiple > 20) this.options.downloadFileMultiple = 20
+        if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
         if (!this.options.loader.enable) this.options.loader = false;
         this.start();
     }

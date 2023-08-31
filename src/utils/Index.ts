@@ -88,8 +88,8 @@ async function getFileFromJar(jar: string, file: string = null, path: string = n
                 if (entry.entryName == file) fileReturn = entry.getData();
             }
 
-            if (!entry.isDirectory && entry.entryName.includes(path)) {
-                fileReturn.push(entry.entryName)
+            if (!entry.isDirectory && entry.entryName.includes(path) && path) {
+                fileReturn.push(entry.entryName);
             }
         }
         resolve(fileReturn);
