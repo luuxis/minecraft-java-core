@@ -23,7 +23,7 @@ let mc
     }
 
     let opt = {
-        url: 'http://launcher.luuxis.fr/files=?instance=PokeMoonX',
+        url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
@@ -33,12 +33,12 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'Forge',
             build: 'latest',
             enable: true
         },
 
-        verify: false,
+        verify: true,
         ignored: [
             'config',
             'essential',
