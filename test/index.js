@@ -1,5 +1,4 @@
-const { spawn } = require('child_process');
-const { Microsoft, Launch, Mojang } = require('../build/Index');
+const { Microsoft, Launch } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
 
@@ -23,12 +22,12 @@ let mc
     }
 
     let opt = {
-        url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
+        //url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'PokeMoonX',
-        version: '1.16.5',
+        version: '1.20.1',
         detached: false,
         downloadFileMultiple: 30,
 
@@ -108,25 +107,3 @@ let mc
         console.log(err);
     });
 })()
-
-// const VERSIONS_ENDPOINT = 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge'
-// const DOWNLOAD_URL = 'https://maven.neoforged.net/net/neoforged/forge';
-
-// (async () => {
-//     let versionJson;
-
-//     const response = await fetch(VERSIONS_ENDPOINT);
-//     versionJson = await response.json();
-
-//     if (versionJson) {
-//         let { versions } = versionJson;
-//         console.log(versions);
-
-//         versions = versions[1];
-
-//         const installerUrl = `${DOWNLOAD_URL}/${versions}/forge-${versions}-installer.jar`;
-
-//         console.log(installerUrl);
-
-//     }
-// })()

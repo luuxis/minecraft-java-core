@@ -4,3 +4,4 @@ files
 .Minecraft
 test/*.json
 webfiles/instances/*
+.DS_Store
