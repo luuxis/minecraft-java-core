@@ -23,17 +23,22 @@ export default class java {
 
         if (os.platform() == "win32") {
             let arch = { x64: "windows-x64", ia32: "windows-x86" }
-            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
+            if (version.includes('undefined')) return { error: true, message: "Java not found" };
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
         } else if (os.platform() == "darwin") {
-            let arch = { x64: "mac-os", arm64: "mac-os-arm64" }
-            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+            let arch = { x64: "mac-os", arm64: "mac-os" }
+            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
+            if (version.includes('undefined')) return { error: true, message: "Java not found" };
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
         } else if (os.platform() == "linux") {
             let arch = { x64: "linux", ia32: "linux-i386" }
-            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].version.name}`
-            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0].manifest.url).then(res => res.json())).files)
+            version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
+            if (version.includes('undefined')) return { error: true, message: "Java not found" };
+            javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
         } else return console.log("OS not supported");
+
+        if (!javaVersionsJson) return { error: true, message: "Java not found" };
 
         let java = javaVersionsJson.find(file => file[0].endsWith(process.platform == "win32" ? "bin/javaw.exe" : "bin/java"))[0];
         let toDelete = java.replace(process.platform == "win32" ? "bin/javaw.exe" : "bin/java", "");
@@ -54,5 +59,6 @@ export default class java {
             files: files,
             path: path.resolve(this.options.path, `runtime/${version}-${process.platform}/bin/java${process.platform == "win32" ? ".exe" : ""}`),
         };
+
     }
 }

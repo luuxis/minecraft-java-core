@@ -128,6 +128,8 @@ export default class Launch {
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
         let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).GetJsonJava(json);
 
+        if (gameJava.error) return gameJava
+
         let filesList: any = await bundle.checkBundle([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
 
         if (filesList.length > 0) {

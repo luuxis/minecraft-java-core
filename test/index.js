@@ -22,12 +22,12 @@ let mc
     }
 
     let opt = {
-        //url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
+        url: 'https://launcher.luuxis.fr/files/?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        instance: 'PokeMoonX',
-        version: '1.20.1',
+        instance: 'Hypixel',
+        version: '1.8.9',
         detached: false,
         downloadFileMultiple: 30,
 
@@ -55,10 +55,10 @@ let mc
 
         javaPath: null,
 
-        screen: {
-            width: 1600,
-            height: 900
-        },
+        //screen: {
+        //    width: 1600,
+        //    height: 900
+        //},
 
         memory: {
             min: '4G',
