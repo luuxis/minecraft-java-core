@@ -43,6 +43,7 @@ export default class Launch {
             instance: opt?.instance || null,
             detached: opt?.detached || false,
             downloadFileMultiple: opt?.downloadFileMultiple || 3,
+            armEnabledMac: opt?.armEnabledMac || true,
 
             loader: {
                 type: opt?.loader?.type?.toLowerCase() || null,
