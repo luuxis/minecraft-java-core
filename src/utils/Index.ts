@@ -82,7 +82,7 @@ async function getFileFromJar(jar: string, file: string = null, path: string = n
     let zip = new admZip(jar);
     let entries = zip.getEntries();
 
-    return new Promise(resolve => {
+    return await new Promise(resolve => {
         for (let entry of entries) {
             if (!entry.isDirectory && !path) {
                 if (entry.entryName == file) fileReturn = entry.getData();

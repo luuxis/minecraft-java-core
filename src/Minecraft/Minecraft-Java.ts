@@ -27,7 +27,7 @@ export default class java {
             if (version.includes('undefined')) return { error: true, message: "Java not found" };
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
         } else if (os.platform() == "darwin") {
-            let arch = { x64: "mac-os", arm64: this.options.armEnabledMac ? "mac-os-arm64" : "mac-os" }
+            let arch = { x64: "mac-os", arm64: this.options.intelEnabledMac ?  "mac-os" : "mac-os-arm64" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
             if (version.includes('undefined')) return { error: true, message: "Java not found" };
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)

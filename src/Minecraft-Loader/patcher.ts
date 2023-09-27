@@ -5,8 +5,6 @@ import { EventEmitter } from 'events';
 
 import { getPathLibraries, getFileFromJar } from '../utils/Index.js';
 
-
-
 export default class forgePatcher {
     options: any;
     on: any;

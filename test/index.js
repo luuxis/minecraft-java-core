@@ -22,17 +22,18 @@ let mc
     }
 
     let opt = {
-        url: 'https://launcher.luuxis.fr/files/?instance=hypixel',
+        url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
         instance: 'Hypixel',
-        version: '1.8.9',
+        version: '1.16.5',
         detached: false,
+        intelEnabledMac: false,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'Forge',
+            type: 'forge',
             build: 'latest',
             enable: true
         },
@@ -92,7 +93,7 @@ let mc
     })
 
     launch.on('patch', patch => {
-        console.log(patch);
+        //console.log(patch);
     });
 
     launch.on('data', (e) => {
