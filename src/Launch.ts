@@ -22,9 +22,45 @@ import { isold } from './utils/Index.js';
 
 import Downloader from './utils/Downloader.js';
 
+type loader = {
+    type?: string,
+    build?: string,
+    enable?: boolean
+}
+
+type screen = {
+    width?: number,
+    height?: number,
+    fullscreen?: boolean
+}
+
+type memory = {
+    min?: string,
+    max?: string
+}
+
+type LaunchOPTS = {
+    url: string | null,
+    authenticator: any,
+    timeout: number,
+    path: string,
+    version: string,
+    instance: string,
+    detached: boolean,
+    downloadFileMultiple: number,
+    intelEnabledMac: boolean,
+    loader: loader,
+    verify: boolean,
+    ignored: string[],
+    JVM_ARGS: string[],
+    GAME_ARGS: string[],
+    javaPath: string,
+    screen: screen,
+    memory: memory
+};
 
 export default class Launch {
-    options: any;
+    options: LaunchOPTS;
     on: any;
     emit: any;
 
@@ -33,47 +69,13 @@ export default class Launch {
         this.emit = EventEmitter.prototype.emit;
     }
 
-    async Launch(opt: any) {
-        this.options = {
-            url: opt?.url || null,
-            authenticator: opt?.authenticator || null,
-            timeout: opt?.timeout || 10000,
-            path: path.resolve(opt?.path || '.Minecraft').replace(/\\/g, '/'),
-            version: opt?.version || 'latest_release',
-            instance: opt?.instance || null,
-            detached: opt?.detached || false,
-            downloadFileMultiple: opt?.downloadFileMultiple || 3,
-            intelEnabledMac: opt?.intelEnabledMac ? true : false,
+    async Launch(opt: LaunchOPTS) {
+        this.options = opt;
 
-            loader: {
-                type: opt?.loader?.type?.toLowerCase() || null,
-                build: opt?.loader?.build?.toLowerCase() || 'latest',
-                enable: opt?.loader?.enable || false,
-            },
-
-            verify: opt?.verify || false,
-            ignored: opt?.ignored || [],
-            JVM_ARGS: opt?.JVM_ARGS || [],
-            GAME_ARGS: opt?.GAME_ARGS || [],
-
-            javaPath: opt?.javaPath || null,
-
-            screen: {
-                width: opt?.screen?.width || null,
-                height: opt?.screen?.height || null,
-                fullscreen: opt?.screen?.fullscreen || false,
-            },
-
-            memory: {
-                min: opt?.memory?.min || '1G',
-                max: opt?.memory?.max || '2G'
-            }
-        }
-
+        this.options.path = path.resolve(this.options.path)
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
         if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
-        if (!this.options.loader.enable) this.options.loader = false;
         this.start();
     }
 
@@ -156,7 +158,7 @@ export default class Launch {
             await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple, this.options.timeout);
         }
 
-        if (this.options.loader) {
+        if (this.options.loader.enable === true) {
             let loaderInstall = new loaderMinecraft(this.options)
 
             loaderInstall.on('extract', (extract: any) => {

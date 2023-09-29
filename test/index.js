@@ -26,10 +26,10 @@ let mc
         authenticator: mc,
         timeout: 10000,
         path: './.Minecraft',
-        instance: 'Hypixel',
+        instance: 'PokeMoonX',
         version: '1.16.5',
         detached: false,
-        intelEnabledMac: false,
+        intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
@@ -93,7 +93,7 @@ let mc
     })
 
     launch.on('patch', patch => {
-        //console.log(patch);
+        console.log(patch);
     });
 
     launch.on('data', (e) => {
