@@ -9,17 +9,14 @@ import fs from 'fs';
 import { spawn } from 'child_process';
 
 import jsonMinecraft from './Minecraft/Minecraft-Json.js';
-
 import librariesMinecraft from './Minecraft/Minecraft-Libraries.js';
 import assetsMinecraft from './Minecraft/Minecraft-Assets.js';
 import loaderMinecraft from './Minecraft/Minecraft-Loader.js';
 import javaMinecraft from './Minecraft/Minecraft-Java.js';
-
 import bundleMinecraft from './Minecraft/Minecraft-Bundle.js';
 import argumentsMinecraft from './Minecraft/Minecraft-Arguments.js';
 
 import { isold } from './utils/Index.js';
-
 import Downloader from './utils/Downloader.js';
 
 type loader = {
@@ -42,13 +39,13 @@ type memory = {
 type LaunchOPTS = {
     url: string | null,
     authenticator: any,
-    timeout: number,
+    timeout?: number,
     path: string,
     version: string,
-    instance: string,
-    detached: boolean,
-    downloadFileMultiple: number,
-    intelEnabledMac: boolean,
+    instance?: string,
+    detached?: boolean,
+    downloadFileMultiple?: number,
+    intelEnabledMac?: boolean,
     loader: loader,
     verify: boolean,
     ignored: string[],
@@ -70,14 +67,56 @@ export default class Launch {
     }
 
     async Launch(opt: LaunchOPTS) {
-        this.options = opt;
+        const defaultOptions: LaunchOPTS = {
+            url: null,
+            authenticator: null,
+            timeout: 10000,
+            path: '.Minecraft',
+            version: 'latest_release',
+            instance: null,
+            detached: false,
+            intelEnabledMac: false,
+            downloadFileMultiple: 3,
 
-        this.options.path = path.resolve(this.options.path)
+            loader: {
+                type: null,
+                build: 'latest',
+                enable: false,
+            },
+
+            verify: false,
+            ignored: [],
+            JVM_ARGS: [],
+            GAME_ARGS: [],
+
+            javaPath: null,
+
+            screen: {
+                width: null,
+                height: null,
+                fullscreen: false,
+            },
+
+            memory: {
+                min: '1G',
+                max: '2G'
+            },
+            ...opt,
+        };
+
+        this.options = defaultOptions;
+
+        this.options.path = path.resolve(this.options.path).replace(/\\/g, '/');
+        if (this.options.loader.type) {
+            this.options.loader.type = this.options.loader.type.toLowerCase()
+            this.options.loader.build = this.options.loader.build.toLowerCase()
+        }
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
         if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
         this.start();
     }
+
 
     async start() {
         let data: any = await this.DownloadGame();

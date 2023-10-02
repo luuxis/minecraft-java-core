@@ -8,7 +8,6 @@ import Microsoft from './Authenticator/Microsoft.js';
 import * as Mojang from './Authenticator/Mojang.js';
 import Status from './StatusServer/status.js';
 
-
 export {
     AZauth as AZauth,
     Launch as Launch,

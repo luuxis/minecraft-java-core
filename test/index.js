@@ -29,11 +29,11 @@ let mc
         instance: 'PokeMoonX',
         version: '1.16.5',
         detached: false,
-        intelEnabledMac: true,
+        intelEnabledMac: false,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'Forge',
             build: 'latest',
             enable: true
         },
@@ -56,10 +56,10 @@ let mc
 
         javaPath: null,
 
-        //screen: {
-        //    width: 1600,
-        //    height: 900
-        //},
+        screen: {
+           width: 1600,
+           height: 900
+        },
 
         memory: {
             min: '4G',
