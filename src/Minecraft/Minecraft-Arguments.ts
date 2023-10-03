@@ -43,7 +43,7 @@ export default class MinecraftArguments {
             '${auth_uuid}': this.authenticator.uuid,
             '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
             '${user_properties}': this.authenticator.user_properties,
-            '${user_type}': this.authenticator.meta.type,
+            '${user_type}': this.authenticator.meta.type === 'Xbox' ? 'msa' : this.authenticator.meta.type,
             '${version_name}': json.id,
             '${assets_index_name}': json.assetIndex.id,
             '${game_directory}': this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path,

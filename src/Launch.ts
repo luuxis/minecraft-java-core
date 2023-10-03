@@ -76,7 +76,7 @@ export default class Launch {
             instance: null,
             detached: false,
             intelEnabledMac: false,
-            downloadFileMultiple: 3,
+            downloadFileMultiple: 5,
 
             loader: {
                 type: null,
