@@ -17,7 +17,7 @@ export default class MinecraftBundle {
         let todownload = [];
 
         for (let file of bundle) {
-            if (!file.path) continue;
+            if (!file.path) continue
             file.path = path.resolve(this.options.path, file.path).replace(/\\/g, "/");
             file.folder = file.path.split("/").slice(0, -1).join("/");
 
@@ -28,12 +28,12 @@ export default class MinecraftBundle {
             }
 
             if (fs.existsSync(file.path)) {
-                if (this.options.ignored.find(ignored => ignored == file.path.replaceAll(`${this.options.path}/`, ""))) continue
+                let replaceName = `${this.options.path}/`
+                if (this.options.instance) replaceName = `${this.options.path}/instances/${this.options.instance}/`
+                if (this.options.ignored.find(ignored => ignored == file.path.replaceAll(replaceName, ""))) continue
 
                 if (file.sha1) {
-                    if (await getFileHash(file.path) != file.sha1) {
-                        todownload.push(file);
-                    }
+                    if (await getFileHash(file.path) != file.sha1) todownload.push(file);
                 }
 
             } else todownload.push(file);
