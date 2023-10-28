@@ -30,11 +30,16 @@ export default class MinecraftArguments {
 
     async GetGameArguments(json: any, loaderJson: any) {
         let game = json.minecraftArguments ? json.minecraftArguments.split(' ') : json.arguments.game;
+        let userType: String
+
         if (loaderJson) {
             let gameLoader = loaderJson.minecraftArguments ? loaderJson.minecraftArguments.split(' ') : [];
             game = game.concat(gameLoader);
-            game = game.filter((item: any, index: any, self: any) => index === self.findIndex((res: any) => res == item))
+            game = game.filter((item: String, index: Number, self: any) => index === self.findIndex((res: String) => res == item))
         }
+
+        if (json.id.startsWith('1.16')) userType = 'Xbox'
+        else userType = this.authenticator.meta.type === 'Xbox' ? 'msa' : this.authenticator.meta.type
 
         let table = {
             '${auth_access_token}': this.authenticator.access_token,
@@ -43,7 +48,7 @@ export default class MinecraftArguments {
             '${auth_uuid}': this.authenticator.uuid,
             '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
             '${user_properties}': this.authenticator.user_properties,
-            '${user_type}': this.authenticator.meta.type === 'Xbox' ? 'msa' : this.authenticator.meta.type,
+            '${user_type}': userType,
             '${version_name}': json.id,
             '${assets_index_name}': json.assetIndex.id,
             '${game_directory}': this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path,
