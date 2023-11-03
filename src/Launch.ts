@@ -220,7 +220,8 @@ export default class Launch {
                 .then((data: any) => data)
                 .catch((err: any) => err);
             if (jsonLoader.error) return jsonLoader;
-            loaderJson = jsonLoader;
+            if (jsonLoader.ext === 'zip') loaderJson = json;
+            else loaderJson = jsonLoader;
         }
 
         if (this.options.verify) await bundle.checkFiles([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
