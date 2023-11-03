@@ -32,16 +32,17 @@ export default class MinecraftLoader {
                 }
             }
         });
+        
         return await new Promise((resolve, reject) => {
             loader.install();
 
             loader.on('json', (json: any) => {
                 let loaderJson = json;
+                if (json.ext === 'zip') return resolve(loaderJson);
                 loaderJson.libraries = loaderJson.libraries.map((lib: any) => {
                     lib.loader = `${this.options.path}/loader/${this.options.loader.type}`;
                     return lib;
                 });
-
                 resolve(loaderJson);
             });
 

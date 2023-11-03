@@ -57,7 +57,6 @@ export default class Loader {
 
     async forge(Loader: any) {
         let forge = new Forge(this.options);
-
         // set event
         forge.on('check', (progress, size, element) => {
             this.emit('check', progress, size, element);
@@ -79,26 +78,32 @@ export default class Loader {
         let installer = await forge.downloadInstaller(Loader);
         if (installer.error) return installer;
 
-        // extract install profile
-        let profile: any = await forge.extractProfile(installer.filePath);
-        if (profile.error) return profile
-        let destination = path.resolve(this.options.path, 'versions', profile.version.id)
-        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-        fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+        if (installer.ext == 'jar') {
+            // extract install profile
+            let profile: any = await forge.extractProfile(installer.filePath);
+            if (profile.error) return profile
+            let destination = path.resolve(this.options.path, 'versions', profile.version.id)
+            if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+            fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
 
-        // extract universal jar
-        let universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
-        if (universal.error) return universal;
+            // extract universal jar
+            let universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
+            if (universal.error) return universal;
 
-        // download libraries
-        let libraries: any = await forge.downloadLibraries(profile, universal);
-        if (libraries.error) return libraries;
+            // download libraries
+            let libraries: any = await forge.downloadLibraries(profile, universal);
+            if (libraries.error) return libraries;
 
-        // patch forge if nessary
-        let patch: any = await forge.patchForge(profile.install);
-        if (patch.error) return patch;
+            // patch forge if nessary
+            let patch: any = await forge.patchForge(profile.install);
+            if (patch.error) return patch;
 
-        return profile.version;
+            return profile.version;
+        } else {
+            await forge.createJar(installer.filePath);
+            let profile: any = await forge.createProfile();
+            return profile;
+        }
     }
 
     async neoForge(Loader: any) {

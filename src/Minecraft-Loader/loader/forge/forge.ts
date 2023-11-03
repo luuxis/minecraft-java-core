@@ -8,6 +8,7 @@ import download from '../../../utils/Downloader.js';
 import forgePatcher from '../../patcher.js'
 
 import nodeFetch from 'node-fetch'
+import AdmZip from 'adm-zip';
 import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
@@ -27,7 +28,7 @@ export default class ForgeMC {
         let metaData = (await nodeFetch(Loader.metaData).then(res => res.json()))[this.options.loader.version];
         let AvailableBuilds = metaData;
         let forgeURL: String;
-        let ext: String;
+        let ext;
         let hashFileOrigin: String;
         if (!metaData) return { error: `Forge ${this.options.loader.version} not supported` };
 
@@ -49,23 +50,37 @@ export default class ForgeMC {
         if (!metaData) return { error: `Build ${build} not found, Available builds: ${AvailableBuilds.join(', ')}` };
 
 
-        // forgeURL = forgeURL.replace(/\${version}/g, metaData);
-        let urlMeta = Loader.meta.replace(/\${build}/g, metaData);
+        let meta = await nodeFetch(Loader.meta.replace(/\${build}/g, metaData)).then(res => res.json());
+        let installerType = Object.keys(meta.classifiers).find((key: String) => key == 'installer');
+        let clientType = Object.keys(meta.classifiers).find((key: String) => key == 'client');
+        let universalType = Object.keys(meta.classifiers).find((key: String) => key == 'universal');
 
-        // let pathFolder = path.resolve(this.options.path, 'forge');
-        // let filePath = path.resolve(pathFolder, `forge-${metaData}-installer.jar`);
-        let meta = await nodeFetch(urlMeta).then(res => res.json());
+        if (installerType) {
+            forgeURL = forgeURL = Loader.install.replace(/\${version}/g, metaData);
+            ext = Object.keys(meta.classifiers.installer)[0];
+            hashFileOrigin = meta.classifiers.installer[ext];
+        } else if (clientType) {
+            forgeURL = Loader.client.replace(/\${version}/g, metaData);
+            ext = Object.keys(meta.classifiers.client)[0];
+            hashFileOrigin = meta.classifiers.client[ext];
+        } else if (universalType) {
+            forgeURL = Loader.universal.replace(/\${version}/g, metaData);
+            ext = Object.keys(meta.classifiers.universal)[0];
+            hashFileOrigin = meta.classifiers.universal[ext];
+        }
 
-        console.log(Object.entries(meta).map(([key, value]) => ({ key, value })));
+        let pathFolder = path.resolve(this.options.path, 'forge');
+        let filePath = path.resolve(pathFolder, (`${forgeURL}.${ext}`).split('/').pop());
+
         if (!fs.existsSync(filePath)) {
             if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
             let downloadForge = new download();
 
             downloadForge.on('progress', (downloaded, size) => {
-                this.emit('progress', downloaded, size, `forge-${metaData}-installer.jar`);
+                this.emit('progress', downloaded, size, (`${forgeURL}.${ext}`).split('/').pop());
             });
 
-            await downloadForge.downloadFile(forgeURL, pathFolder, `forge-${metaData}-installer.${ext}`);
+            await downloadForge.downloadFile(`${forgeURL}.${ext}`, pathFolder, (`${forgeURL}.${ext}`).split('/').pop());
         }
 
         let hashFileDownload = await getFileHash(filePath, 'md5');
@@ -74,7 +89,7 @@ export default class ForgeMC {
             fs.rmSync(filePath);
             return { error: 'Invalid hash' };
         }
-        return { filePath, metaData }
+        return { filePath, metaData, ext }
     }
 
     async extractProfile(pathInstaller: any) {
@@ -241,7 +256,13 @@ export default class ForgeMC {
                 await patcher.patcher(profile, config);
             }
         }
-
         return true
     }
+
+    async createJar(pathInstaller: any) {
+        console.log(this.options)
+        
+    }
+
+    async createProfile() { }
 }
