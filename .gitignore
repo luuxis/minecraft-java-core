@@ -1,7 +1,7 @@
 node_modules
 build
 files
-.Minecraft
+Minecraft
 test/*.json
 webfiles/instances/*
 .DS_Store
