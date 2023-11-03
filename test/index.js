@@ -38,6 +38,8 @@ let mc
             enable: true
         },
 
+        mcp: 'mcp/test.jar',
+
         verify: false,
         ignored: [
             'config',

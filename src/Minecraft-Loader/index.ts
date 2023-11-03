@@ -100,8 +100,11 @@ export default class Loader {
 
             return profile.version;
         } else {
-            await forge.createJar(installer.filePath);
-            let profile: any = await forge.createProfile();
+            let profile: any = await forge.createProfile(installer.id,installer.filePath);
+            if (profile.error) return profile
+            let destination = path.resolve(this.options.path, 'versions', profile.id)
+            if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+            fs.writeFileSync(path.resolve(destination, `${profile.id}.json`), JSON.stringify(profile, null, 4));
             return profile;
         }
     }
@@ -138,7 +141,7 @@ export default class Loader {
         fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
 
         //extract universal jar
-        let universal: any = await neoForge.extractUniversalJar(profile.install, installer.filePath);
+        let universal: any = await neoForge.extractUniversalJar(profile.install, installer.filePath, installer.oldAPI);
         if (universal.error) return universal;
 
         // download libraries
@@ -146,7 +149,7 @@ export default class Loader {
         if (libraries.error) return libraries;
 
         // patch forge if nessary
-        let patch: any = await neoForge.patchneoForge(profile.install);
+        let patch: any = await neoForge.patchneoForge(profile.install, installer.oldAPI);
         if (patch.error) return patch;
 
         return profile.version;

@@ -101,7 +101,6 @@ export default class MinecraftArguments {
             jvm.push(opts[process.platform])
         }
 
-
         if (json.nativesList) {
             jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
         }
@@ -145,7 +144,14 @@ export default class MinecraftArguments {
                 classPath.push(`${this.options.path}/libraries/${path.path}/${path.name}`)
             }
         }
-        classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
+
+        if (loaderJson?.isOldForge) {
+            classPath.push(loaderJson?.jarPath)
+          }  else if (this.options.mcp) {
+            classPath.push(this.options.mcp)
+        } else {
+            classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
+        }
 
         return {
             classpath: [
