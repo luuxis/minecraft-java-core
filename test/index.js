@@ -27,7 +27,7 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         instance: 'PokeMoonX',
-        version: '1.20.1',
+        version: '1.8.8',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
