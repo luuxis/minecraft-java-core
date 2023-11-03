@@ -3,12 +3,11 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { getPathLibraries, getFileHash, mirrors, getFileFromJar } from '../../../utils/Index.js';
+import { getPathLibraries, getFileHash, mirrors, getFileFromJar, createZIP } from '../../../utils/Index.js';
 import download from '../../../utils/Downloader.js';
 import forgePatcher from '../../patcher.js'
 
 import nodeFetch from 'node-fetch'
-import AdmZip from 'adm-zip';
 import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
@@ -28,7 +27,7 @@ export default class ForgeMC {
         let metaData = (await nodeFetch(Loader.metaData).then(res => res.json()))[this.options.loader.version];
         let AvailableBuilds = metaData;
         let forgeURL: String;
-        let ext;
+        let ext: String;
         let hashFileOrigin: String;
         if (!metaData) return { error: `Forge ${this.options.loader.version} not supported` };
 
@@ -58,15 +57,17 @@ export default class ForgeMC {
         if (installerType) {
             forgeURL = forgeURL = Loader.install.replace(/\${version}/g, metaData);
             ext = Object.keys(meta.classifiers.installer)[0];
-            hashFileOrigin = meta.classifiers.installer[ext];
+            hashFileOrigin = meta.classifiers.installer[`${ext}`];
         } else if (clientType) {
             forgeURL = Loader.client.replace(/\${version}/g, metaData);
             ext = Object.keys(meta.classifiers.client)[0];
-            hashFileOrigin = meta.classifiers.client[ext];
+            hashFileOrigin = meta.classifiers.client[`${ext}`];
         } else if (universalType) {
             forgeURL = Loader.universal.replace(/\${version}/g, metaData);
             ext = Object.keys(meta.classifiers.universal)[0];
-            hashFileOrigin = meta.classifiers.universal[ext];
+            hashFileOrigin = meta.classifiers.universal[`${ext}`];
+        } else {
+            return { error: 'Invalid forge installer' };
         }
 
         let pathFolder = path.resolve(this.options.path, 'forge');
@@ -89,7 +90,7 @@ export default class ForgeMC {
             fs.rmSync(filePath);
             return { error: 'Invalid hash' };
         }
-        return { filePath, metaData, ext }
+        return { filePath, metaData, ext, id: `forge-${build}` };
     }
 
     async extractProfile(pathInstaller: any) {
@@ -259,10 +260,21 @@ export default class ForgeMC {
         return true
     }
 
-    async createJar(pathInstaller: any) {
-        console.log(this.options)
-        
-    }
+    async createProfile(id: any, pathInstaller: any) {
+        let forgeFiles: any = await getFileFromJar(pathInstaller)
+        let minecraftJar: any = await getFileFromJar(this.options.loader.config.minecraftJar)
+        let data: any = await createZIP([...minecraftJar, ...forgeFiles], 'META-INF');
 
-    async createProfile() { }
+        let destination = path.resolve(this.options.path, 'versions', id);
+
+        let profile = JSON.parse(fs.readFileSync(this.options.loader.config.minecraftJson, 'utf-8'))
+        profile.libraries = [];
+        profile.id = id;
+        profile.isOldForge = true;
+        profile.jarPath = path.resolve(destination, `${id}.jar`);
+
+        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+        fs.writeFileSync(path.resolve(destination, `${id}.jar`), data, { mode: 0o777 });
+        return profile
+    }
 }

@@ -50,8 +50,10 @@ function loader(type: string) {
         }
     } else if (type === 'neoforge') {
         return {
-            metaData: 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge',
-            install: 'https://maven.neoforged.net/net/neoforged/forge/${version}/forge-${version}-installer.jar'
+            legacyMetaData: 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge',
+            metaData: 'https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge',
+            legacyInstall: 'https://maven.neoforged.net/net/neoforged/forge/${version}/forge-${version}-installer.jar',
+            install: 'https://maven.neoforged.net/net/neoforged/neoforge/${version}/neoforge-${version}-installer.jar'
         }
     } else if (type === 'fabric') {
         return {
@@ -88,6 +90,7 @@ async function getFileFromJar(jar: string, file: string = null, path: string = n
         for (let entry of entries) {
             if (!entry.isDirectory && !path) {
                 if (entry.entryName == file) fileReturn = entry.getData();
+                if (!file) fileReturn.push({ name: entry.entryName, data: entry.getData() });
             }
 
             if (!entry.isDirectory && entry.entryName.includes(path) && path) {
@@ -98,11 +101,24 @@ async function getFileFromJar(jar: string, file: string = null, path: string = n
     });
 }
 
+async function createZIP(files: any, ignored: any = null) {
+    let zip = new admZip();
+
+    return await new Promise(resolve => {
+        for (let entry of files) {
+            if (ignored && entry.name.includes(ignored)) continue;
+            zip.addFile(entry.name, entry.data);
+        }
+        resolve(zip.toBuffer());
+    });
+}
+
 export {
     getPathLibraries,
     isold,
     getFileHash,
     mirrors,
     loader,
-    getFileFromJar
+    getFileFromJar,
+    createZIP
 };

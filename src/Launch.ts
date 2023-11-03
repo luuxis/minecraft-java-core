@@ -47,6 +47,7 @@ type LaunchOPTS = {
     downloadFileMultiple?: number,
     intelEnabledMac?: boolean,
     loader: loader,
+    mcp: any,
     verify: boolean,
     ignored: string[],
     JVM_ARGS: string[],
@@ -84,6 +85,8 @@ export default class Launch {
                 enable: false,
             },
 
+            mcp: null,
+
             verify: false,
             ignored: [],
             JVM_ARGS: [],
@@ -107,6 +110,7 @@ export default class Launch {
         this.options = defaultOptions;
 
         this.options.path = path.resolve(this.options.path).replace(/\\/g, '/');
+        this.options.mcp = this.options.mcp ? path.resolve(`${this.options.path}/${this.options.mcp}`).replace(/\\/g, '/'): null;
         if (this.options.loader.type) {
             this.options.loader.type = this.options.loader.type.toLowerCase()
             this.options.loader.build = this.options.loader.build.toLowerCase()
@@ -220,8 +224,7 @@ export default class Launch {
                 .then((data: any) => data)
                 .catch((err: any) => err);
             if (jsonLoader.error) return jsonLoader;
-            if (jsonLoader.ext === 'zip') loaderJson = json;
-            else loaderJson = jsonLoader;
+            loaderJson = jsonLoader;
         }
 
         if (this.options.verify) await bundle.checkFiles([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);

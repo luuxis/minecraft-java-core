@@ -49,13 +49,12 @@ export default class Libraries {
             });
         }
 
-        let clientjar = this.json.downloads.client;
         libraries.push({
-            sha1: clientjar.sha1,
-            size: clientjar.size,
+            sha1: this.json.downloads.client.sha1,
+            size: this.json.downloads.client.size,
             path: `versions/${this.json.id}/${this.json.id}.jar`,
             type: "Libraries",
-            url: clientjar.url
+            url: this.json.downloads.client.url
         });
 
         libraries.push({
