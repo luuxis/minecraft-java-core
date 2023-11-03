@@ -26,16 +26,16 @@ let mc
         authenticator: mc,
         timeout: 10000,
         path: './Minecraft',
-        // instance: 'PokeMoonX',
-        version: '1.2.5',
+        instance: 'PokeMoonX',
+        version: '1.20.1',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'neoforge',
             build: 'latest',
-            enable: true
+            enable: false
         },
 
         mcp: 'mcp/test.jar',

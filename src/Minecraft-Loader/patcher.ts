@@ -16,7 +16,7 @@ export default class forgePatcher {
         this.emit = EventEmitter.prototype.emit;
     }
 
-    async patcher(profile: any, config: any) {
+    async patcher(profile: any, config: any, neoForgeOld: boolean = true) {
         let { processors } = profile;
 
         for (let key in processors) {
@@ -29,7 +29,7 @@ export default class forgePatcher {
                 let jar = getPathLibraries(processor.jar)
                 let filePath = path.resolve(this.options.path, 'libraries', jar.path, jar.name)
 
-                let args = processor.args.map(arg => this.setArgument(arg, profile, config)).map(arg => this.computePath(arg));
+                let args = processor.args.map(arg => this.setArgument(arg, profile, config, neoForgeOld)).map(arg => this.computePath(arg));
                 let classPaths = processor.classpath.map(cp => {
                     let classPath = getPathLibraries(cp)
                     return `"${path.join(this.options.path, 'libraries', `${classPath.path}/${classPath.name}`)}"`
@@ -97,11 +97,11 @@ export default class forgePatcher {
         return true;
     }
 
-    setArgument(arg: any, profile: any, config: any) {
+    setArgument(arg: any, profile: any, config: any, neoForgeOld) {
         let finalArg = arg.replace('{', '').replace('}', '');
         let universalPath = profile.libraries.find(v => {
             if (this.options.loader.type === 'forge') return (v.name || '').startsWith('net.minecraftforge:forge')
-            if (this.options.loader.type === 'neoforge') return (v.name || '').startsWith('net.neoforged:forge')
+            if (this.options.loader.type === 'neoforge') return (v.name || '').startsWith(neoForgeOld ? 'net.neoforged:forge' : 'net.neoforged:neoforge')
         })
 
         if (profile.data[finalArg]) {

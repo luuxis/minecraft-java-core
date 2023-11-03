@@ -24,11 +24,20 @@ export default class NeoForgeMC {
     }
 
     async downloadInstaller(Loader: any) {
-        let build: string
-        let neoForgeURL = Loader.install
+        let build: string;
+        let neoForgeURL: string;
+        let oldAPI: boolean = true;
+        let legacyMetaData = await nodeFetch(Loader.legacyMetaData).then(res => res.json());
         let metaData = await nodeFetch(Loader.metaData).then(res => res.json());
 
-        let versions = metaData.versions.filter(version => version.includes(`${this.options.loader.version}-`));
+        let versions = legacyMetaData.versions.filter(version => version.includes(`${this.options.loader.version}-`));
+
+        if (!versions.length) {
+            let minecraftVersion = `${this.options.loader.version.split('.')[1]}.${this.options.loader.version.split('.')[2]}`;
+            versions = metaData.versions.filter(version => version.startsWith(minecraftVersion));
+            oldAPI = false;
+        }
+
         if (!versions.length) return { error: `NeoForge doesn't support Minecraft ${this.options.loader.version}` };
 
         if (this.options.loader.build === 'latest' || this.options.loader.build === 'recommended') {
@@ -37,24 +46,24 @@ export default class NeoForgeMC {
 
         if (!build) return { error: `NeoForge Loader ${this.options.loader.build} not found, Available builds: ${versions.join(', ')}` };
 
-        neoForgeURL = neoForgeURL.replaceAll(/\${version}/g, build);
-
+        if (oldAPI) neoForgeURL = Loader.legacyInstall.replaceAll(/\${version}/g, build);
+        else neoForgeURL = Loader.install.replaceAll(/\${version}/g, build);
 
         let pathFolder = path.resolve(this.options.path, 'neoForge');
-        let filePath = path.resolve(pathFolder, `forge-${build}-installer.jar`);
+        let filePath = path.resolve(pathFolder, `neoForge-${build}-installer.jar`);
 
         if (!fs.existsSync(filePath)) {
             if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
             let downloadForge = new download();
 
             downloadForge.on('progress', (downloaded, size) => {
-                this.emit('progress', downloaded, size, `forge-${build}-installer.jar`);
+                this.emit('progress', downloaded, size, `neoForge-${build}-installer.jar`);
             });
 
-            await downloadForge.downloadFile(neoForgeURL, pathFolder, `forge-${build}-installer.jar`);
+            await downloadForge.downloadFile(neoForgeURL, pathFolder, `neoForge-${build}-installer.jar`);
         }
 
-        return { filePath };
+        return { filePath, oldAPI };
     }
 
     async extractProfile(pathInstaller: any) {
@@ -76,7 +85,7 @@ export default class NeoForgeMC {
         return neoForgeJSON;
     }
 
-    async extractUniversalJar(profile: any, pathInstaller: any) {
+    async extractUniversalJar(profile: any, pathInstaller: any, oldAPI: any) {
         let skipneoForgeFilter = true
 
         if (profile.filePath) {
@@ -108,7 +117,7 @@ export default class NeoForgeMC {
 
         if (profile.processors?.length) {
             let universalPath = profile.libraries.find(v => {
-                return (v.name || '').startsWith('net.neoforged:forge')
+                return (v.name || '').startsWith(oldAPI ? 'net.neoforged:forge' : 'net.neoforged:neoforge')
             })
 
             let client: any = await getFileFromJar(pathInstaller, 'data/client.lzma');
@@ -198,7 +207,7 @@ export default class NeoForgeMC {
         return libraries
     }
 
-    async patchneoForge(profile: any) {
+    async patchneoForge(profile: any, oldAPI: any) {
         if (profile?.processors?.length) {
             let patcher: any = new neoForgePatcher(this.options);
             let config: any = {}
@@ -218,7 +227,7 @@ export default class NeoForgeMC {
                     minecraftJson: this.options.loader.config.minecraftJson
                 }
 
-                await patcher.patcher(profile, config);
+                await patcher.patcher(profile, config, oldAPI);
             }
         }
         return true
