@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { getPathLibraries, getFileHash, mirrors, getFileFromJar } from '../../../utils/Index.js';
+import { getPathLibraries, mirrors, getFileFromJar } from '../../../utils/Index.js';
 import download from '../../../utils/Downloader.js';
 import neoForgePatcher from '../../patcher.js'
 

@@ -26,7 +26,9 @@ export default class ForgeMC {
     async downloadInstaller(Loader: any) {
         let metaData = (await nodeFetch(Loader.metaData).then(res => res.json()))[this.options.loader.version];
         let AvailableBuilds = metaData;
-        let forgeURL = Loader.install
+        let forgeURL: String;
+        let ext: String;
+        let hashFileOrigin: String;
         if (!metaData) return { error: `Forge ${this.options.loader.version} not supported` };
 
         let build
@@ -46,13 +48,15 @@ export default class ForgeMC {
         metaData = metaData.filter(b => b === build)[0];
         if (!metaData) return { error: `Build ${build} not found, Available builds: ${AvailableBuilds.join(', ')}` };
 
-        forgeURL = forgeURL.replace(/\${version}/g, metaData);
+
+        // forgeURL = forgeURL.replace(/\${version}/g, metaData);
         let urlMeta = Loader.meta.replace(/\${build}/g, metaData);
 
-        let pathFolder = path.resolve(this.options.path, 'forge');
-        let filePath = path.resolve(pathFolder, `forge-${metaData}-installer.jar`);
+        // let pathFolder = path.resolve(this.options.path, 'forge');
+        // let filePath = path.resolve(pathFolder, `forge-${metaData}-installer.jar`);
         let meta = await nodeFetch(urlMeta).then(res => res.json());
 
+        console.log(Object.entries(meta).map(([key, value]) => ({ key, value })));
         if (!fs.existsSync(filePath)) {
             if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
             let downloadForge = new download();
@@ -61,11 +65,10 @@ export default class ForgeMC {
                 this.emit('progress', downloaded, size, `forge-${metaData}-installer.jar`);
             });
 
-            await downloadForge.downloadFile(forgeURL, pathFolder, `forge-${metaData}-installer.jar`);
+            await downloadForge.downloadFile(forgeURL, pathFolder, `forge-${metaData}-installer.${ext}`);
         }
 
         let hashFileDownload = await getFileHash(filePath, 'md5');
-        let hashFileOrigin = meta?.classifiers?.installer?.jar;
 
         if (hashFileDownload !== hashFileOrigin) {
             fs.rmSync(filePath);

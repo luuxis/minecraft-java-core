@@ -1,4 +1,4 @@
-const { Microsoft, Launch } = require('../build/Index');
+const { Microsoft, Launch, Mojang } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
 
@@ -22,23 +22,23 @@ let mc
     }
 
     let opt = {
-        url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
+        // url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
         authenticator: mc,
         timeout: 10000,
-        path: './.Minecraft',
-        instance: 'PokeMoonX',
-        version: '1.16.5',
+        path: './Minecraft',
+        // instance: 'PokeMoonX',
+        version: '1.2.5',
         detached: false,
-        intelEnabledMac: false,
+        intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'Forge',
+            type: 'forge',
             build: 'latest',
             enable: true
         },
 
-        verify: true,
+        verify: false,
         ignored: [
             'config',
             'essential',
@@ -57,7 +57,7 @@ let mc
         javaPath: null,
 
         screen: {
-           width: 1600,
+           width: 1500,
            height: 900
         },
 

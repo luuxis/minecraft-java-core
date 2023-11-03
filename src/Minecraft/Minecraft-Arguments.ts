@@ -3,6 +3,9 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
+import fs from 'fs';
+import os from 'os'
+
 import { getPathLibraries, isold } from '../utils/Index.js';
 
 let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
@@ -103,6 +106,14 @@ export default class MinecraftArguments {
             jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
         }
 
+        if (os.platform() == "darwin") {
+            let pathAssets = `${this.options.path}/assets/indexes/${json.assets}.json`;
+            let assets = JSON.parse(fs.readFileSync(pathAssets, 'utf-8'));
+            let icon = assets.objects['icons/minecraft.icns'].hash
+
+            jvm.push(`-Xdock:name=Minecraft`)
+            jvm.push(`-Xdock:icon=${this.options.path}/assets/objects/${icon.substring(0, 2)}/${icon}`)
+        }
         jvm.push(...this.options.JVM_ARGS)
 
         return jvm;
@@ -136,11 +147,13 @@ export default class MinecraftArguments {
         }
         classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
 
-        return {classpath:[
-            `-cp`,
-            classPath.join(process.platform === 'win32' ? ';' : ':'),
-            
-        ],
-        mainClass: loaderJson ? loaderJson.mainClass : json.mainClass}
+        return {
+            classpath: [
+                `-cp`,
+                classPath.join(process.platform === 'win32' ? ';' : ':'),
+
+            ],
+            mainClass: loaderJson ? loaderJson.mainClass : json.mainClass
+        }
     }
 }
