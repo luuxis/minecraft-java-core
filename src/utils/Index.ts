@@ -78,7 +78,8 @@ let mirrors = [
     "https://maven.minecraftforge.net",
     "https://maven.neoforged.net/releases",
     "https://maven.creeperhost.net",
-    "https://libraries.minecraft.net"
+    "https://libraries.minecraft.net",
+    "https://repo1.maven.org/maven2"
 ]
 
 async function getFileFromJar(jar: string, file: string = null, path: string = null) {
@@ -113,6 +114,26 @@ async function createZIP(files: any, ignored: any = null) {
     });
 }
 
+function skipLibrary(lib) {
+    let Lib = { win32: "windows", darwin: "osx", linux: "linux" };
+    
+        let skip = false;
+        if (lib.rules) {
+            skip = true;
+            lib.rules.forEach(({ action, os, features }) => {
+                if (features) return true;
+                if (action === 'allow' && ((os && os.name === Lib[process.platform]) || !os)) {
+                    skip = false;
+                }
+    
+                if (action === 'disallow' && ((os && os.name === Lib[process.platform]) || !os)) {
+                    skip = true;
+                }
+            });
+        }
+        return skip;
+    }
+
 export {
     getPathLibraries,
     isold,
@@ -120,5 +141,6 @@ export {
     mirrors,
     loader,
     getFileFromJar,
-    createZIP
+    createZIP,
+    skipLibrary
 };

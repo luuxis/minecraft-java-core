@@ -27,18 +27,16 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         instance: 'PokeMoonX',
-        version: '1.8.8',
+        version: '1.6.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'neoforge',
+            type: 'forge',
             build: 'latest',
-            enable: false
+            enable: true
         },
-
-        mcp: 'mcp/test.jar',
 
         verify: false,
         ignored: [

@@ -11,6 +11,9 @@ import nodeFetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
+import { skipLibrary } from '../../../utils/Index.js';
+
+let Lib = { win32: "windows", darwin: "osx", linux: "linux" };
 
 export default class ForgeMC {
     options: any;
@@ -176,24 +179,31 @@ export default class ForgeMC {
         ]
 
         for (let lib of libraries) {
+            let natives = null;
+
             if (skipForgeFilter && skipForge.find(libs => lib.name.includes(libs))) {
                 this.emit('check', check++, libraries.length, 'libraries');
                 continue;
             }
-            if (lib.rules) {
+
+            if (skipLibrary(lib)) {
                 this.emit('check', check++, libraries.length, 'libraries');
                 continue;
             }
+
+            if (lib.natives) {
+                natives = lib.natives[Lib[process.platform]];
+            }
+
             let file = {}
-            let libInfo = getPathLibraries(lib.name);
+            let libInfo = getPathLibraries(lib.name, natives ? `-${natives}` : '');
             let pathLib = path.resolve(this.options.path, 'libraries', libInfo.path);
             let pathLibFile = path.resolve(pathLib, libInfo.name);
 
             if (!fs.existsSync(pathLibFile)) {
                 let url
-                let sizeFile = 0
-
-                let baseURL = `${libInfo.path}/${libInfo.name}`;
+                let sizeFile = 0;
+                let baseURL = natives ? `${libInfo.path}/` : `${libInfo.path}/${libInfo.name}`;
                 let response: any = await downloader.checkMirror(baseURL, mirrors)
 
                 if (response?.status === 200) {
