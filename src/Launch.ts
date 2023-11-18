@@ -108,13 +108,18 @@ export default class Launch {
         };
 
         this.options = defaultOptions;
-
         this.options.path = path.resolve(this.options.path).replace(/\\/g, '/');
-        this.options.mcp = this.options.mcp ? path.resolve(`${this.options.path}/${this.options.mcp}`).replace(/\\/g, '/'): null;
+
+        if (this.options.mcp) {
+            if (this.options.instance) this.options.mcp = `${this.options.path}/instances/${this.options.instance}/${this.options.mcp}`
+            else this.options.mcp = path.resolve(`${this.options.path}/${this.options.mcp}`).replace(/\\/g, '/')
+        }
+
         if (this.options.loader.type) {
             this.options.loader.type = this.options.loader.type.toLowerCase()
             this.options.loader.build = this.options.loader.build.toLowerCase()
         }
+
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
         if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30

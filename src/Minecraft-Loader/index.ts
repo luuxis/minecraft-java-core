@@ -138,7 +138,7 @@ export default class Loader {
         if (profile.error) return profile
         let destination = path.resolve(this.options.path, 'versions', profile.version.id)
         if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-        fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile, null, 4));
+        fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
 
         //extract universal jar
         let universal: any = await neoForge.extractUniversalJar(profile.install, installer.filePath, installer.oldAPI);

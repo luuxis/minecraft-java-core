@@ -22,7 +22,7 @@ let mc
     }
 
     let opt = {
-        // url: 'http://launcher.luuxis.fr/files?instance=PokeMoonX',
+        // url: 'https://launcher.luuxis.fr/files/?instance=hypixel',
         authenticator: mc,
         timeout: 10000,
         path: './Minecraft',
@@ -35,10 +35,10 @@ let mc
         loader: {
             type: 'forge',
             build: 'latest',
-            enable: true
+            enable: true,
         },
 
-        verify: false,
+        verify: true,
         ignored: [
             'config',
             'essential',
@@ -56,10 +56,10 @@ let mc
 
         javaPath: null,
 
-        screen: {
-           width: 1500,
-           height: 900
-        },
+        // screen: {
+        //    width: 1500,
+        //    height: 900
+        // },
 
         memory: {
             min: '4G',
