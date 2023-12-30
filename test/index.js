@@ -1,4 +1,4 @@
-const { Microsoft, Launch, Mojang } = require('../build/Index');
+const { Microsoft, Launch } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
 
@@ -27,13 +27,13 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         instance: 'PokeMoonX',
-        version: '1.6.4',
+        version: '1.20.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'neoforge',
             build: 'latest',
             enable: true,
         },

@@ -16,26 +16,30 @@ export default class java {
     async GetJsonJava(jsonversion: any) {
         let version: any;
         let files: any = [];
+        let archOS: String;
         let javaVersionsJson = await nodeFetch("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json").then(res => res.json())
 
         if (!jsonversion.javaVersion) jsonversion = "jre-legacy"
         else jsonversion = jsonversion.javaVersion.component
 
         if (os.platform() == "win32") {
-            let arch = { x64: "windows-x64", ia32: "windows-x86" }
+            let arch = { x64: "windows-x64", ia32: "windows-x86", arm64: "windows-arm64" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
             if (version.includes('undefined')) return { error: true, message: "Java not found" };
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
+            archOS = arch[os.arch()]
         } else if (os.platform() == "darwin") {
-            let arch = { x64: "mac-os", arm64: this.options.intelEnabledMac ?  "mac-os" : "mac-os-arm64" }
+            let arch = { x64: "mac-os", arm64: this.options.intelEnabledMac ? "mac-os" : "mac-os-arm64" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
             if (version.includes('undefined')) return { error: true, message: "Java not found" };
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
+            archOS = arch[os.arch()]
         } else if (os.platform() == "linux") {
             let arch = { x64: "linux", ia32: "linux-i386" }
             version = `jre-${javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.version?.name}`
             if (version.includes('undefined')) return { error: true, message: "Java not found" };
             javaVersionsJson = Object.entries((await nodeFetch(javaVersionsJson[`${arch[os.arch()]}`][jsonversion][0]?.manifest?.url).then(res => res.json())).files)
+            archOS = arch[os.arch()]
         } else return console.log("OS not supported");
 
         if (!javaVersionsJson) return { error: true, message: "Java not found" };
@@ -47,7 +51,7 @@ export default class java {
             if (info.type == "directory") continue;
             if (!info.downloads) continue;
             let file: any = {};
-            file.path = `runtime/${version}-${process.platform}/${path.replace(toDelete, "")}`;
+            file.path = `runtime/${version}-${archOS}/${path.replace(toDelete, "")}`;
             file.executable = info.executable;
             file.sha1 = info.downloads.raw.sha1;
             file.size = info.downloads.raw.size;
@@ -57,7 +61,7 @@ export default class java {
         }
         return {
             files: files,
-            path: path.resolve(this.options.path, `runtime/${version}-${process.platform}/bin/java${process.platform == "win32" ? ".exe" : ""}`),
+            path: path.resolve(this.options.path, `runtime/${version}-${archOS}/bin/java`),
         };
 
     }
