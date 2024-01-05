@@ -52,7 +52,7 @@ export default class MinecraftArguments {
             '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
             '${user_properties}': this.authenticator.user_properties,
             '${user_type}': userType,
-            '${version_name}': json.id,
+            '${version_name}': loaderJson ? loaderJson.id : json.id,
             '${assets_index_name}': json.assetIndex.id,
             '${game_directory}': this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path,
             '${assets_root}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
@@ -94,7 +94,10 @@ export default class MinecraftArguments {
             '-XX:G1ReservePercent=20',
             '-XX:MaxGCPauseMillis=50',
             '-XX:G1HeapRegionSize=32M',
-            '-Dfml.ignoreInvalidMinecraftCertificates=true'
+            '-Dfml.ignoreInvalidMinecraftCertificates=true',
+            `-Djna.tmpdir=${this.options.path}/versions/${json.id}/natives`,
+            `-Dorg.lwjgl.system.SharedLibraryExtractPath=${this.options.path}/versions/${json.id}/natives`,
+            `-Dio.netty.native.workdir=${this.options.path}/versions/${json.id}/natives`
         ]
 
         if (!json.minecraftArguments) {
@@ -147,7 +150,7 @@ export default class MinecraftArguments {
 
         if (loaderJson?.isOldForge) {
             classPath.push(loaderJson?.jarPath)
-          }  else if (this.options.mcp) {
+        } else if (this.options.mcp) {
             classPath.push(this.options.mcp)
         } else {
             classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
