@@ -182,8 +182,10 @@ export default class ForgeMC {
             let natives = null;
 
             if (skipForgeFilter && skipForge.find(libs => lib.name.includes(libs))) {
-                this.emit('check', check++, libraries.length, 'libraries');
-                continue;
+                if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
+                    this.emit('check', check++, libraries.length, 'libraries');
+                    continue;
+                }
             }
 
             if (skipLibrary(lib)) {
