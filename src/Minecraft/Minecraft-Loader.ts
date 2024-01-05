@@ -16,8 +16,7 @@ export default class MinecraftLoader {
         this.options = options;
         this.on = EventEmitter.prototype.on;
         this.emit = EventEmitter.prototype.emit;
-        if (this.options.loader.rootPath) this.loaderPath = this.options.path;
-        else this.loaderPath = `${this.options.path}/loader/${this.options.loader.type}`;
+        this.loaderPath = `${this.options.path}/${this.options.loader.path}`;
     }
 
     async GetLoader(version: any, javaPath: any) {

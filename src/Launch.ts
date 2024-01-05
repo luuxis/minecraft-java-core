@@ -20,7 +20,7 @@ import { isold } from './utils/Index.js';
 import Downloader from './utils/Downloader.js';
 
 type loader = {
-    rootPath?: boolean,
+    path?: string,
     type?: string,
     build?: string,
     enable?: boolean
@@ -81,7 +81,7 @@ export default class Launch {
             downloadFileMultiple: 5,
 
             loader: {
-                rootPath: false,
+                path: './loader',
                 type: null,
                 build: 'latest',
                 enable: false,
@@ -125,6 +125,7 @@ export default class Launch {
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
         if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
+        if (typeof this.options.loader.path !== 'string') this.options.loader.path = './loader'
         this.start();
     }
 
