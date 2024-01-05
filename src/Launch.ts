@@ -20,6 +20,7 @@ import { isold } from './utils/Index.js';
 import Downloader from './utils/Downloader.js';
 
 type loader = {
+    rootPath?: boolean,
     type?: string,
     build?: string,
     enable?: boolean
@@ -80,6 +81,7 @@ export default class Launch {
             downloadFileMultiple: 5,
 
             loader: {
+                rootPath: false,
                 type: null,
                 build: 'latest',
                 enable: false,
