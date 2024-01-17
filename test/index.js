@@ -33,9 +33,9 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            path: './loader',
+            // path: './loader',
             type: 'neoforge',
-            build: '20.2.86',
+            build: 'latest',
             enable: true
         },
 

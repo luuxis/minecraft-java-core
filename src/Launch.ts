@@ -125,7 +125,7 @@ export default class Launch {
         if (!this.options.authenticator) return this.emit("error", { error: "Authenticator not found" });
         if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
         if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
-        if (typeof this.options.loader.path !== 'string') this.options.loader.path = './loader'
+        if (typeof this.options.loader.path !== 'string') this.options.loader.path = `./loader/${this.options.loader.type}`;
         this.start();
     }
 
@@ -180,7 +180,7 @@ export default class Launch {
         let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
-        let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).GetJsonJava(json);
+        let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).getJavaFiles(json);
 
         if (gameJava.error) return gameJava
 
