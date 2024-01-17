@@ -93,7 +93,14 @@ export default class JavaDownloader {
         const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
         const filePath = path.resolve(pathFolder, fileName);
 
-        await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
+        await this.verifyAndDownloadFile({
+            filePath,
+            pathFolder,
+            fileName,
+            url,
+            checksum,
+            pathExtract: `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}`
+        });
 
         let javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/bin/java`;
         if (platform == 'mac') javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/Contents/Home/bin/java`;
@@ -113,14 +120,26 @@ export default class JavaDownloader {
 
     getPlatformArch() {
         return {
-            platform: { win32: 'windows', darwin: 'mac', linux: 'linux' }[os.platform()],
-            arch: { x64: 'x64', ia32: 'x32', arm64: this.options.intelEnabledMac ? "x64" : "aarch64", arm: 'arm' }[os.arch()]
+            platform: {
+                win32: 'windows',
+                darwin: 'mac',
+                linux: 'linux'
+            }[os.platform()],
+            arch: {
+                x64: 'x64',
+                ia32: 'x32',
+                arm64: this.options.intelEnabledMac && os.platform() == 'darwin' ? "x64" : "aarch64",
+                arm: 'arm'
+            }[os.arch()]
         };
     }
 
-    async verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum }) {
+    async verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum, pathExtract }) {
         if (fs.existsSync(filePath)) {
-            if (await getFileHash(filePath, 'sha256') !== checksum) fs.unlinkSync(filePath);
+            if (await getFileHash(filePath, 'sha256') !== checksum) {
+                fs.unlinkSync(filePath);
+                fs.rmdirSync(pathExtract, { recursive: true });
+            }
         }
 
         if (!fs.existsSync(filePath)) {
@@ -137,7 +156,9 @@ export default class JavaDownloader {
         if (await getFileHash(filePath, 'sha256') !== checksum) {
             return { error: true, message: "Java checksum failed" };
         }
+
     }
+
     extract(filePath, destPath) {
         return new Promise((resolve, reject) => {
             const extract = Seven.extractFull(filePath, destPath, {
