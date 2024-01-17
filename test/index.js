@@ -55,8 +55,8 @@ let mc
         GAME_ARGS: [],
 
         java: {
-            // path: 'java',
-            version: 16,
+            path: null,
+            version: null,
             type: 'jdk',
         },
 
