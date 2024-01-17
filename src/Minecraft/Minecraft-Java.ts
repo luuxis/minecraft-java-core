@@ -26,7 +26,7 @@ export default class JavaDownloader {
     }
 
     async getJavaFiles(jsonversion: any) {
-        if (this.options.java.version) return await this.getJavaOther(jsonversion,this.options.java.version);
+        if (this.options.java.version) return await this.getJavaOther(jsonversion, this.options.java.version);
         const archMapping = {
             win32: { x64: 'windows-x64', ia32: 'windows-x86', arm64: 'windows-arm64' },
             darwin: { x64: 'mac-os', arm64: this.options.intelEnabledMac ? "mac-os" : "mac-os-arm64" },
@@ -76,13 +76,12 @@ export default class JavaDownloader {
 
     async getJavaOther(jsonversion: any, versionDownload?: any) {
         const majorVersion = jsonversion.javaVersion?.component || versionDownload ? versionDownload : '8';
-        console.log(majorVersion)
         const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
         const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
         const { platform, arch } = this.getPlatformArch();
 
         const java = javaVersions.find(file =>
-            file.binary.image_type === 'jre' &&
+            file.binary.image_type === this.options.java.type &&
             file.binary.architecture === arch &&
             file.binary.os === platform);
 
@@ -96,8 +95,8 @@ export default class JavaDownloader {
 
         await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
 
-        let javaPath = `${pathFolder}/${version}-${image_type}/bin/java`;
-        if (platform == 'mac') javaPath = `${pathFolder}/${version}-${image_type}/Contents/Home/bin/java`;
+        let javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/bin/java`;
+        if (platform == 'mac') javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/Contents/Home/bin/java`;
 
         if (!fs.existsSync(javaPath)) {
             await this.extract(filePath, pathFolder);
@@ -115,7 +114,7 @@ export default class JavaDownloader {
     getPlatformArch() {
         return {
             platform: { win32: 'windows', darwin: 'mac', linux: 'linux' }[os.platform()],
-            arch: { x64: 'x64', ia32: 'x32', arm64: 'aarch64', arm: 'arm' }[os.arch()]
+            arch: { x64: 'x64', ia32: 'x32', arm64: this.options.intelEnabledMac ? "x64" : "aarch64", arm: 'arm' }[os.arch()]
         };
     }
 

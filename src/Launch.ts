@@ -39,7 +39,8 @@ type memory = {
 
 type javaOPTS = {
     path?: string,
-    version?: number
+    version?: number,
+    type?: string
 }
 
 type LaunchOPTS = {
@@ -101,7 +102,8 @@ export default class Launch {
 
             java: {
                 path: null,
-                version: null
+                version: null,
+                type: 'jre',
             },
 
             screen: {
@@ -185,6 +187,10 @@ export default class Launch {
         let libraries = new librariesMinecraft(this.options)
         let bundle = new bundleMinecraft(this.options)
         let java = new javaMinecraft(this.options)
+
+        java.on('progress', (progress: any, size: any, element: any) => {
+            this.emit('progress', progress, size, element)
+        });
 
         java.on('extract', (progress: any) => {
             this.emit('extract', progress)
