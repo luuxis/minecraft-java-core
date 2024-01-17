@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
 
-import { getPathLibraries, getFileFromJar } from '../utils/Index.js';
+import { getPathLibraries, getFileFromArchive } from '../utils/Index.js';
 
 export default class forgePatcher {
     options: any;
@@ -132,7 +132,7 @@ export default class forgePatcher {
     }
 
     async readJarManifest(jarPath: string) {
-        let extraction: any = await getFileFromJar(jarPath, 'META-INF/MANIFEST.MF');
+        let extraction: any = await getFileFromArchive(jarPath, 'META-INF/MANIFEST.MF');
 
         if (extraction) return (extraction.toString("utf8")).split('Main-Class: ')[1].split('\r\n')[0];
         return null;

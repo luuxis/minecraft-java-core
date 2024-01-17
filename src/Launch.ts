@@ -176,11 +176,17 @@ export default class Launch {
 
         let libraries = new librariesMinecraft(this.options)
         let bundle = new bundleMinecraft(this.options)
+        let java = new javaMinecraft(this.options)
+
+        java.on('progress', (progress: any, size: any, element: any) => {
+            this.emit('progress', progress, size, element);
+        });
 
         let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
-        let gameJava: any = this.options.javaPath ? { files: [] } : await new javaMinecraft(this.options).getJavaFiles(json);
+        let gameJava: any = this.options.javaPath ? { files: [] } : await java.getJavaFiles(json);
+
 
         if (gameJava.error) return gameJava
 

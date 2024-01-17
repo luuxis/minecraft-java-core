@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { getPathLibraries, getFileHash, mirrors, getFileFromJar, createZIP } from '../../../utils/Index.js';
+import { getPathLibraries, getFileHash, mirrors, getFileFromArchive, createZIP } from '../../../utils/Index.js';
 import download from '../../../utils/Downloader.js';
 import forgePatcher from '../../patcher.js'
 
@@ -99,7 +99,7 @@ export default class ForgeMC {
     async extractProfile(pathInstaller: any) {
         let forgeJSON: any = {}
 
-        let file: any = await getFileFromJar(pathInstaller, 'install_profile.json')
+        let file: any = await getFileFromArchive(pathInstaller, 'install_profile.json')
         let forgeJsonOrigin = JSON.parse(file);
 
         if (!forgeJsonOrigin) return { error: { message: 'Invalid forge installer' } };
@@ -108,7 +108,7 @@ export default class ForgeMC {
             forgeJSON.version = forgeJsonOrigin.versionInfo;
         } else {
             forgeJSON.install = forgeJsonOrigin;
-            let file: any = await getFileFromJar(pathInstaller, path.basename(forgeJSON.install.json))
+            let file: any = await getFileFromArchive(pathInstaller, path.basename(forgeJSON.install.json))
             forgeJSON.version = JSON.parse(file);
         }
 
@@ -125,17 +125,17 @@ export default class ForgeMC {
             let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
             if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
 
-            let file: any = await getFileFromJar(pathInstaller, profile.filePath)
+            let file: any = await getFileFromArchive(pathInstaller, profile.filePath)
             fs.writeFileSync(`${pathFileDest}/${fileInfo.name}`, file, { mode: 0o777 })
         } else if (profile.path) {
             let fileInfo = getPathLibraries(profile.path)
-            let listFile: any = await getFileFromJar(pathInstaller, null, `maven/${fileInfo.path}`)
+            let listFile: any = await getFileFromArchive(pathInstaller, null, `maven/${fileInfo.path}`)
 
             await Promise.all(
                 listFile.map(async (files: any) => {
                     let fileName = files.split('/')
                     this.emit('extract', `Extracting ${fileName[fileName.length - 1]}...`);
-                    let file: any = await getFileFromJar(pathInstaller, files)
+                    let file: any = await getFileFromArchive(pathInstaller, files)
                     let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
                     if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
                     fs.writeFileSync(`${pathFileDest}/${fileName[fileName.length - 1]}`, file, { mode: 0o777 })
@@ -150,7 +150,7 @@ export default class ForgeMC {
                 return (v.name || '').startsWith('net.minecraftforge:forge')
             })
 
-            let client: any = await getFileFromJar(pathInstaller, 'data/client.lzma');
+            let client: any = await getFileFromArchive(pathInstaller, 'data/client.lzma');
             let fileInfo = getPathLibraries(profile.path || universalPath.name, '-clientdata', '.lzma')
             let pathFile = path.resolve(this.options.path, 'libraries', fileInfo.path)
 
@@ -273,8 +273,8 @@ export default class ForgeMC {
     }
 
     async createProfile(id: any, pathInstaller: any) {
-        let forgeFiles: any = await getFileFromJar(pathInstaller)
-        let minecraftJar: any = await getFileFromJar(this.options.loader.config.minecraftJar)
+        let forgeFiles: any = await getFileFromArchive(pathInstaller)
+        let minecraftJar: any = await getFileFromArchive(this.options.loader.config.minecraftJar)
         let data: any = await createZIP([...minecraftJar, ...forgeFiles], 'META-INF');
 
         let destination = path.resolve(this.options.path, 'versions', id);

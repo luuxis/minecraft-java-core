@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import { getPathLibraries, mirrors, getFileFromJar } from '../../../utils/Index.js';
+import { getPathLibraries, mirrors, getFileFromArchive } from '../../../utils/Index.js';
 import download from '../../../utils/Downloader.js';
 import neoForgePatcher from '../../patcher.js'
 
@@ -69,7 +69,7 @@ export default class NeoForgeMC {
     async extractProfile(pathInstaller: any) {
         let neoForgeJSON: any = {}
 
-        let file: any = await getFileFromJar(pathInstaller, 'install_profile.json')
+        let file: any = await getFileFromArchive(pathInstaller, 'install_profile.json')
         let neoForgeJsonOrigin = JSON.parse(file);
 
         if (!neoForgeJsonOrigin) return { error: { message: 'Invalid neoForge installer' } };
@@ -78,7 +78,7 @@ export default class NeoForgeMC {
             neoForgeJSON.version = neoForgeJsonOrigin.versionInfo;
         } else {
             neoForgeJSON.install = neoForgeJsonOrigin;
-            let file: any = await getFileFromJar(pathInstaller, path.basename(neoForgeJSON.install.json))
+            let file: any = await getFileFromArchive(pathInstaller, path.basename(neoForgeJSON.install.json))
             neoForgeJSON.version = JSON.parse(file);
         }
 
@@ -95,17 +95,17 @@ export default class NeoForgeMC {
             let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
             if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
 
-            let file: any = await getFileFromJar(pathInstaller, profile.filePath)
+            let file: any = await getFileFromArchive(pathInstaller, profile.filePath)
             fs.writeFileSync(`${pathFileDest}/${fileInfo.name}`, file, { mode: 0o777 })
         } else if (profile.path) {
             let fileInfo = getPathLibraries(profile.path)
-            let listFile: any = await getFileFromJar(pathInstaller, null, `maven/${fileInfo.path}`)
+            let listFile: any = await getFileFromArchive(pathInstaller, null, `maven/${fileInfo.path}`)
 
             await Promise.all(
                 listFile.map(async (files: any) => {
                     let fileName = files.split('/')
                     this.emit('extract', `Extracting ${fileName[fileName.length - 1]}...`);
-                    let file: any = await getFileFromJar(pathInstaller, files)
+                    let file: any = await getFileFromArchive(pathInstaller, files)
                     let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
                     if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
                     fs.writeFileSync(`${pathFileDest}/${fileName[fileName.length - 1]}`, file, { mode: 0o777 })
@@ -120,7 +120,7 @@ export default class NeoForgeMC {
                 return (v.name || '').startsWith(oldAPI ? 'net.neoforged:forge' : 'net.neoforged:neoforge')
             })
 
-            let client: any = await getFileFromJar(pathInstaller, 'data/client.lzma');
+            let client: any = await getFileFromArchive(pathInstaller, 'data/client.lzma');
             let fileInfo = getPathLibraries(profile.path || universalPath.name, '-clientdata', '.lzma')
             let pathFile = path.resolve(this.options.path, 'libraries', fileInfo.path)
 

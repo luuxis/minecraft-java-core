@@ -82,7 +82,7 @@ let mirrors = [
     "https://repo1.maven.org/maven2"
 ]
 
-async function getFileFromJar(jar: string, file: string = null, path: string = null) {
+async function getFileFromArchive(jar: string, file: string = null, path: string = null) {
     let fileReturn: any = []
     let zip = new admZip(jar);
     let entries = zip.getEntries();
@@ -116,23 +116,23 @@ async function createZIP(files: any, ignored: any = null) {
 
 function skipLibrary(lib) {
     let Lib = { win32: "windows", darwin: "osx", linux: "linux" };
-    
-        let skip = false;
-        if (lib.rules) {
-            skip = true;
-            lib.rules.forEach(({ action, os, features }) => {
-                if (features) return true;
-                if (action === 'allow' && ((os && os.name === Lib[process.platform]) || !os)) {
-                    skip = false;
-                }
-    
-                if (action === 'disallow' && ((os && os.name === Lib[process.platform]) || !os)) {
-                    skip = true;
-                }
-            });
-        }
-        return skip;
+
+    let skip = false;
+    if (lib.rules) {
+        skip = true;
+        lib.rules.forEach(({ action, os, features }) => {
+            if (features) return true;
+            if (action === 'allow' && ((os && os.name === Lib[process.platform]) || !os)) {
+                skip = false;
+            }
+
+            if (action === 'disallow' && ((os && os.name === Lib[process.platform]) || !os)) {
+                skip = true;
+            }
+        });
     }
+    return skip;
+}
 
 export {
     getPathLibraries,
@@ -140,7 +140,7 @@ export {
     getFileHash,
     mirrors,
     loader,
-    getFileFromJar,
+    getFileFromArchive,
     createZIP,
     skipLibrary
 };
