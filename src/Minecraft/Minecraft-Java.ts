@@ -75,7 +75,7 @@ export default class JavaDownloader {
     }
 
     async getJavaOther(jsonversion: any, versionDownload?: any) {
-        const majorVersion = jsonversion.javaVersion?.component || versionDownload ? versionDownload : '8';
+        const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion;
         const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
         const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
         const { platform, arch } = this.getPlatformArch();
