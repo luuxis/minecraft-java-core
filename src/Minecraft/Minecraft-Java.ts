@@ -26,6 +26,7 @@ export default class JavaDownloader {
     }
 
     async getJavaFiles(jsonversion: any) {
+        if (this.options.java.version) return await this.getJavaOther(jsonversion,this.options.java.version);
         const archMapping = {
             win32: { x64: 'windows-x64', ia32: 'windows-x86', arm64: 'windows-arm64' },
             darwin: { x64: 'mac-os', arm64: this.options.intelEnabledMac ? "mac-os" : "mac-os-arm64" },
@@ -38,14 +39,14 @@ export default class JavaDownloader {
         const javaVersion = jsonversion.javaVersion?.component || 'jre-legacy';
         let files = []
 
-        if (!osArchMapping) return await this.getJavaFilesArm64(jsonversion);
+        if (!osArchMapping) return await this.getJavaOther(jsonversion);
 
         const archOs: any = osArchMapping[arch];
         const javaVersionsJson = await nodeFetch(`https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json`).then(res => res.json());
 
         const versionName = javaVersionsJson[archOs]?.[javaVersion]?.[0]?.version?.name;
 
-        if (!versionName) return await this.getJavaFilesArm64(jsonversion);
+        if (!versionName) return await this.getJavaOther(jsonversion);
 
         const manifestUrl = javaVersionsJson[archOs][javaVersion][0]?.manifest?.url;
         const manifest = await nodeFetch(manifestUrl).then(res => res.json());
@@ -73,31 +74,52 @@ export default class JavaDownloader {
         };
     }
 
-    async getJavaFilesArm64(jsonversion: any) {
-        const majorVersion = jsonversion.javaVersion?.majorVersion || '8';
-        const javaVersion = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`
-        const javaVersionsJson = await nodeFetch(javaVersion).then(res => res.json());
+    async getJavaOther(jsonversion: any, versionDownload?: any) {
+        const majorVersion = jsonversion.javaVersion?.component || versionDownload ? versionDownload : '8';
+        console.log(majorVersion)
+        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
+        const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
+        const { platform, arch } = this.getPlatformArch();
 
-        const java = javaVersionsJson.find((file: any) => {
-            if (file.binary.image_type === 'jre') {
-                if (file.binary.architecture === (os.arch() === 'x64' ? 'x64' : 'aarch64')) {
-                    if (file.binary.os === os.platform()) {
-                        return true;
-                    }
-                }
-            }
-        });
+        const java = javaVersions.find(file =>
+            file.binary.image_type === 'jre' &&
+            file.binary.architecture === arch &&
+            file.binary.os === platform);
 
         if (!java) return { error: true, message: "No Java found" };
 
-        const checksum = java.binary.package.checksum;
-        const url = java.binary.package.link;
-        const fileName = java.binary.package.name;
-        const version = java.release_name;
+        const { checksum, link: url, name: fileName } = java.binary.package;
+        const { release_name: version } = java;
         const image_type = java.binary.image_type;
         const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
-        const filePath = path.resolve(this.options.path, `runtime/jre-${majorVersion}/${fileName}`);
+        const filePath = path.resolve(pathFolder, fileName);
 
+        await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
+
+        let javaPath = `${pathFolder}/${version}-${image_type}/bin/java`;
+        if (platform == 'mac') javaPath = `${pathFolder}/${version}-${image_type}/Contents/Home/bin/java`;
+
+        if (!fs.existsSync(javaPath)) {
+            await this.extract(filePath, pathFolder);
+            await this.extract(filePath.replace('.gz', ''), pathFolder);
+            if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
+            if (platform !== 'windows') fs.chmodSync(javaPath, 0o755);
+        }
+
+        return {
+            files: [],
+            path: javaPath,
+        };
+    }
+
+    getPlatformArch() {
+        return {
+            platform: { win32: 'windows', darwin: 'mac', linux: 'linux' }[os.platform()],
+            arch: { x64: 'x64', ia32: 'x32', arm64: 'aarch64', arm: 'arm' }[os.arch()]
+        };
+    }
+
+    async verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum }) {
         if (fs.existsSync(filePath)) {
             if (await getFileHash(filePath, 'sha256') !== checksum) fs.unlinkSync(filePath);
         }
@@ -113,30 +135,27 @@ export default class JavaDownloader {
             await download.downloadFile(url, pathFolder, fileName);
         }
 
-        if (await getFileHash(filePath, 'sha256') !== checksum) return { error: true, message: "Java checksum failed" };
-
-        // extract file tar.
-        await this.tarExtract(filePath, pathFolder);
-        console.log("Java extracted");
-
-        return {
-            files: [],
-            path: `${pathFolder}/${version}-${image_type}/bin/java`,
-        };
+        if (await getFileHash(filePath, 'sha256') !== checksum) {
+            return { error: true, message: "Java checksum failed" };
+        }
     }
-
-   async tarExtract(archiveFilePath: string, extractionPath: string) {
+    extract(filePath, destPath) {
         return new Promise((resolve, reject) => {
-            if (process.platform !== 'win32') fs.chmodSync(sevenBin.path7za, '755');
-            const myStream = Seven.extract(archiveFilePath, extractionPath, {
-                $progress: true,
+            const extract = Seven.extractFull(filePath, destPath, {
                 $bin: sevenBin.path7za,
-                recursive: true
+                recursive: true,
+                $progress: true,
             })
-    
-            myStream.on('end', () => resolve);
-            myStream.on('progress', (progress: any) => console.log(progress) )
-            myStream.on('error', (err: any) => reject(err));
-        });
+            extract.on('end', () => {
+                resolve(true)
+            })
+            extract.on('error', (err) => {
+                reject(err)
+            })
+
+            extract.on('progress', (progress) => {
+                if (progress.percent > 0) this.emit('extract', progress.percent);
+            })
+        })
     }
 }

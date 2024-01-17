@@ -27,13 +27,12 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         instance: 'PokeMoonX',
-        version: '1.12.2',
+        version: '1.20',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            // path: './loader',
             type: 'neoforge',
             build: 'latest',
             enable: false
@@ -55,7 +54,10 @@ let mc
         JVM_ARGS: [],
         GAME_ARGS: [],
 
-        javaPath: null,
+        java: {
+            // path: 'java',
+            version: null,
+        },
 
         // screen: {
         //    width: 1500,

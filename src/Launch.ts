@@ -37,6 +37,11 @@ type memory = {
     max?: string
 }
 
+type javaOPTS = {
+    path?: string,
+    version?: number
+}
+
 type LaunchOPTS = {
     url: string | null,
     authenticator: any,
@@ -53,7 +58,7 @@ type LaunchOPTS = {
     ignored: string[],
     JVM_ARGS: string[],
     GAME_ARGS: string[],
-    javaPath: string,
+    java: javaOPTS,
     screen: screen,
     memory: memory
 };
@@ -94,7 +99,10 @@ export default class Launch {
             JVM_ARGS: [],
             GAME_ARGS: [],
 
-            javaPath: null,
+            java: {
+                path: null,
+                version: null
+            },
 
             screen: {
                 width: null,
@@ -150,7 +158,7 @@ export default class Launch {
             ...loaderArguments.game
         ]
 
-        let java: any = this.options.javaPath ? this.options.javaPath : minecraftJava.path;
+        let java: any = this.options.java.path ? this.options.java.path : minecraftJava.path;
         let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
 
@@ -178,14 +186,14 @@ export default class Launch {
         let bundle = new bundleMinecraft(this.options)
         let java = new javaMinecraft(this.options)
 
-        java.on('progress', (progress: any, size: any, element: any) => {
-            this.emit('progress', progress, size, element);
+        java.on('extract', (progress: any) => {
+            this.emit('extract', progress)
         });
 
         let gameLibraries: any = await libraries.Getlibraries(json);
         let gameAssetsOther: any = await libraries.GetAssetsOthers(this.options.url);
         let gameAssets: any = await new assetsMinecraft(this.options).GetAssets(json);
-        let gameJava: any = this.options.javaPath ? { files: [] } : await java.getJavaFiles(json);
+        let gameJava: any = this.options.java.path ? { files: [] } : await java.getJavaFiles(json);
 
 
         if (gameJava.error) return gameJava
@@ -234,7 +242,7 @@ export default class Launch {
                 this.emit('patch', patch);
             });
 
-            let jsonLoader = await loaderInstall.GetLoader(version, this.options.javaPath ? this.options.javaPath : gameJava.path)
+            let jsonLoader = await loaderInstall.GetLoader(version, this.options.java.path ? this.options.java.path : gameJava.path)
                 .then((data: any) => data)
                 .catch((err: any) => err);
             if (jsonLoader.error) return jsonLoader;
