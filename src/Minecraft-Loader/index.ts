@@ -15,15 +15,12 @@ import { EventEmitter } from 'events';
 import fs from 'fs'
 import path from 'path'
 
-export default class Loader {
+export default class Loader extends EventEmitter {
     options: any;
-    on: any;
-    emit: any;
 
     constructor(options: any) {
+        super();
         this.options = options
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async install() {
@@ -100,7 +97,7 @@ export default class Loader {
 
             return profile.version;
         } else {
-            let profile: any = await forge.createProfile(installer.id,installer.filePath);
+            let profile: any = await forge.createProfile(installer.id, installer.filePath);
             if (profile.error) return profile
             let destination = path.resolve(this.options.path, 'versions', profile.id)
             if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });

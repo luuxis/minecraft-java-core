@@ -15,15 +15,12 @@ import { skipLibrary } from '../../../utils/Index.js';
 
 let Lib = { win32: "windows", darwin: "osx", linux: "linux" };
 
-export default class ForgeMC {
+export default class ForgeMC extends EventEmitter {
     options: any;
-    on: any;
-    emit: any;
 
     constructor(options = {}) {
+        super();
         this.options = options;
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async downloadInstaller(Loader: any) {

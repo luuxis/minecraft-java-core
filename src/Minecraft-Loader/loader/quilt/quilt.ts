@@ -11,16 +11,13 @@ import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
 
-export default class Quilt {
+export default class Quilt extends EventEmitter {
     options: any;
     versionMinecraft: any;
-    on: any;
-    emit: any;
 
     constructor(options = {}) {
+        super();
         this.options = options;
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async downloadJson(Loader: any) {

@@ -14,14 +14,7 @@ interface downloadOptions {
     folder: string
 }
 
-export default class download {
-    on: any;
-    emit: any;
-
-    constructor() {
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
-    }
+export default class download extends EventEmitter {
 
     async downloadFile(url: string, path: string, fileName: string) {
         if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });

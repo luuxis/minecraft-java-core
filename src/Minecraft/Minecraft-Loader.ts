@@ -6,7 +6,6 @@
 import { EventEmitter } from 'events';
 import loaderDownloader from '../Minecraft-Loader/index.js'
 
-
 export default class MinecraftLoader {
     options: any;
     on: any;

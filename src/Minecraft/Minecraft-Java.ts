@@ -14,15 +14,12 @@ import sevenBin from '7zip-bin'
 import { getFileHash } from '../utils/Index.js';
 import downloader from '../utils/Downloader.js';
 
-export default class JavaDownloader {
+export default class JavaDownloader extends EventEmitter {
     options: any;
-    on: any;
-    emit: any;
 
     constructor(options: any) {
+        super();
         this.options = options;
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async getJavaFiles(jsonversion: any) {

@@ -8,18 +8,15 @@ import download from '../../../utils/Downloader.js';
 
 import nodeFetch from 'node-fetch'
 import fs from 'fs'
-import path from'path'
+import path from 'path'
 import { EventEmitter } from 'events';
 
-export default class FabricMC {
+export default class FabricMC extends EventEmitter {
     options: any;
-    on: any;
-    emit: any;
 
     constructor(options = {}) {
+        super();
         this.options = options;
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async downloadJson(Loader) {
@@ -46,7 +43,7 @@ export default class FabricMC {
     async downloadLibraries(json) {
         let { libraries } = json;
         let downloader = new download();
-        let files:any = [];
+        let files: any = [];
         let check = 0;
         let size = 0;
 
@@ -64,7 +61,7 @@ export default class FabricMC {
                 let url = `${lib.url}${libInfo.path}/${libInfo.name}`
                 let sizeFile = 0
 
-                let res:any = await downloader.checkURL(url);
+                let res: any = await downloader.checkURL(url);
                 if (res.status === 200) {
                     sizeFile = res.size;
                     size += res.size;

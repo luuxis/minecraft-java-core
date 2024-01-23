@@ -12,15 +12,12 @@ import fs from 'fs'
 import path from 'path'
 import { EventEmitter } from 'events';
 
-export default class NeoForgeMC {
+export default class NeoForgeMC extends EventEmitter {
     options: any;
-    on: any;
-    emit: any;
 
     constructor(options = {}) {
+        super();
         this.options = options;
-        this.on = EventEmitter.prototype.on;
-        this.emit = EventEmitter.prototype.emit;
     }
 
     async downloadInstaller(Loader: any) {
@@ -151,8 +148,8 @@ export default class NeoForgeMC {
         for (let lib of libraries) {
             if (skipneoForgeFilter && skipneoForge.find(libs => lib.name.includes(libs))) {
                 // if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
-                    this.emit('check', check++, libraries.length, 'libraries');
-                    continue;
+                this.emit('check', check++, libraries.length, 'libraries');
+                continue;
                 // }
             }
             if (lib.rules) {
