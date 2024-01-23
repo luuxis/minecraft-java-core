@@ -3,7 +3,10 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
+import MinecraftNativeLinuxARM from './Minecraft-Native-Linux-ARM.js';
+
 import nodeFetch from 'node-fetch';
+import os from 'os';
 
 export default class Json {
     options: any;
@@ -14,7 +17,7 @@ export default class Json {
 
     async GetInfoVersion() {
         let version: string = this.options.version;
-        let data: any = await nodeFetch(`https://raw.githubusercontent.com/theofficialgman/piston-meta-arm64/main/mc/game/version_manifest_noncompact.json`);
+        let data: any = await nodeFetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
         data = await data.json();
 
         if (version == 'latest_release' || version == 'r' || version == 'lr') {
@@ -31,9 +34,12 @@ export default class Json {
             message: `Minecraft ${version} is not found.`
         };
 
+        let json: any = await nodeFetch(data.url).then(res => res.json());
+        if (os.platform() == 'linux' && os.arch().startsWith('arm')) json = new MinecraftNativeLinuxARM(this.options).ProcessJson(json);
+
         return {
             InfoVersion: data,
-            json: await nodeFetch(data.url).then(res => res.json()),
+            json: json,
             version: version
         };
     }
