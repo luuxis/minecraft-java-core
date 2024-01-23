@@ -27,7 +27,7 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         // instance: 'PokeMoonX',
-        version: '1.8.9',
+        version: '1.20.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
@@ -56,8 +56,8 @@ let mc
 
         java: {
             path: null,
-            version: null,
-            type: 'jre',
+            version: 21,
+            type: 'jdk',
         },
 
         screen: {

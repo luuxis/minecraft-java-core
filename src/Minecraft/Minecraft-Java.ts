@@ -104,7 +104,7 @@ export default class JavaDownloader extends EventEmitter {
         if (!fs.existsSync(javaPath)) {
             await this.extract(filePath, pathFolder);
             await this.extract(filePath.replace('.gz', ''), pathFolder);
-          //  if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
+            if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
             if (platform !== 'windows') fs.chmodSync(javaPath, 0o755);
         }
 
@@ -155,8 +155,9 @@ export default class JavaDownloader extends EventEmitter {
 
     }
 
-   async extract(filePath, destPath) {
+    async extract(filePath, destPath) {
         return await new Promise((resolve, reject) => {
+            if (os.platform() !== 'win32') fs.chmodSync(sevenBin.path7za, 0o755);
             const extract = Seven.extractFull(filePath, destPath, {
                 $bin: sevenBin.path7za,
                 recursive: true,

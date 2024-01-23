@@ -56,7 +56,7 @@ export default class MinecraftBundle {
             instancePath = `/instances/${this.options.instance}`
         }
         let files = this.options.instance ? this.getFiles(`${this.options.path}/instances/${this.options.instance}`) : this.getFiles(this.options.path);
-        let ignoredfiles = [...this.getFiles(`${this.options.path}/loader`)]
+        let ignoredfiles = [...this.getFiles(`${this.options.path}/loader`), ...this.getFiles(`${this.options.path}/runtime`)]
 
         for (let file of this.options.ignored) {
             file = (`${this.options.path}${instancePath}/${file}`)
