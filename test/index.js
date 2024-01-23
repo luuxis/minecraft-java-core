@@ -27,7 +27,7 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         instance: 'PokeMoonX',
-        version: 's',
+        version: '1.20.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
@@ -35,7 +35,7 @@ let mc
         loader: {
             type: 'neoforge',
             build: 'latest',
-            enable: false
+            enable: true
         },
 
         verify: true,
@@ -60,10 +60,10 @@ let mc
             type: 'jdk',
         },
 
-        // screen: {
-        //    width: 1500,
-        //    height: 900
-        // },
+        screen: {
+            width: 1500,
+            height: 900
+        },
 
         memory: {
             min: '4G',

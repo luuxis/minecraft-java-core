@@ -14,7 +14,7 @@ export default class Json {
 
     async GetInfoVersion() {
         let version: string = this.options.version;
-        let data: any = await nodeFetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
+        let data: any = await nodeFetch(`https://raw.githubusercontent.com/theofficialgman/piston-meta-arm64/main/mc/game/version_manifest_noncompact.json`);
         data = await data.json();
 
         if (version == 'latest_release' || version == 'r' || version == 'lr') {
