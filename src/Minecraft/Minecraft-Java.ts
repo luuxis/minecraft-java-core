@@ -16,7 +16,6 @@ import downloader from '../utils/Downloader.js';
 
 export default class JavaDownloader extends EventEmitter {
     options: any;
-
     constructor(options: any) {
         super();
         this.options = options;
@@ -105,7 +104,7 @@ export default class JavaDownloader extends EventEmitter {
         if (!fs.existsSync(javaPath)) {
             await this.extract(filePath, pathFolder);
             await this.extract(filePath.replace('.gz', ''), pathFolder);
-            if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
+          //  if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
             if (platform !== 'windows') fs.chmodSync(javaPath, 0o755);
         }
 
@@ -156,8 +155,8 @@ export default class JavaDownloader extends EventEmitter {
 
     }
 
-    extract(filePath, destPath) {
-        return new Promise((resolve, reject) => {
+   async extract(filePath, destPath) {
+        return await new Promise((resolve, reject) => {
             const extract = Seven.extractFull(filePath, destPath, {
                 $bin: sevenBin.path7za,
                 recursive: true,
@@ -167,6 +166,7 @@ export default class JavaDownloader extends EventEmitter {
                 resolve(true)
             })
             extract.on('error', (err) => {
+                console.log(err)
                 reject(err)
             })
 

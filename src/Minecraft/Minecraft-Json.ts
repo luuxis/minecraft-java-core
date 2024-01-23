@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
  */
 
-import MinecraftNativeLinuxARM from './Minecraft-Native-Linux-ARM.js';
+import MinecraftNativeLinuxARM from './Minecraft-Lwjgl-Native.js';
 
 import nodeFetch from 'node-fetch';
 import os from 'os';

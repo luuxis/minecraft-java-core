@@ -157,18 +157,18 @@ export default class Launch extends EventEmitter {
         let logs = this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path;
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
 
-        let argumentsLogs: string = Arguments.join(' ')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xuid, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
-        this.emit('data', `Launching with arguments ${argumentsLogs}`);
+       // let argumentsLogs: string = Arguments.join(' ')
+       // argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '????????')
+       // argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '????????')
+       // argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '????????')
+       // argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xuid, '????????')
+      //  argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
+       // this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
-        let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
-        minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
-        minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
-        minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))
+      //  let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
+      //  minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
+      //  minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
+       // minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))
     }
 
     async DownloadGame() {
