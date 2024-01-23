@@ -1,0 +1,202 @@
+{
+  "libraries": [
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "c1f8d244dda855a936e136844a5c80611a5f36fe",
+          "size": 314536,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-core.jar",
+          "path": "org/lwjgl/lwjgl/3.2.1/lwjgl-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "c1f8d244dda855a936e136844a5c80611a5f36fe",
+          "size": 314536,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-core.jar",
+          "path": "org/lwjgl/lwjgl/3.2.1/lwjgl-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "a50f6e12091dccd4901e783b168b428f7653d254",
+            "size": 65481,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl/3.2.1/lwjgl-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "f8f7801d8b82af7705f06c40bbea16b066479531",
+          "size": 37712,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-jemalloc.jar",
+          "path": "org/lwjgl/lwjgl-jemalloc/3.2.1/lwjgl-jemalloc-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl-jemalloc:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "f8f7801d8b82af7705f06c40bbea16b066479531",
+          "size": 37712,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-jemalloc.jar",
+          "path": "org/lwjgl/lwjgl-jemalloc/3.2.1/lwjgl-jemalloc-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "e19e402887625f15a982426156976badcdffaadc",
+            "size": 134237,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-jemalloc-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl-jemalloc/3.2.1/lwjgl-jemalloc-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl-jemalloc:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "3dcb4c151a8ccf65f50f4aee9f6ff30a79bb7439",
+          "size": 79683,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-openal.jar",
+          "path": "org/lwjgl/lwjgl-openal/3.2.1/lwjgl-openal-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl-openal:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "3dcb4c151a8ccf65f50f4aee9f6ff30a79bb7439",
+          "size": 79683,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-openal.jar",
+          "path": "org/lwjgl/lwjgl-openal/3.2.1/lwjgl-openal-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "0dce4b9a444fcb0a4e5b75ea758b0094049daea3",
+            "size": 398418,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-openal-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl-openal/3.2.1/lwjgl-openal-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl-openal:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "2350cc2bd1fe80e14ff2c39a81477b57dccfe09a",
+          "size": 939248,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-opengl.jar",
+          "path": "org/lwjgl/lwjgl-opengl/3.2.1/lwjgl-opengl-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl-opengl:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "2350cc2bd1fe80e14ff2c39a81477b57dccfe09a",
+          "size": 939248,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-opengl.jar",
+          "path": "org/lwjgl/lwjgl-opengl/3.2.1/lwjgl-opengl-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "a6d3ff86fe3e07bd055032e93ce3b8952574a427",
+            "size": 56387,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-opengl-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl-opengl/3.2.1/lwjgl-opengl-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl-opengl:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "f245bcd89c484e05b524c25ea9935b6aa1e6d7ac",
+          "size": 116839,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-glfw.jar",
+          "path": "org/lwjgl/lwjgl-glfw/3.2.1/lwjgl-glfw-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl-glfw:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "f245bcd89c484e05b524c25ea9935b6aa1e6d7ac",
+          "size": 116839,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-glfw.jar",
+          "path": "org/lwjgl/lwjgl-glfw/3.2.1/lwjgl-glfw-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "14533fb79a7077b2eb1d156067956d2da9f3403f",
+            "size": 80186,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-glfw-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl-glfw/3.2.1/lwjgl-glfw-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl-glfw:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "acd384013d30ea9ddddd805e9a5996b2b6058c5c",
+          "size": 105432,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-stb.jar",
+          "path": "org/lwjgl/lwjgl-stb/3.2.1/lwjgl-stb-3.2.1.jar"
+        }
+      },
+      "name": "org.lwjgl:lwjgl-stb:3.2.1"
+    },
+    {
+      "downloads": {
+        "artifact": {
+          "sha1": "acd384013d30ea9ddddd805e9a5996b2b6058c5c",
+          "size": 105432,
+          "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-stb.jar",
+          "path": "org/lwjgl/lwjgl-stb/3.2.1/lwjgl-stb-3.2.1.jar"
+        },
+        "classifiers": {
+          "natives-linux": {
+            "sha1": "bc5bb97dbb328df0c82375637030f692a161d082",
+            "size": 144685,
+            "url": "https://github.com/theofficialgman/lwjgl3-binaries-arm32/raw/lwjgl-3.2.1/lwjgl-stb-natives-linux-arm32.jar",
+            "path": "org/lwjgl/lwjgl-stb/3.2.1/lwjgl-stb-3.2.1-natives-linux.jar"
+          }
+        }
+      },
+      "name": "org.lwjgl:lwjgl-stb:3.2.1",
+      "natives": {
+        "linux": "natives-linux"
+      }
+    }
+  ]
+}
