@@ -35,7 +35,7 @@ export default class Json {
         };
 
         let json: any = await nodeFetch(data.url).then(res => res.json());
-        if (os.platform() == 'linux' && os.arch().startsWith('arm')) json = new MinecraftNativeLinuxARM(this.options).ProcessJson(json);
+        if (os.platform() == 'linux' && os.arch().startsWith('arm')) json = await new MinecraftNativeLinuxARM(this.options).ProcessJson(json);
 
         return {
             InfoVersion: data,

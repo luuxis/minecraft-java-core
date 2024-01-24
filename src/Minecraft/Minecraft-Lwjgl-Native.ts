@@ -10,6 +10,7 @@ export default class MinecraftLoader {
     }
  
     async ProcessJson(version: any) {
+        console.log(version.libraries)
         return version;
     }
 }
