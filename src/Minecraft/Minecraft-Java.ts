@@ -72,7 +72,7 @@ export default class JavaDownloader extends EventEmitter {
 
     async getJavaOther(jsonversion: any, versionDownload?: any) {
         const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion;
-        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
+        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion ? majorVersion : 8}/hotspot`;
         const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
         const { platform, arch } = this.getPlatformArch();
 
