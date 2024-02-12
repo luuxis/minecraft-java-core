@@ -156,6 +156,11 @@ export default class MinecraftArguments {
             classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
         }
 
+        classPath = classPath.filter((url: string, index: number, self: string[]) => {
+            let lastSegment = url.substring(url.lastIndexOf('/') + 1);
+            return self.findIndex((u: string) => u.substring(u.lastIndexOf('/') + 1) === lastSegment) === index;
+        });
+
         return {
             classpath: [
                 `-cp`,
