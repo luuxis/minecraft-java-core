@@ -48,35 +48,54 @@ const launch = new Launch();
 
 async function main() {
     let opt = {
+        url: 'https://launcher.luuxis.fr/files/?instance=PokeMoonX',
         authenticator: await Mojang.login('Luuxis'),
         timeout: 10000,
-        path: './.Minecraft test',
-        version: '1.19.3',
+        path: './Minecraft',
+        instance: 'PokeMoonX',
+        version: '1.20.4',
         detached: false,
-        downloadFileMultiple: 100,
+        intelEnabledMac: true,
+        downloadFileMultiple: 30,
 
         loader: {
+            path: '',
             type: 'forge',
             build: 'latest',
             enable: true
         },
 
-        verify: false,
-        ignored: ['loader', 'options.txt'],
-        args: [],
+        verify: true,
+        ignored: [
+            'config',
+            'essential',
+            'logs',
+            'resourcepacks',
+            'saves',
+            'screenshots',
+            'shaderpacks',
+            'W-OVERFLOW',
+            'options.txt',
+            'optionsof.txt'
+        ],
 
-        javaPath: null,
-        java: true,
+        JVM_ARGS: [],
+        GAME_ARGS: [],
+
+        java: {
+            path: null,
+            version: null,
+            type: 'jre',
+        },
 
         screen: {
-            width: null,
-            height: null,
-            fullscreen: null,
+            width: 1500,
+            height: 900
         },
 
         memory: {
-            min: '2G',
-            max: '4G'
+            min: '4G',
+            max: '6G'
         }
     }
 

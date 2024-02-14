@@ -147,10 +147,10 @@ export default class NeoForgeMC extends EventEmitter {
 
         for (let lib of libraries) {
             if (skipneoForgeFilter && skipneoForge.find(libs => lib.name.includes(libs))) {
-                // if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
+                if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
                 this.emit('check', check++, libraries.length, 'libraries');
                 continue;
-                // }
+                }
             }
             if (lib.rules) {
                 this.emit('check', check++, libraries.length, 'libraries');

@@ -139,6 +139,18 @@ export default class Microsoft {
             return xsts
         }
 
+        let launch = await nodeFetch("https://api.minecraftservices.com/launcher/login", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ xtoken: `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}`, platform: "PC_LAUNCHER"})
+        }).then(res => res.json()).catch(err => { return { error: err } });
+        if (launch.error) {
+            launch.errorType = "launch";
+            return launch
+        }
+
         let mcLogin = await nodeFetch("https://api.minecraftservices.com/authentication/login_with_xbox", {
             method: "POST",
             headers: {

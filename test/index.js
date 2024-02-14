@@ -27,15 +27,16 @@ let mc
         timeout: 10000,
         path: './Minecraft',
         // instance: 'PokeMoonX',
-        version: '1.16.5',
+        version: '1.20.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            path: '',
+            type: 'neoforge',
             build: 'latest',
-            enable: false
+            enable: true
         },
 
         verify: false,
@@ -56,7 +57,7 @@ let mc
 
         java: {
             path: null,
-            version: null,
+            version: 21,
             type: 'jre',
         },
 
@@ -111,4 +112,4 @@ let mc
     launch.on('error', err => {
         console.log(err);
     });
-})()
+})();
