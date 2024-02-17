@@ -34,7 +34,7 @@ let mc
 
         loader: {
             path: '',
-            type: 'neoforge',
+            type: 'forge',
             build: 'latest',
             enable: true
         },
@@ -57,7 +57,7 @@ let mc
 
         java: {
             path: null,
-            version: 21,
+            version: 8,
             type: 'jre',
         },
 

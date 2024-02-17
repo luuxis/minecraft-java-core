@@ -177,10 +177,14 @@ export default class Microsoft {
             refresh_token: oauth2.refresh_token,
             user_properties: '{}',
             meta: {
-                xuid: xboxAccount.DisplayClaims.xui[0].xid,
                 type: "Xbox",
                 access_token_expires_in: mcLogin.expires_in + Math.floor(Date.now() / 1000),
                 demo: profile.error ? true : false
+            },
+            xboxAccount: {
+                xuid: xboxAccount.DisplayClaims.xui[0].xid,
+                gamertag: xboxAccount.DisplayClaims.xui[0].gtg,
+                ageGroup: xboxAccount.DisplayClaims.xui[0].agg,
             },
             profile: {
                 skins: profile.skins,

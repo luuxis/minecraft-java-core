@@ -49,7 +49,7 @@ export default class MinecraftArguments {
             '${auth_session}': this.authenticator.access_token,
             '${auth_player_name}': this.authenticator.name,
             '${auth_uuid}': this.authenticator.uuid,
-            '${auth_xuid}': this.authenticator.meta.xuid || this.authenticator.access_token,
+            '${auth_xuid}': this.authenticator.xboxAccount.xuid || this.authenticator.access_token,
             '${user_properties}': this.authenticator.user_properties,
             '${user_type}': userType,
             '${version_name}': loaderJson ? loaderJson.id : json.id,
