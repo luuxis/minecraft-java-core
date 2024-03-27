@@ -57,27 +57,26 @@ export default class Microsoft {
 
     async refresh(acc: any) {
         let timeStamp = Math.floor(Date.now() / 1000)
-        let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
-        }).then(res => res.json()).catch(err => { return { error: err } });;
-        if (oauth2.error) {
-            oauth2.errorType = "oauth2";
-            return oauth2
-        };
 
         if (timeStamp < (acc?.meta?.access_token_expires_in - 7200)) {
             let profile = await this.getProfile(acc)
-            acc.refresh_token = oauth2.refresh_token
             acc.profile = {
                 skins: profile.skins,
                 capes: profile.capes
             }
             return acc
         } else {
+            let oauth2 = await nodeFetch("https://login.live.com/oauth20_token.srf", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
+            }).then(res => res.json()).catch(err => { return { error: err } });;
+            if (oauth2.error) {
+                oauth2.errorType = "oauth2";
+                return oauth2
+            };
             return await this.getAccount(oauth2)
         }
     }
@@ -144,7 +143,7 @@ export default class Microsoft {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ xtoken: `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}`, platform: "PC_LAUNCHER"})
+            body: JSON.stringify({ xtoken: `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}`, platform: "PC_LAUNCHER" })
         }).then(res => res.json()).catch(err => { return { error: err } });
         if (launch.error) {
             launch.errorType = "launch";
@@ -161,6 +160,20 @@ export default class Microsoft {
         if (mcLogin.error) {
             mcLogin.errorType = "mcLogin";
             return mcLogin
+        }
+
+        let hasGame = await nodeFetch("https://api.minecraftservices.com/entitlements/mcstore", {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${mcLogin.access_token}`
+            }
+        }).then(res => res.json());
+
+        if (!hasGame.items.find(i => i.name == "product_minecraft" || i.name == "game_minecraft")) {
+            return {
+                error: "You don't own the game",
+                errorType: "game"
+            }
         }
 
         let profile = await this.getProfile(mcLogin);
@@ -184,7 +197,7 @@ export default class Microsoft {
             xboxAccount: {
                 xuid: xboxAccount.DisplayClaims.xui[0].xid,
                 gamertag: xboxAccount.DisplayClaims.xui[0].gtg,
-                ageGroup: xboxAccount.DisplayClaims.xui[0].agg,
+                ageGroup: xboxAccount.DisplayClaims.xui[0].agg
             },
             profile: {
                 skins: profile.skins,

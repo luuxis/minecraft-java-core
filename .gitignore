@@ -1,6 +1,6 @@
 node_modules
 build
 test/Minecraft
-test/*.json
+test/*.json*
 webfiles/instances/*
 .DS_Store

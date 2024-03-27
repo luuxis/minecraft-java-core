@@ -26,16 +26,15 @@ let mc
         authenticator: mc,
         timeout: 10000,
         path: './Minecraft',
-        // instance: 'PokeMoonX',
+        instance: 'PokeMoonX',
         version: '1.20.4',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            path: '',
-            type: 'forge',
-            build: 'latest',
+            type: 'fabric',
+            build: 'Recommended',
             enable: true
         },
 
@@ -57,7 +56,7 @@ let mc
 
         java: {
             path: null,
-            version: 8,
+            version: 21,
             type: 'jre',
         },
 
