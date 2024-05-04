@@ -50,6 +50,11 @@ export default class AZauth {
             meta: {
                 online: false,
                 type: 'AZauth',
+            },
+            profile: {
+                skin: [
+                    await this.skin(response.uuid),
+                ]
             }
         }
     }
@@ -87,6 +92,11 @@ export default class AZauth {
             meta: {
                 online: false,
                 type: 'AZauth',
+            },
+            profile: {
+                skin: [
+                    await this.skin(response.uuid),
+                ]
             }
         }
     }
@@ -101,5 +111,26 @@ export default class AZauth {
         }).then((res: any) => res.json())
         if (auth.error) return false;
         return true
+    }
+
+    async skin(uuid: string) {
+        let response: any = await nodeFetch(`https://poke-universe.fr/api/skin-api/skins/${uuid}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+
+        if (response.status == 404) {
+            return {
+                url: `https://poke-universe.fr/api/skin-api/skins/${uuid}`,
+            }
+        }
+
+        response = await response.buffer()
+        return {
+            url: `https://poke-universe.fr/api/skin-api/skins/${uuid}`,
+            base64: "data:image/png;base64," + response.toString('base64')
+        }
     }
 }
