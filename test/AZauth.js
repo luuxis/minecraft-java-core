@@ -1,7 +1,7 @@
 const prompt = require('prompt')
 const { AZauth, Launch } = require('../build/Index');
 const launch = new Launch();
-const auth = new AZauth('http://craftdium.ml/test');
+const auth = new AZauth('https://poke-universe.fr');
 const fs = require('fs');
 
 let mc
@@ -47,9 +47,10 @@ async function main() {
         // url: 'https://luuxis.fr/api/user/893bbc-a0bc41-da8568-ef56dd-7f2df8/files',
         authenticator: mc,
         timeout: 10000,
-        path: './.Minecraft',
-        version: '1.19.3',
+        path: './Minecraft',
+        version: '1.16.5',
         detached: false,
+        intelEnabledMac: true,
         downloadFileMultiple: 10,
 
         loader: {
@@ -77,7 +78,7 @@ async function main() {
         }
     }
 
-    await launch.Launch(opt);
+    // await launch.Launch(opt);
 
     launch.on('extract', extract => {
         console.log(extract);

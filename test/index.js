@@ -22,19 +22,19 @@ let mc
     }
 
     let opt = {
-        // url: 'https://launcher.luuxis.fr/files/?instance=hypixel',
+        url: 'http://launcher.poke-universe.fr/files?instance=poke-universe',
         authenticator: mc,
         timeout: 10000,
+        instance: 'test',
         path: './Minecraft',
-        instance: 'PokeMoonX',
-        version: '1.20.4',
+        version: '1.16.5',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'fabric',
-            build: 'Recommended',
+            type: 'forge',
+            build: 'latest',
             enable: true
         },
 
@@ -56,14 +56,14 @@ let mc
 
         java: {
             path: null,
-            version: 21,
+            version: null,
             type: 'jre',
         },
 
-        screen: {
-            width: 1500,
-            height: 900
-        },
+        // screen: {
+        //     width: 1500,
+        //     height: 900
+        // },
 
         memory: {
             min: '4G',

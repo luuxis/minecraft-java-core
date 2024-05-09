@@ -7,8 +7,11 @@ import nodeFetch from 'node-fetch';
 
 export default class AZauth {
     url: string;
+    skinAPI: string;
+
     constructor(url: string) {
         this.url = `${url}/api/auth`;
+        this.skinAPI = `${url}/api/skin-api/skins`;
     }
 
     async login(username: string, password: string, A2F: any = null) {
@@ -114,7 +117,7 @@ export default class AZauth {
     }
 
     async skin(uuid: string) {
-        let response: any = await nodeFetch(`https://poke-universe.fr/api/skin-api/skins/${uuid}`, {
+        let response: any = await nodeFetch(`${this.skinAPI}/${uuid}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -123,13 +126,13 @@ export default class AZauth {
 
         if (response.status == 404) {
             return {
-                url: `https://poke-universe.fr/api/skin-api/skins/${uuid}`,
+                url: `${this.skinAPI}/${uuid}`
             }
         }
 
         response = await response.buffer()
         return {
-            url: `https://poke-universe.fr/api/skin-api/skins/${uuid}`,
+            url: `${this.skinAPI}/${uuid}`,
             base64: "data:image/png;base64," + response.toString('base64')
         }
     }
