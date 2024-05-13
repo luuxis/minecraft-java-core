@@ -46,6 +46,7 @@ export default class AZauth {
             name: response.username,
             user_properties: '{}',
             user_info: {
+                id: response.id,
                 banned: response.banned,
                 money: response.money,
                 role: response.role
@@ -88,6 +89,7 @@ export default class AZauth {
             name: response.username,
             user_properties: '{}',
             user_info: {
+                id: response.id,
                 banned: response.banned,
                 money: response.money,
                 role: response.role
@@ -98,7 +100,7 @@ export default class AZauth {
             },
             profile: {
                 skins: [
-                    await this.skin(response.uuid),
+                    await this.skin(response.id),
                 ]
             }
         }
