@@ -57,7 +57,7 @@ export default class AZauth {
             },
             profile: {
                 skins: [
-                    await this.skin(response.uuid),
+                    await this.skin(response.id),
                 ]
             }
         }
