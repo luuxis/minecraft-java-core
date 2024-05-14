@@ -10,8 +10,8 @@ export default class AZauth {
     skinAPI: string;
 
     constructor(url: string) {
-        this.url = `${url}/api/auth`;
-        this.skinAPI = `${url}/api/skin-api/skins`;
+        this.url = new URL('/api/auth', url).toString();
+        this.skinAPI = new URL('/api/skin-api/skins', url).toString();
     }
 
     async login(username: string, password: string, A2F: any = null) {
