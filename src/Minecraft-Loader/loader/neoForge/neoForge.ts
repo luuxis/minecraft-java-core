@@ -30,7 +30,8 @@ export default class NeoForgeMC extends EventEmitter {
         let versions = legacyMetaData.versions.filter(version => version.includes(`${this.options.loader.version}-`));
 
         if (!versions.length) {
-            let minecraftVersion = `${this.options.loader.version.split('.')[1]}.${this.options.loader.version.split('.')[2]}`;
+            let minecraftVersion = `${this.options.loader.version.split('.')[1]}.${this.options.loader.version.split('.')[2] || 0}`;
+            console.log(minecraftVersion);
             versions = metaData.versions.filter(version => version.startsWith(minecraftVersion));
             oldAPI = false;
         }
