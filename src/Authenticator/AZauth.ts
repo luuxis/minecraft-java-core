@@ -49,7 +49,8 @@ export default class AZauth {
                 id: response.id,
                 banned: response.banned,
                 money: response.money,
-                role: response.role
+                role: response.role,
+                verified: response.email_verified
             },
             meta: {
                 online: false,
@@ -92,7 +93,8 @@ export default class AZauth {
                 id: response.id,
                 banned: response.banned,
                 money: response.money,
-                role: response.role
+                role: response.role,
+                verified: response.email_verified
             },
             meta: {
                 online: false,
