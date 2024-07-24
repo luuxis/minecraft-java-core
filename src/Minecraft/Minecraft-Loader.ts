@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import loaderDownloader from '../Minecraft-Loader/index.js'
+import path from 'path'
 
 export default class MinecraftLoader {
     options: any;
@@ -15,7 +16,7 @@ export default class MinecraftLoader {
         this.options = options;
         this.on = EventEmitter.prototype.on;
         this.emit = EventEmitter.prototype.emit;
-        this.loaderPath = `${this.options.path}/${this.options.loader.path}`;
+        this.loaderPath = path.join(this.options.path, this.options.loader.path);
     }
  
     async GetLoader(version: any, javaPath: any) {
