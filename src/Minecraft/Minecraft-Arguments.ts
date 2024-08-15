@@ -124,9 +124,19 @@ export default class MinecraftArguments {
     async GetClassPath(json: any, loaderJson: any) {
         let classPath: any = []
         let libraries: any = json.libraries;
+        let seenSegments = new Set<string>();
 
         if (loaderJson?.libraries) libraries = loaderJson.libraries.concat(libraries);
         libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name))
+
+        libraries = Object.values(libraries.reduce((acc, lib) => {
+            const libName = lib.name.replace(/:(\d+[\d.:]*)(@.*)?$/, ':');
+            const version = lib.name.match(/:(\d+[\d.:]*)/)[1];
+
+            if (!acc[libName] || acc[libName].name.match(/:(\d+[\d.:]*)/)[1] < version) acc[libName] = lib;
+            return acc;
+        }, {}));
+
 
         for (let lib of libraries) {
             if (lib.natives) {
@@ -139,26 +149,27 @@ export default class MinecraftArguments {
                 }
             }
 
-
-            let path = getPathLibraries(lib.name)
+            let path = getPathLibraries(lib.name);
             if (lib.loader) {
-                classPath.push(`${lib.loader}/libraries/${path.path}/${path.name}`)
+                classPath.push(`${lib.loader}/libraries/${path.path}/${path.name}`);
             } else {
-                classPath.push(`${this.options.path}/libraries/${path.path}/${path.name}`)
+                classPath.push(`${this.options.path}/libraries/${path.path}/${path.name}`);
             }
         }
 
         if (loaderJson?.isOldForge) {
-            classPath.push(loaderJson?.jarPath)
+            classPath.push(loaderJson?.jarPath);
         } else if (this.options.mcp) {
-            classPath.push(this.options.mcp)
+            classPath.push(this.options.mcp);
         } else {
-            classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`)
+            classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`);
         }
 
-        classPath = classPath.filter((url: string, index: number, self: string[]) => {
-            let lastSegment = url.substring(url.lastIndexOf('/') + 1);
-            return self.findIndex((u: string) => u.substring(u.lastIndexOf('/') + 1) === lastSegment) === index;
+        classPath = classPath.filter((url: string) => {
+            const lastSegment = url.substring(url.lastIndexOf('/') + 1);
+            if (seenSegments.has(lastSegment)) return false;
+            seenSegments.add(lastSegment);
+            return true;
         });
 
         return {
