@@ -70,77 +70,87 @@ export default class JavaDownloader extends EventEmitter {
         };
     }
 
+
     async getJavaOther(jsonversion: any, versionDownload?: any) {
-        const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion;
-        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion ? majorVersion : 8}/hotspot`;
+        const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion || 8;
+        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
         const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
+
         const { platform, arch } = this.getPlatformArch();
 
-        const java = javaVersions.find(file =>
-            file.binary.image_type === this.options.java.type &&
-            file.binary.architecture === arch &&
-            file.binary.os === platform);
+        const java = javaVersions.find(({ binary }) =>
+            binary.image_type === this.options.java.type &&
+            binary.architecture === arch &&
+            binary.os === platform
+        );
 
         if (!java) return { error: true, message: "No Java found" };
 
         const { checksum, link: url, name: fileName } = java.binary.package;
-        const { release_name: version } = java;
-        const image_type = java.binary.image_type;
         const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
-        const filePath = path.resolve(pathFolder, fileName);
+        const filePath = path.join(pathFolder, fileName);
 
-        await this.verifyAndDownloadFile({
-            filePath,
-            pathFolder,
-            fileName,
-            url,
-            checksum,
-            pathExtract: `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}`
-        });
+        await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
 
-        let javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/bin/java`;
-        if (platform == 'mac') javaPath = `${pathFolder}/${version}${image_type === 'jre' ? '-jre' : ''}/Contents/Home/bin/java`;
+        let javaPath = path.join(pathFolder, 'bin', 'java');
+        if (platform === 'mac') javaPath = path.join(pathFolder, 'Contents', 'Home', 'bin', 'java');
 
         if (!fs.existsSync(javaPath)) {
             await this.extract(filePath, pathFolder);
-            await this.extract(filePath.replace('.gz', ''), pathFolder);
-            if (fs.existsSync(filePath.replace('.gz', ''))) fs.unlinkSync(filePath.replace('.gz', ''));
+            fs.unlinkSync(filePath);
+
+            if (filePath.endsWith('.tar.gz')) {
+                const tarFilePath = filePath.replace('.gz', '');
+                await this.extract(tarFilePath, pathFolder);
+                if (fs.existsSync(tarFilePath)) fs.unlinkSync(tarFilePath);
+            }
+
+            const extractedItems = fs.readdirSync(pathFolder);
+            if (extractedItems.length === 1) {
+                const extractedFolder = path.join(pathFolder, extractedItems[0]);
+                const stat = fs.statSync(extractedFolder);
+                if (stat.isDirectory()) {
+                    const subItems = fs.readdirSync(extractedFolder);
+                    for (const item of subItems) {
+                        const srcPath = path.join(extractedFolder, item);
+                        const destPath = path.join(pathFolder, item);
+                        fs.renameSync(srcPath, destPath);
+                    }
+                    fs.rmdirSync(extractedFolder);
+                }
+            }
+
             if (platform !== 'windows') fs.chmodSync(javaPath, 0o755);
         }
 
-        return {
-            files: [],
-            path: javaPath,
-        };
+        return { files: [], path: javaPath };
     }
 
     getPlatformArch() {
-        return {
-            platform: {
-                win32: 'windows',
-                darwin: 'mac',
-                linux: 'linux'
-            }[os.platform()],
-            arch: {
-                x64: 'x64',
-                ia32: 'x32',
-                arm64: this.options.intelEnabledMac && os.platform() == 'darwin' ? "x64" : "aarch64",
-                arm: 'arm'
-            }[os.arch()]
-        };
+        const platformMap = { win32: 'windows', darwin: 'mac', linux: 'linux' };
+        const archMap = { x64: 'x64', ia32: 'x32', arm64: 'aarch64', arm: 'arm' };
+        const platform = platformMap[os.platform()] || os.platform();
+        let arch = archMap[os.arch()] || os.arch();
+
+        if (os.platform() === 'darwin' && os.arch() === 'arm64' && this.options.intelEnabledMac) {
+            arch = 'x64';
+        }
+
+        return { platform, arch };
     }
 
-    async verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum, pathExtract }) {
+    async verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum }) {
         if (fs.existsSync(filePath)) {
-            if (await getFileHash(filePath, 'sha256') !== checksum) {
+            const existingChecksum = await getFileHash(filePath, 'sha256');
+            if (existingChecksum !== checksum) {
                 fs.unlinkSync(filePath);
-                fs.rmdirSync(pathExtract, { recursive: true });
+                fs.rmSync(pathFolder, { recursive: true, force: true });
             }
         }
 
         if (!fs.existsSync(filePath)) {
-            if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
-            let download = new downloader();
+            fs.mkdirSync(pathFolder, { recursive: true });
+            const download = new downloader();
 
             download.on('progress', (downloaded, size) => {
                 this.emit('progress', downloaded, size, fileName);
@@ -149,30 +159,27 @@ export default class JavaDownloader extends EventEmitter {
             await download.downloadFile(url, pathFolder, fileName);
         }
 
-        if (await getFileHash(filePath, 'sha256') !== checksum) {
-            return { error: true, message: "Java checksum failed" };
+        const downloadedChecksum = await getFileHash(filePath, 'sha256');
+        if (downloadedChecksum !== checksum) {
+            throw new Error("Java checksum failed");
         }
-
     }
 
-    async extract(filePath, destPath) {
-        return await new Promise((resolve, reject) => {
-            if (os.platform() !== 'win32') fs.chmodSync(sevenBin.path7za, 0o755);
+    async extract(filePath: string, destPath: string) {
+        if (os.platform() !== 'win32') fs.chmodSync(sevenBin.path7za, 0o755);
+
+        await new Promise<void>((resolve, reject) => {
             const extract = Seven.extractFull(filePath, destPath, {
                 $bin: sevenBin.path7za,
                 recursive: true,
                 $progress: true,
-            })
-            extract.on('end', () => {
-                resolve(true)
-            })
-            extract.on('error', (err) => {
-                reject(err)
-            })
+            });
 
+            extract.on('end', () => resolve());
+            extract.on('error', (err) => reject(err));
             extract.on('progress', (progress) => {
                 if (progress.percent > 0) this.emit('extract', progress.percent);
-            })
-        })
+            });
+        });
     }
 }
