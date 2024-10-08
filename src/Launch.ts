@@ -158,10 +158,10 @@ export default class Launch extends EventEmitter {
         if (!fs.existsSync(logs)) fs.mkdirSync(logs, { recursive: true });
 
         let argumentsLogs: string = Arguments.join(' ')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.access_token, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.client_token, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.uuid, '????????')
-        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator.xboxAccount.xuid, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator?.access_token, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator?.client_token, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator?.uuid, '????????')
+        argumentsLogs = argumentsLogs.replaceAll(this.options.authenticator?.xboxAccount?.xuid, '????????')
         argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
         this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
