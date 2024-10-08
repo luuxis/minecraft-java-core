@@ -31,7 +31,6 @@ export default class NeoForgeMC extends EventEmitter {
 
         if (!versions.length) {
             let minecraftVersion = `${this.options.loader.version.split('.')[1]}.${this.options.loader.version.split('.')[2] || 0}`;
-            console.log(minecraftVersion);
             versions = metaData.versions.filter(version => version.startsWith(minecraftVersion));
             oldAPI = false;
         }
@@ -149,8 +148,8 @@ export default class NeoForgeMC extends EventEmitter {
         for (let lib of libraries) {
             if (skipneoForgeFilter && skipneoForge.find(libs => lib.name.includes(libs))) {
                 if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
-                this.emit('check', check++, libraries.length, 'libraries');
-                continue;
+                    this.emit('check', check++, libraries.length, 'libraries');
+                    continue;
                 }
             }
             if (lib.rules) {

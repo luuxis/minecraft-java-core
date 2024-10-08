@@ -18,7 +18,7 @@ export default class MinecraftLoader {
         this.emit = EventEmitter.prototype.emit;
         this.loaderPath = path.join(this.options.path, this.options.loader.path);
     }
- 
+
     async GetLoader(version: any, javaPath: any) {
         let loader = new loaderDownloader({
             path: this.loaderPath,

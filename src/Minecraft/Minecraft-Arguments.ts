@@ -122,21 +122,12 @@ export default class MinecraftArguments {
     }
 
     async GetClassPath(json: any, loaderJson: any) {
-        let classPath: any = []
+        let librariesList: string[] = []
+        let classPath: string[] = []
         let libraries: any = json.libraries;
-        let seenSegments = new Set<string>();
 
         if (loaderJson?.libraries) libraries = loaderJson.libraries.concat(libraries);
-        libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name))
-
-        libraries = Object.values(libraries.reduce((acc, lib) => {
-            const libName = lib.name.replace(/:(\d+[\d.:]*)(@.*)?$/, ':');
-            const version = lib.name.match(/:(\d+[\d.:]*)/)[1];
-
-            if (!acc[libName] || acc[libName].name.match(/:(\d+[\d.:]*)/)[1] < version) acc[libName] = lib;
-            return acc;
-        }, {}));
-
+        libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name));
 
         for (let lib of libraries) {
             if (lib.natives) {
@@ -151,32 +142,34 @@ export default class MinecraftArguments {
 
             let path = getPathLibraries(lib.name);
             if (lib.loader) {
-                classPath.push(`${lib.loader}/libraries/${path.path}/${path.name}`);
+                librariesList.push(`${lib.loader}/libraries/${path.path}/${path.name}`);
             } else {
-                classPath.push(`${this.options.path}/libraries/${path.path}/${path.name}`);
+                librariesList.push(`${this.options.path}/libraries/${path.path}/${path.name}`);
             }
         }
 
         if (loaderJson?.isOldForge) {
-            classPath.push(loaderJson?.jarPath);
+            librariesList.push(loaderJson?.jarPath);
         } else if (this.options.mcp) {
-            classPath.push(this.options.mcp);
+            librariesList.push(this.options.mcp);
         } else {
-            classPath.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`);
+            librariesList.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`);
         }
 
-        classPath = classPath.filter((url: string) => {
-            const lastSegment = url.substring(url.lastIndexOf('/') + 1);
-            if (seenSegments.has(lastSegment)) return false;
-            seenSegments.add(lastSegment);
-            return true;
+
+        classPath = librariesList.filter((path: string) => {
+            let lib = path.split('/').pop();
+            if (lib && !classPath.includes(lib)) {
+                classPath.push(lib);
+                return true;
+            }
+            return false;
         });
 
         return {
             classpath: [
                 `-cp`,
                 classPath.join(process.platform === 'win32' ? ';' : ':'),
-
             ],
             mainClass: loaderJson ? loaderJson.mainClass : json.mainClass
         }

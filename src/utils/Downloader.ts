@@ -15,7 +15,6 @@ interface downloadOptions {
 }
 
 export default class download extends EventEmitter {
-
     async downloadFile(url: string, path: string, fileName: string) {
         if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
         const writer = fs.createWriteStream(path + '/' + fileName);

@@ -33,7 +33,7 @@ export default class JavaDownloader extends EventEmitter {
         const arch = os.arch();
         const osArchMapping = archMapping[osPlatform];
         const javaVersion = jsonversion.javaVersion?.component || 'jre-legacy';
-        let files = []
+        let files = [];
 
         if (!osArchMapping) return await this.getJavaOther(jsonversion);
 
@@ -167,7 +167,6 @@ export default class JavaDownloader extends EventEmitter {
                 resolve(true)
             })
             extract.on('error', (err) => {
-                console.log(err)
                 reject(err)
             })
 

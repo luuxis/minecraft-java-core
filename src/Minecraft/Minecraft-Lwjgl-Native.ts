@@ -15,7 +15,7 @@ export default class MinecraftLoader {
     }
 
     async ProcessJson(version: any) {
-        let archMapping: any = { arm64: "aarch64",        arm: 'aarch'       }[os.arch()]
+        let archMapping: any = { arm64: "aarch64", arm: 'aarch' }[os.arch()]
         let pathLWJGL = path.join(__dirname, `../../assets/LWJGL/${archMapping}`);
 
         let versionJinput = version.libraries.find((lib: any) => {
@@ -48,7 +48,7 @@ export default class MinecraftLoader {
                 return true;
             });
 
-            if (versionLWJGL.includes('2.9')){
+            if (versionLWJGL.includes('2.9')) {
                 let versionLWJGLNatives = JSON.parse(fs.readFileSync(path.join(pathLWJGL, '2.9.4.json'), 'utf-8'));
                 version.libraries.push(...versionLWJGLNatives.libraries);
             } else {

@@ -22,20 +22,21 @@ let mc
     }
 
     let opt = {
-        url: 'http://launcher.poke-universe.fr/files?instance=poke-universe',
+        url: 'http://launcher.luuxis.fr/files?instance=TEST',
         authenticator: mc,
         timeout: 10000,
         instance: 'test',
         path: './Minecraft',
-        version: '1.16.5',
+        version: '1.21',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
+            type: 'neoforge',
             build: 'latest',
-            enable: true
+            enable: true,
+            path: './',
         },
 
         verify: false,
