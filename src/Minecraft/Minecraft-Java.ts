@@ -167,7 +167,6 @@ export default class JavaDownloader extends EventEmitter {
                 resolve(true)
             })
             extract.on('error', (err) => {
-                console.log(err)
                 reject(err)
             })
 
