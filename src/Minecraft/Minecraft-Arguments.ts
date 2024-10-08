@@ -130,6 +130,8 @@ export default class MinecraftArguments {
         libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name));
 
         for (let lib of libraries) {
+            if (lib.loader && lib.name.startsWith('org.apache.logging.log4j:log4j-slf4j2-impl')) continue;
+
             if (lib.natives) {
                 let native = lib.natives[MojangLib[process.platform]];
                 if (!native) native = lib.natives[process.platform];
