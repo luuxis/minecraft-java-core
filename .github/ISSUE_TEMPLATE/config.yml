@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Nous rejoindre sur Discord, pour toutes questions ou demandes
+    url: http://discord.luuxis.fr
+    about: Veuillez ne pas ouvrir d'issue autre que pour signaler des bugs
