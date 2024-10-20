@@ -10,8 +10,8 @@ export default class AZauth {
     skinAPI: string;
 
     constructor(url: string) {
-        this.url = `${url}/api/auth`;
-        this.skinAPI = `${url}/api/skin-api/skins`;
+        this.url = new URL('/api/auth', url).toString();
+        this.skinAPI = new URL('/api/skin-api/skins', url).toString();
     }
 
     async login(username: string, password: string, A2F: any = null) {
@@ -49,7 +49,8 @@ export default class AZauth {
                 id: response.id,
                 banned: response.banned,
                 money: response.money,
-                role: response.role
+                role: response.role,
+                verified: response.email_verified
             },
             meta: {
                 online: false,
@@ -92,7 +93,8 @@ export default class AZauth {
                 id: response.id,
                 banned: response.banned,
                 money: response.money,
-                role: response.role
+                role: response.role,
+                verified: response.email_verified
             },
             meta: {
                 online: false,
