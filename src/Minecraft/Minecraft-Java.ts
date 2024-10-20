@@ -73,16 +73,15 @@ export default class JavaDownloader extends EventEmitter {
 
     async getJavaOther(jsonversion: any, versionDownload?: any) {
         const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion || 8;
-        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot`;
+        const { platform, arch } = this.getPlatformArch();
+        const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot?` + new URLSearchParams({
+            image_type: this.options.java.type,
+            architecture: arch,
+            os: platform
+        }).toString();
         const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
 
-        const { platform, arch } = this.getPlatformArch();
-
-        const java = javaVersions.find(({ binary }) =>
-            binary.image_type === this.options.java.type &&
-            binary.architecture === arch &&
-            binary.os === platform
-        );
+        const java = javaVersions[0];
 
         if (!java) return { error: true, message: "No Java found" };
 
