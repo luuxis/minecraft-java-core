@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "3.11.2",
+    "version": "3.11.3",
     "types": "./build/Index.d.ts",
     "exports": {
         ".": {
@@ -11,7 +11,8 @@
     "description": "A library starting minecraft game NW.js and Electron.js",
     "scripts": {
         "dev": "rimraf ./build && tsc -w",
-        "build": "rimraf ./build && tsc"
+        "build": "rimraf ./build && tsc",
+        "prepublishOnly": "npm i && npm run build"
     },
     "files": [
         "assets/**",
