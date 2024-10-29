@@ -90,12 +90,11 @@ export default class JavaDownloader extends EventEmitter {
         const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
         const filePath = path.join(pathFolder, fileName);
 
-        await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
-
         let javaPath = path.join(pathFolder, 'bin', 'java');
         if (platform === 'mac') javaPath = path.join(pathFolder, 'Contents', 'Home', 'bin', 'java');
 
         if (!fs.existsSync(javaPath)) {
+            await this.verifyAndDownloadFile({ filePath, pathFolder, fileName, url, checksum });
             await this.extract(filePath, pathFolder);
             fs.unlinkSync(filePath);
 
