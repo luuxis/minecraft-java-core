@@ -22,19 +22,19 @@ let mc
     }
 
     let opt = {
-        url: 'http://launcher.luuxis.fr/files?instance=TEST',
+        // url: 'http://www.pokefree.fr/launcher_pokefree/files?instance=PokeFree',
         authenticator: mc,
         timeout: 10000,
-        instance: 'test',
+        instance: 'PokeFree',
         path: './Minecraft',
-        version: '1.21',
+        version: '1.16.5',
         detached: false,
         intelEnabledMac: true,
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'neoforge',
-            build: 'latest',
+            type: 'forge',
+            build: '1.16.5-36.2.35',
             enable: true,
             path: './',
         },
