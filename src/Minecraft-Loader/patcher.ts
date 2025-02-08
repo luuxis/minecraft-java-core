@@ -1,137 +1,169 @@
 import { spawn } from 'child_process';
-import fs from 'fs'
-import path from 'path'
+import fs from 'fs';
+import path from 'path';
 import { EventEmitter } from 'events';
-
 import { getPathLibraries, getFileFromArchive } from '../utils/Index.js';
 
-export default class forgePatcher extends EventEmitter {
-    options: any;
+interface ForgePatcherOptions {
+	path: string;
+	loader: {
+		type: 'forge' | 'neoforge';
+	};
+}
 
-    constructor(options: any) {
-        super();
-        this.options = options;
-    }
+interface Config {
+	java: string;
+	minecraft: string;
+	minecraftJson: string;
+}
 
-    async patcher(profile: any, config: any, neoForgeOld: boolean = true) {
-        let { processors } = profile;
+interface ProfileData {
+	client: string;
+	[key: string]: any;
+}
 
-        for (let key in processors) {
-            if (Object.prototype.hasOwnProperty.call(processors, key)) {
-                let processor = processors[key];
-                if (processor?.sides && !(processor?.sides || []).includes('client')) {
-                    continue;
-                }
+interface Processor {
+	jar: string;
+	args: string[];
+	classpath: string[];
+	sides?: string[];
+}
 
-                let jar = getPathLibraries(processor.jar)
-                let filePath = path.resolve(this.options.path, 'libraries', jar.path, jar.name)
+interface Profile {
+	data: Record<string, ProfileData>;
+	libraries: Array<{ name: string }>;
+	processors: Record<string, Processor>;
+	path?: string;
+}
 
-                let args = processor.args.map(arg => this.setArgument(arg, profile, config, neoForgeOld)).map(arg => this.computePath(arg));
-                let classPaths = processor.classpath.map(cp => {
-                    let classPath = getPathLibraries(cp)
-                    return `"${path.join(this.options.path, 'libraries', `${classPath.path}/${classPath.name}`)}"`
-                });
-                let mainClass = await this.readJarManifest(filePath);
+export default class ForgePatcher extends EventEmitter {
+	private readonly options: ForgePatcherOptions;
 
-                await new Promise((resolve: any) => {
-                    const ps = spawn(
-                        `"${path.resolve(config.java)}"`,
-                        [
-                            '-classpath',
-                            [`"${filePath}"`, ...classPaths].join(path.delimiter),
-                            mainClass,
-                            ...args
-                        ], { shell: true }
-                    );
+	constructor(options: ForgePatcherOptions) {
+		super();
+		this.options = options;
+	}
 
-                    ps.stdout.on('data', data => {
-                        this.emit('patch', data.toString('utf-8'))
-                    });
+	public async patcher(profile: Profile, config: Config, neoForgeOld: boolean = true): Promise<void> {
+		const { processors } = profile;
 
-                    ps.stderr.on('data', data => {
-                        this.emit('patch', data.toString('utf-8'))
-                    });
+		for (const [_, processor] of Object.entries(processors)) {
+			if (processor.sides && !processor.sides.includes('client')) continue;
 
-                    ps.on('close', code => {
-                        if (code !== 0) {
-                            this.emit('error', `Forge patcher exited with code ${code}`);
-                            resolve();
-                        }
-                        resolve();
-                    });
-                });
-            }
-        }
+			const jarInfo = getPathLibraries(processor.jar);
+			const jarPath = path.resolve(this.options.path, 'libraries', jarInfo.path, jarInfo.name);
 
-    }
+			const args = processor.args
+				.map(arg => this.setArgument(arg, profile, config, neoForgeOld))
+				.map(arg => this.computePath(arg));
 
-    check(profile: any) {
-        let files = [];
-        let { processors } = profile;
+			const classPaths = processor.classpath.map(cp => {
+				const cpInfo = getPathLibraries(cp);
+				return `"${path.join(this.options.path, 'libraries', cpInfo.path, cpInfo.name)}"`;
+			});
 
-        for (let key in processors) {
-            if (Object.prototype.hasOwnProperty.call(processors, key)) {
-                let processor = processors[key];
-                if (processor?.sides && !(processor?.sides || []).includes('client')) continue;
+			const mainClass = await this.readJarManifest(jarPath);
+			if (!mainClass) {
+				this.emit('error', `Impossible de déterminer la classe principale dans le JAR: ${jarPath}`);
+				continue;
+			}
 
-                processor.args.map(arg => {
-                    let finalArg = arg.replace('{', '').replace('}', '');
-                    if (profile.data[finalArg]) {
-                        if (finalArg === 'BINPATCH') return
-                        files.push(profile.data[finalArg].client)
-                    }
-                })
-            }
-        }
+			await new Promise<void>((resolve) => {
+				const spawned = spawn(
+					`"${path.resolve(config.java)}"`,
+					[
+						'-classpath',
+						[`"${jarPath}"`, ...classPaths].join(path.delimiter),
+						mainClass,
+						...args
+					],
+					{ shell: true }
+				);
 
-        files = files.filter((item, index) => files.indexOf(item) === index);
+				spawned.stdout.on('data', data => {
+					this.emit('patch', data.toString('utf-8'));
+				});
 
-        for (let file of files) {
-            let libMCP = getPathLibraries(file.replace('[', '').replace(']', ''))
-            file = `${path.resolve(this.options.path, 'libraries', `${libMCP.path}/${libMCP.name}`)}`;
-            if (!fs.existsSync(file)) return false
-        }
-        return true;
-    }
+				spawned.stderr.on('data', data => {
+					this.emit('patch', data.toString('utf-8'));
+				});
 
-    setArgument(arg: any, profile: any, config: any, neoForgeOld) {
-        let finalArg = arg.replace('{', '').replace('}', '');
-        let universalPath = profile.libraries.find(v => {
-            if (this.options.loader.type === 'forge') return (v.name || '').startsWith('net.minecraftforge:forge')
-            if (this.options.loader.type === 'neoforge') return (v.name || '').startsWith(neoForgeOld ? 'net.neoforged:forge' : 'net.neoforged:neoforge')
-        })
+				spawned.on('close', code => {
+					if (code !== 0) {
+						this.emit('error', `Le patcher Forge s'est terminé avec le code ${code}`);
+					}
+					resolve();
+				});
+			});
+		}
+	}
 
-        if (profile.data[finalArg]) {
-            if (finalArg === 'BINPATCH') {
-                let clientdata = getPathLibraries(profile.path || universalPath.name)
-                return `"${path
-                    .join(this.options.path, 'libraries', `${clientdata.path}/${clientdata.name}`)
-                    .replace('.jar', '-clientdata.lzma')}"`;
-            }
-            return profile.data[finalArg].client;
-        }
+	public check(profile: Profile): boolean {
+		const { processors } = profile;
+		let files: string[] = [];
 
-        return arg
-            .replace('{SIDE}', `client`)
-            .replace('{ROOT}', `"${path.dirname(path.resolve(this.options.path, 'forge'))}"`)
-            .replace('{MINECRAFT_JAR}', `"${config.minecraft}"`)
-            .replace('{MINECRAFT_VERSION}', `"${config.minecraftJson}"`)
-            .replace('{INSTALLER}', `"${this.options.path}/libraries"`)
-            .replace('{LIBRARY_DIR}', `"${this.options.path}/libraries"`);
-    }
+		for (const processor of Object.values(processors)) {
+			if (processor.sides && !processor.sides.includes('client')) continue;
 
-    computePath(arg: any) {
-        if (arg[0] === '[') {
-            let libMCP = getPathLibraries(arg.replace('[', '').replace(']', ''))
-            return `"${path.join(this.options.path, 'libraries', `${libMCP.path}/${libMCP.name}`)}"`;
-        }
-        return arg;
-    }
+			processor.args.forEach(arg => {
+				const finalArg = arg.replace('{', '').replace('}', '');
+				if (profile.data[finalArg]) {
+					if (finalArg === 'BINPATCH') return;
+					files.push(profile.data[finalArg].client);
+				}
+			});
+		}
 
-    async readJarManifest(jarPath: string) {
-        let extraction: any = await getFileFromArchive(jarPath, 'META-INF/MANIFEST.MF');
+		files = Array.from(new Set(files));
 
-        if (extraction) return (extraction.toString("utf8")).split('Main-Class: ')[1].split('\r\n')[0];
-        return null;
-    }
+		for (const file of files) {
+			const lib = getPathLibraries(file.replace('[', '').replace(']', ''));
+			const filePath = path.resolve(this.options.path, 'libraries', lib.path, lib.name);
+			if (!fs.existsSync(filePath)) return false;
+		}
+		return true;
+	}
+
+	private setArgument(arg: string, profile: Profile, config: Config, neoForgeOld: boolean): string {
+		const finalArg = arg.replace('{', '').replace('}', '');
+
+		const universalLib = profile.libraries.find(lib => {
+			if (this.options.loader.type === 'forge') return lib.name.startsWith('net.minecraftforge:forge');
+			else return lib.name.startsWith(neoForgeOld ? 'net.neoforged:forge' : 'net.neoforged:neoforge');
+		});
+
+		if (profile.data[finalArg]) {
+			if (finalArg === 'BINPATCH') {
+				const jarInfo = getPathLibraries(profile.path || (universalLib?.name ?? ''));
+				return `"${path.join(this.options.path, 'libraries', jarInfo.path, jarInfo.name).replace('.jar', '-clientdata.lzma')}"`;
+			}
+			return profile.data[finalArg].client;
+		}
+
+		return arg
+			.replace('{SIDE}', 'client')
+			.replace('{ROOT}', `"${path.dirname(path.resolve(this.options.path, 'forge'))}"`)
+			.replace('{MINECRAFT_JAR}', `"${config.minecraft}"`)
+			.replace('{MINECRAFT_VERSION}', `"${config.minecraftJson}"`)
+			.replace('{INSTALLER}', `"${path.join(this.options.path, 'libraries')}"`)
+			.replace('{LIBRARY_DIR}', `"${path.join(this.options.path, 'libraries')}"`);
+	}
+
+	private computePath(arg: string): string {
+		if (arg.startsWith('[')) {
+			const libInfo = getPathLibraries(arg.replace('[', '').replace(']', ''));
+			return `"${path.join(this.options.path, 'libraries', libInfo.path, libInfo.name)}"`;
+		}
+		return arg;
+	}
+
+	private async readJarManifest(jarPath: string): Promise<string | null> {
+		const manifestContent = await getFileFromArchive(jarPath, 'META-INF/MANIFEST.MF');
+		if (!manifestContent) return null;
+
+		const content = manifestContent.toString();
+		const mainClassLine = content.split('Main-Class: ')[1];
+		if (!mainClassLine) return null;
+		return mainClassLine.split('\r\n')[0];
+	}
 }
