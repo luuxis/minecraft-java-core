@@ -1,143 +1,212 @@
 /**
- * @author Luuxis
- * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ * This code is distributed under the CC-BY-NC 4.0 license:
+ * https://creativecommons.org/licenses/by-nc/4.0/
+ *
+ * Original author: Luuxis
  */
 
 import nodeFetch from 'node-fetch';
 
+// This interface defines the structure of the user object
+// returned by the AZauth service. You can adapt it to your needs.
+interface AZauthUser {
+	access_token?: string;
+	client_token?: string;
+	uuid?: string;
+	name?: string;
+	user_properties?: string;
+	user_info?: {
+		id?: string;
+		banned?: boolean;
+		money?: number;
+		role?: string;
+		verified?: boolean;
+	};
+	meta?: {
+		online: boolean;
+		type: string;
+	};
+	profile?: {
+		skins: Array<{
+			url: string;
+			base64?: string;
+		}>;
+	};
+	// Error-related fields
+	error?: boolean;
+	reason?: string;
+	message?: string;
+	A2F?: boolean;
+}
+
 export default class AZauth {
-    url: string;
-    skinAPI: string;
+	private url: string;
+	private skinAPI: string;
 
-    constructor(url: string) {
-        this.url = new URL('/api/auth', url).toString();
-        this.skinAPI = new URL('/api/skin-api/skins', url).toString();
-    }
+	/**
+	 * The constructor prepares the authentication and skin URLs from the base URL.
+	 * @param url The base URL of the AZauth server
+	 */
+	constructor(url: string) {
+		// '/api/auth' for authentication, '/api/skin-api/skins' for skin data
+		this.url = new URL('/api/auth', url).toString();
+		this.skinAPI = new URL('/api/skin-api/skins', url).toString();
+	}
 
-    async login(username: string, password: string, A2F: any = null) {
-        let response = await nodeFetch(`${this.url}/authenticate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: username,
-                password: password,
-                code: A2F
-            }),
-        }).then((res: any) => res.json())
+	/**
+	 * Authenticates a user using their username/email and password.
+	 * Optionally, a 2FA code can be provided.
+	 *
+	 * @param username The email or username for authentication
+	 * @param password The password
+	 * @param A2F Optional 2FA code
+	 * @returns A Promise that resolves to an AZauthUser object
+	 */
+	public async login(username: string, password: string, A2F: string | null = null): Promise<AZauthUser> {
+		const response = await nodeFetch(`${this.url}/authenticate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email: username,
+				password,
+				code: A2F
+			})
+		});
 
-        if (response.status == 'pending' && response.reason == '2fa') {
-            return { A2F: true };
-        }
+		const data = await response.json();
 
-        if (response.status == 'error') {
-            return {
-                error: true,
-                reason: response.reason,
-                message: response.message
-            };
-        }
+		// If the server indicates that 2FA is required
+		if (data.status === 'pending' && data.reason === '2fa') {
+			return { A2F: true };
+		}
 
-        return {
-            access_token: response.access_token,
-            client_token: response.uuid,
-            uuid: response.uuid,
-            name: response.username,
-            user_properties: '{}',
-            user_info: {
-                id: response.id,
-                banned: response.banned,
-                money: response.money,
-                role: response.role,
-                verified: response.email_verified
-            },
-            meta: {
-                online: false,
-                type: 'AZauth',
-            },
-            profile: {
-                skins: [
-                    await this.skin(response.id),
-                ]
-            }
-        }
-    }
+		// If the server returns an error status
+		if (data.status === 'error') {
+			return {
+				error: true,
+				reason: data.reason,
+				message: data.message
+			};
+		}
 
-    async verify(user: any) {
-        let response = await nodeFetch(`${this.url}/verify`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                access_token: user.access_token
-            }),
-        }).then((res: any) => res.json())
+		// If authentication is successful, return the complete user object
+		return {
+			access_token: data.access_token,
+			client_token: data.uuid,
+			uuid: data.uuid,
+			name: data.username,
+			user_properties: '{}',
+			user_info: {
+				id: data.id,
+				banned: data.banned,
+				money: data.money,
+				role: data.role,
+				verified: data.email_verified
+			},
+			meta: {
+				online: false,
+				type: 'AZauth'
+			},
+			profile: {
+				skins: [await this.skin(data.id)]
+			}
+		};
+	}
 
-        if (response.status == 'error') {
-            return {
-                error: true,
-                reason: response.reason,
-                message: response.message
-            };
-        }
+	/**
+	 * Verifies an existing session (e.g., for refreshing tokens).
+	 * @param user An AZauthUser object containing at least the access token
+	 * @returns A Promise that resolves to an updated AZauthUser object or an error object
+	 */
+	public async verify(user: AZauthUser): Promise<AZauthUser> {
+		const response = await nodeFetch(`${this.url}/verify`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				access_token: user.access_token
+			})
+		});
 
-        return {
-            access_token: response.access_token,
-            client_token: response.uuid,
-            uuid: response.uuid,
-            name: response.username,
-            user_properties: '{}',
-            user_info: {
-                id: response.id,
-                banned: response.banned,
-                money: response.money,
-                role: response.role,
-                verified: response.email_verified
-            },
-            meta: {
-                online: false,
-                type: 'AZauth',
-            },
-            profile: {
-                skins: [
-                    await this.skin(response.id),
-                ]
-            }
-        }
-    }
+		const data = await response.json();
 
-    async signout(user: any) {
-        let auth = await nodeFetch(`${this.url}/logout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                access_token: user.access_token
-            }),
-        }).then((res: any) => res.json())
-        if (auth.error) return false;
-        return true
-    }
+		// If the server indicates an error
+		if (data.status === 'error') {
+			return {
+				error: true,
+				reason: data.reason,
+				message: data.message
+			};
+		}
 
-    async skin(uuid: string) {
-        let response: any = await nodeFetch(`${this.skinAPI}/${uuid}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
+		// Return the updated user session object
+		return {
+			access_token: data.access_token,
+			client_token: data.uuid,
+			uuid: data.uuid,
+			name: data.username,
+			user_properties: '{}',
+			user_info: {
+				id: data.id,
+				banned: data.banned,
+				money: data.money,
+				role: data.role,
+				verified: data.email_verified
+			},
+			meta: {
+				online: false,
+				type: 'AZauth'
+			},
+			profile: {
+				skins: [await this.skin(data.id)]
+			}
+		};
+	}
 
-        if (response.status == 404) {
-            return {
-                url: `${this.skinAPI}/${uuid}`
-            }
-        }
+	/**
+	 * Logs out a user from the AZauth service (invalidates the token).
+	 * @param user The AZauthUser object with a valid access token
+	 * @returns A Promise that resolves to true if logout is successful, otherwise false
+	 */
+	public async signout(user: AZauthUser): Promise<boolean> {
+		const response = await nodeFetch(`${this.url}/logout`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				access_token: user.access_token
+			})
+		});
 
-        response = await response.buffer()
-        return {
-            url: `${this.skinAPI}/${uuid}`,
-            base64: "data:image/png;base64," + response.toString('base64')
-        }
-    }
+		const data = await response.json();
+		if (data.error) return false;
+		return true;
+	}
+
+	/**
+	 * Retrieves the skin of a user by their ID (UUID).
+	 * If the skin exists, returns both the direct URL and a base64-encoded PNG.
+	 * If the skin doesn't exist, only the URL is returned.
+	 *
+	 * @param uuid The UUID or ID of the user
+	 * @returns A Promise resolving to an object with the skin URL (and optional base64 data)
+	 */
+	private async skin(uuid: string): Promise<{ url: string; base64?: string }> {
+		let response = await nodeFetch(`${this.skinAPI}/${uuid}`, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' }
+		});
+
+		// If the skin is not found (404), return only the URL
+		if (response.status === 404) {
+			return {
+				url: `${this.skinAPI}/${uuid}`
+			};
+		}
+
+		// Otherwise, convert the skin image to a base64-encoded string
+		const buffer = await response.buffer();
+		return {
+			url: `${this.skinAPI}/${uuid}`,
+			base64: `data:image/png;base64,${buffer.toString('base64')}`
+		};
+	}
 }
