@@ -1,3 +1,10 @@
+/**
+ * This code is distributed under the CC-BY-NC 4.0 license:
+ * https://creativecommons.org/licenses/by-nc/4.0/
+ *
+ * Original author: Luuxis
+ */
+
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -7,7 +14,7 @@ import { getPathLibraries, getFileFromArchive } from '../utils/Index.js';
 interface ForgePatcherOptions {
 	path: string;
 	loader: {
-		type: 'forge' | 'neoforge';
+		type: string;
 	};
 }
 
@@ -29,10 +36,10 @@ interface Processor {
 	sides?: string[];
 }
 
-interface Profile {
+export interface Profile {
 	data: Record<string, ProfileData>;
-	libraries: Array<{ name: string }>;
-	processors: Record<string, Processor>;
+	processors?: any[];
+	libraries?: Array<{ name?: string }>; // The universal jar/libraries reference
 	path?: string;
 }
 
