@@ -1,289 +1,490 @@
 /**
- * @author Luuxis
- * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ * This code is distributed under the CC-BY-NC 4.0 license:
+ * https://creativecommons.org/licenses/by-nc/4.0/
+ *
+ * Original author: Luuxis
  */
 
-import { getPathLibraries, getFileHash, mirrors, getFileFromArchive, createZIP } from '../../../utils/Index.js';
-import download from '../../../utils/Downloader.js';
-import forgePatcher from '../../patcher.js'
 
-import nodeFetch from 'node-fetch'
-import fs from 'fs'
-import path from 'path'
+import fs from 'fs';
+import path from 'path';
 import { EventEmitter } from 'events';
-import { skipLibrary } from '../../../utils/Index.js';
+import nodeFetch from 'node-fetch';
 
-let Lib = { win32: "windows", darwin: "osx", linux: "linux" };
+import {
+	getPathLibraries,
+	getFileHash,
+	mirrors,
+	getFileFromArchive,
+	createZIP,
+	skipLibrary
+} from '../../../utils/Index.js';
 
+import Downloader from '../../../utils/Downloader.js';
+import ForgePatcher, { Profile } from '../../patcher.js';
+
+/**
+ * Maps Node.js process.platform values to Mojang library naming conventions.
+ * Used for choosing the right native library.
+ */
+const Lib: Record<string, string> = {
+	win32: 'windows',
+	darwin: 'osx',
+	linux: 'linux'
+};
+
+/**
+ * Represents the loader configuration. You may need to expand or adjust
+ * this interface if your real code has more properties.
+ */
+interface LoaderConfig {
+	version: string;       // Minecraft version for Forge (e.g., "1.19.2")
+	build: string;         // Forge build (e.g., "latest", "recommended", or a numeric version)
+	config: {
+		javaPath: string;          // Path to Java for patching
+		minecraftJar: string;      // Path to the vanilla Minecraft JAR
+		minecraftJson: string;     // Path to the corresponding .json version file
+	};
+}
+
+/**
+ * Options passed to ForgeMC. Adjust as needed.
+ */
+interface ForgeOptions {
+	path: string;        // Base path where files will be placed or read from
+	loader: {
+		version: string;   // Minecraft version (e.g. "1.19.2")
+		build: string;     // Build type ("latest", "recommended", or a numeric version)
+		config: {
+			javaPath: string;         // Path to the Java executable for patching
+			minecraftJar: string;     // Path to the vanilla Minecraft .jar
+			minecraftJson: string;    // Path to the corresponding .json version file
+		};
+		type: string;   // Type of loader
+	};
+	downloadFileMultiple?: number; // Number of concurrent downloads
+	[key: string]: any;           // Allow extra fields as necessary
+}
+
+/**
+ * Represents information about the Forge installer file after download:
+ * - If successful, contains filePath, metaData, ext, and an id (e.g. "forge-<build>")
+ * - If an error occurs, returns an object with `error` describing the issue.
+ */
+type DownloadInstallerResult =
+	| {
+		filePath: string;
+		metaData: string;
+		ext: string;
+		id: string;
+	}
+	| {
+		error: string;
+	};
+
+/**
+ * Describes the structure of an install_profile.json (Forge Installer) after extraction.
+ */
+interface ForgeProfile extends Profile {
+	install?: {
+		libraries?: any[];
+		[key: string]: any;
+	};
+	version?: {
+		libraries?: any[];
+		[key: string]: any;
+	};
+	filePath?: string;
+	path?: string;
+	[key: string]: any;
+}
+
+/**
+ * The main class for handling Forge installations, including:
+ *  - Downloading the appropriate Forge installer
+ *  - Extracting relevant files from the installer
+ *  - Patching Forge when necessary
+ *  - Creating a merged jar for older Forge versions
+ */
 export default class ForgeMC extends EventEmitter {
-    options: any;
+	private readonly options: ForgeOptions;
 
-    constructor(options = {}) {
-        super();
-        this.options = options;
-    }
+	constructor(options: ForgeOptions) {
+		super();
+		this.options = options;
+	}
 
-    async downloadInstaller(Loader: any) {
-        let metaData = (await nodeFetch(Loader.metaData).then(res => res.json()))[this.options.loader.version];
-        let AvailableBuilds = metaData;
-        let forgeURL: String;
-        let ext: String;
-        let hashFileOrigin: String;
-        if (!metaData) return { error: `Forge ${this.options.loader.version} not supported` };
+	/**
+	 * Downloads the Forge installer (or client/universal) for the specified version/build.
+	 * Verifies the downloaded file's MD5 hash. Returns file details or an error.
+	 *
+	 * @param Loader An object containing URLs for metadata and Forge files.
+	 */
+	public async downloadInstaller(Loader: any): Promise<DownloadInstallerResult> {
+		// Fetch metadata for the given Forge version
+		let metaDataList: string[] = await nodeFetch(Loader.metaData)
+			.then(res => res.json())
+			.then(json => json[this.options.loader.version]);
 
-        let build
-        if (this.options.loader.build === 'latest') {
-            let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
-            promotions = promotions.promos[`${this.options.loader.version}-latest`];
-            build = metaData.find(build => build.includes(promotions))
-        } else if (this.options.loader.build === 'recommended') {
-            let promotion = await nodeFetch(Loader.promotions).then(res => res.json());
-            let promotions = promotion.promos[`${this.options.loader.version}-recommended`];
-            if (!promotions) promotions = promotion.promos[`${this.options.loader.version}-latest`];
-            build = metaData.find(build => build.includes(promotions))
-        } else {
-            build = this.options.loader.build;
-        }
+		if (!metaDataList) {
+			return { error: `Forge ${this.options.loader.version} not supported` };
+		}
 
-        metaData = metaData.filter(b => b === build)[0];
-        if (!metaData) return { error: `Build ${build} not found, Available builds: ${AvailableBuilds.join(', ')}` };
+		const allBuilds = metaDataList;
+		let build: string | undefined;
 
+		// Handle "latest" or "recommended" builds by checking promotions
+		if (this.options.loader.build === 'latest') {
+			let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
+			const promoKey = `${this.options.loader.version}-latest`;
+			const promoBuild = promotions.promos[promoKey];
+			build = metaDataList.find(b => b.includes(promoBuild));
+		} else if (this.options.loader.build === 'recommended') {
+			let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
+			let promoKey = `${this.options.loader.version}-recommended`;
+			let promoBuild = promotions.promos[promoKey] || promotions.promos[`${this.options.loader.version}-latest`];
+			build = metaDataList.find(b => b.includes(promoBuild));
+		} else {
+			// Else, look for a specific numeric build if provided
+			build = this.options.loader.build;
+		}
 
-        let meta = await nodeFetch(Loader.meta.replace(/\${build}/g, metaData)).then(res => res.json());
-        let installerType = Object.keys(meta.classifiers).find((key: String) => key == 'installer');
-        let clientType = Object.keys(meta.classifiers).find((key: String) => key == 'client');
-        let universalType = Object.keys(meta.classifiers).find((key: String) => key == 'universal');
+		const chosenBuild = metaDataList.find(b => b === build);
+		if (!chosenBuild) {
+			return {
+				error: `Build ${build} not found, Available builds: ${allBuilds.join(', ')}`
+			};
+		}
 
-        if (installerType) {
-            forgeURL = forgeURL = Loader.install.replace(/\${version}/g, metaData);
-            ext = Object.keys(meta.classifiers.installer)[0];
-            hashFileOrigin = meta.classifiers.installer[`${ext}`];
-        } else if (clientType) {
-            forgeURL = Loader.client.replace(/\${version}/g, metaData);
-            ext = Object.keys(meta.classifiers.client)[0];
-            hashFileOrigin = meta.classifiers.client[`${ext}`];
-        } else if (universalType) {
-            forgeURL = Loader.universal.replace(/\${version}/g, metaData);
-            ext = Object.keys(meta.classifiers.universal)[0];
-            hashFileOrigin = meta.classifiers.universal[`${ext}`];
-        } else {
-            return { error: 'Invalid forge installer' };
-        }
+		// Fetch info about the chosen build from the meta URL
+		const meta = await nodeFetch(Loader.meta.replace(/\${build}/g, chosenBuild)).then(res => res.json());
 
-        let pathFolder = path.resolve(this.options.path, 'forge');
-        let filePath = path.resolve(pathFolder, (`${forgeURL}.${ext}`).split('/').pop());
+		// Determine which classifier to use (installer, client, or universal)
+		const hasInstaller = meta.classifiers.installer;
+		const hasClient = meta.classifiers.client;
+		const hasUniversal = meta.classifiers.universal;
 
-        if (!fs.existsSync(filePath)) {
-            if (!fs.existsSync(pathFolder)) fs.mkdirSync(pathFolder, { recursive: true });
-            let downloadForge = new download();
+		let forgeURL: string = '';
+		let ext: string = '';
+		let hashFileOrigin: string = '';
 
-            downloadForge.on('progress', (downloaded, size) => {
-                this.emit('progress', downloaded, size, (`${forgeURL}.${ext}`).split('/').pop());
-            });
+		if (hasInstaller) {
+			forgeURL = Loader.install.replace(/\${version}/g, chosenBuild);
+			ext = Object.keys(meta.classifiers.installer)[0];
+			hashFileOrigin = meta.classifiers.installer[ext];
+		} else if (hasClient) {
+			forgeURL = Loader.client.replace(/\${version}/g, chosenBuild);
+			ext = Object.keys(meta.classifiers.client)[0];
+			hashFileOrigin = meta.classifiers.client[ext];
+		} else if (hasUniversal) {
+			forgeURL = Loader.universal.replace(/\${version}/g, chosenBuild);
+			ext = Object.keys(meta.classifiers.universal)[0];
+			hashFileOrigin = meta.classifiers.universal[ext];
+		} else {
+			return { error: 'Invalid forge installer' };
+		}
 
-            await downloadForge.downloadFile(`${forgeURL}.${ext}`, pathFolder, (`${forgeURL}.${ext}`).split('/').pop());
-        }
+		const forgeFolder = path.resolve(this.options.path, 'forge');
+		const fileName = `${forgeURL}.${ext}`.split('/').pop()!;
+		const installerPath = path.resolve(forgeFolder, fileName);
 
-        let hashFileDownload = await getFileHash(filePath, 'md5');
+		// Download if not already present
+		if (!fs.existsSync(installerPath)) {
+			if (!fs.existsSync(forgeFolder)) {
+				fs.mkdirSync(forgeFolder, { recursive: true });
+			}
+			const dl = new Downloader();
+			dl.on('progress', (downloaded: number, size: number) => {
+				this.emit('progress', downloaded, size, fileName);
+			});
 
-        if (hashFileDownload !== hashFileOrigin) {
-            fs.rmSync(filePath);
-            return { error: 'Invalid hash' };
-        }
-        return { filePath, metaData, ext, id: `forge-${build}` };
-    }
+			await dl.downloadFile(`${forgeURL}.${ext}`, forgeFolder, fileName);
+		}
 
-    async extractProfile(pathInstaller: any) {
-        let forgeJSON: any = {}
+		// Verify the MD5 hash
+		const hashFileDownload = await getFileHash(installerPath, 'md5');
+		if (hashFileDownload !== hashFileOrigin) {
+			fs.rmSync(installerPath);
+			return { error: 'Invalid hash' };
+		}
 
-        let file: any = await getFileFromArchive(pathInstaller, 'install_profile.json')
-        let forgeJsonOrigin = JSON.parse(file);
+		return {
+			filePath: installerPath,
+			metaData: chosenBuild,
+			ext,
+			id: `forge-${build}`
+		};
+	}
 
-        if (!forgeJsonOrigin) return { error: { message: 'Invalid forge installer' } };
-        if (forgeJsonOrigin.install) {
-            forgeJSON.install = forgeJsonOrigin.install;
-            forgeJSON.version = forgeJsonOrigin.versionInfo;
-        } else {
-            forgeJSON.install = forgeJsonOrigin;
-            let file: any = await getFileFromArchive(pathInstaller, path.basename(forgeJSON.install.json))
-            forgeJSON.version = JSON.parse(file);
-        }
+	/**
+	 * Extracts the main Forge profile from the installer's archive (install_profile.json),
+	 * plus an additional JSON if specified in that profile. Returns an object containing
+	 * both "install" and "version" data for further processing.
+	 *
+	 * @param pathInstaller Path to the downloaded Forge installer file.
+	 */
+	public async extractProfile(pathInstaller: string): Promise<{ error?: any; install?: any; version?: any }> {
+		const fileContent = await getFileFromArchive(pathInstaller, 'install_profile.json');
+		if (!fileContent) {
+			return { error: { message: 'Invalid forge installer' } };
+		}
 
-        return forgeJSON;
-    }
+		const forgeJsonOrigin = JSON.parse(fileContent.toString());
+		if (!forgeJsonOrigin) {
+			return { error: { message: 'Invalid forge installer' } };
+		}
 
-    async extractUniversalJar(profile: any, pathInstaller: any) {
-        let skipForgeFilter = true
+		const result: any = {};
 
-        if (profile.filePath) {
-            let fileInfo = getPathLibraries(profile.path)
-            this.emit('extract', `Extracting ${fileInfo.name}...`);
+		// Distinguish between older and newer Forge installers
+		if (forgeJsonOrigin.install) {
+			result.install = forgeJsonOrigin.install;
+			result.version = forgeJsonOrigin.versionInfo;
+		} else {
+			result.install = forgeJsonOrigin;
+			const extraFile = await getFileFromArchive(pathInstaller, path.basename(result.install.json));
+			if (!extraFile) {
+				return { error: { message: 'Invalid additional JSON in forge installer' } };
+			}
+			result.version = JSON.parse(extraFile.toString());
+		}
 
-            let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
-            if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
+		return result;
+	}
 
-            let file: any = await getFileFromArchive(pathInstaller, profile.filePath)
-            fs.writeFileSync(`${pathFileDest}/${fileInfo.name}`, file, { mode: 0o777 })
-        } else if (profile.path) {
-            let fileInfo = getPathLibraries(profile.path)
-            let listFile: any = await getFileFromArchive(pathInstaller, null, `maven/${fileInfo.path}`)
+	/**
+	 * Extracts the "universal" Forge jar (or other relevant data) from the installer,
+	 * placing it in your local "libraries" folder. Also extracts client data if required.
+	 *
+	 * @param profile The Forge profile object containing file paths to extract.
+	 * @param pathInstaller The path to the Forge installer file.
+	 * @returns A boolean (skipForgeFilter) that indicates whether to filter out certain Forge libs
+	 */
+	public async extractUniversalJar(profile: ForgeProfile, pathInstaller: string): Promise<boolean> {
+		let skipForgeFilter = true;
 
-            await Promise.all(
-                listFile.map(async (files: any) => {
-                    let fileName = files.split('/')
-                    this.emit('extract', `Extracting ${fileName[fileName.length - 1]}...`);
-                    let file: any = await getFileFromArchive(pathInstaller, files)
-                    let pathFileDest = path.resolve(this.options.path, 'libraries', fileInfo.path)
-                    if (!fs.existsSync(pathFileDest)) fs.mkdirSync(pathFileDest, { recursive: true });
-                    fs.writeFileSync(`${pathFileDest}/${fileName[fileName.length - 1]}`, file, { mode: 0o777 })
-                })
-            );
-        } else {
-            skipForgeFilter = false
-        }
+		// If there's a direct file path, extract just that file
+		if (profile.filePath) {
+			const fileInfo = getPathLibraries(profile.path);
+			this.emit('extract', `Extracting ${fileInfo.name}...`);
 
-        if (profile.processors?.length) {
-            let universalPath = profile.libraries.find(v => {
-                return (v.name || '').startsWith('net.minecraftforge:forge')
-            })
+			const destFolder = path.resolve(this.options.path, 'libraries', fileInfo.path);
+			if (!fs.existsSync(destFolder)) {
+				fs.mkdirSync(destFolder, { recursive: true });
+			}
 
-            let client: any = await getFileFromArchive(pathInstaller, 'data/client.lzma');
-            let fileInfo = getPathLibraries(profile.path || universalPath.name, '-clientdata', '.lzma')
-            let pathFile = path.resolve(this.options.path, 'libraries', fileInfo.path)
+			const archiveContent = await getFileFromArchive(pathInstaller, profile.filePath);
+			if (archiveContent) {
+				fs.writeFileSync(path.join(destFolder, fileInfo.name), archiveContent, { mode: 0o777 });
+			}
+		}
+		// Otherwise, if there's a path referencing "maven/<something>"
+		else if (profile.path) {
+			const fileInfo = getPathLibraries(profile.path);
+			const filesInArchive: string[] = await getFileFromArchive(pathInstaller, null, `maven/${fileInfo.path}`);
+			for (const file of filesInArchive) {
+				const fileName = path.basename(file);
+				this.emit('extract', `Extracting ${fileName}...`);
+				const fileContent = await getFileFromArchive(pathInstaller, file);
+				if (!fileContent) {
+					continue;
+				}
 
-            if (!fs.existsSync(pathFile)) fs.mkdirSync(pathFile, { recursive: true });
-            fs.writeFileSync(`${pathFile}/${fileInfo.name}`, client, { mode: 0o777 })
-            this.emit('extract', `Extracting ${fileInfo.name}...`);
-        }
+				const destFolder = path.resolve(this.options.path, 'libraries', fileInfo.path);
+				if (!fs.existsSync(destFolder)) {
+					fs.mkdirSync(destFolder, { recursive: true });
+				}
 
-        return skipForgeFilter
-    }
+				fs.writeFileSync(path.join(destFolder, fileName), fileContent, { mode: 0o777 });
+			}
+		} else {
+			// If we do not find filePath or path in profile, skip the Forge filter
+			skipForgeFilter = false;
+		}
 
-    async downloadLibraries(profile: any, skipForgeFilter: any) {
-        let { libraries } = profile.version;
-        let downloader = new download();
-        let check = 0;
-        let files: any = [];
-        let size = 0;
+		// If there are processors, we likely have a "client.lzma" to store
+		if (profile.processors?.length) {
+			const universalPath = profile.libraries?.find((v: any) => (v.name || '').startsWith('net.minecraftforge:forge'));
+			const clientData = await getFileFromArchive(pathInstaller, 'data/client.lzma');
+			if (clientData) {
+				const fileInfo = getPathLibraries(profile.path || universalPath.name, '-clientdata', '.lzma');
+				const destFolder = path.resolve(this.options.path, 'libraries', fileInfo.path);
+				if (!fs.existsSync(destFolder)) {
+					fs.mkdirSync(destFolder, { recursive: true });
+				}
+				fs.writeFileSync(path.join(destFolder, fileInfo.name), clientData, { mode: 0o777 });
+				this.emit('extract', `Extracting ${fileInfo.name}...`);
+			}
+		}
 
-        if (profile.install.libraries) libraries = libraries.concat(profile.install.libraries);
+		return skipForgeFilter;
+	}
 
-        libraries = libraries.filter((library, index, self) => index === self.findIndex(t => t.name === library.name))
+	/**
+	 * Downloads all the libraries needed by the Forge profile, skipping duplicates
+	 * and any library that is already present. Also applies optional skip logic
+	 * for certain Forge libraries if skipForgeFilter is true.
+	 *
+	 * @param profile The parsed Forge profile.
+	 * @param skipForgeFilter Whether to filter out "net.minecraftforge:forge" or "minecraftforge"
+	 * @returns An array of the final libraries (including newly downloaded ones).
+	 */
+	public async downloadLibraries(profile: ForgeProfile, skipForgeFilter: boolean): Promise<any[] | { error: string }> {
+		let libraries = profile.version?.libraries || [];
+		const dl = new Downloader();
+		let checkCount = 0;
+		const downloadList: Array<{
+			url: string;
+			folder: string;
+			path: string;
+			name: string;
+			size: number;
+		}> = [];
+		let totalSize = 0;
 
-        let skipForge = [
-            'net.minecraftforge:forge:',
-            'net.minecraftforge:minecraftforge:'
-        ]
+		// Combine with any "install.libraries"
+		if (profile.install?.libraries) {
+			libraries = libraries.concat(profile.install.libraries);
+		}
 
-        for (let lib of libraries) {
-            let natives = null;
+		// Remove duplicates by name
+		libraries = libraries.filter(
+			(library: any, index: number, self: any[]) => index === self.findIndex(t => t.name === library.name)
+		);
 
-            if (skipForgeFilter && skipForge.find(libs => lib.name.includes(libs))) {
-                if (lib.downloads?.artifact?.url == "" || !lib.downloads?.artifact?.url) {
-                    this.emit('check', check++, libraries.length, 'libraries');
-                    continue;
-                }
-            }
+		// Certain Forge libs may be skipped if skipForgeFilter is true
+		const skipForge = ['net.minecraftforge:forge:', 'net.minecraftforge:minecraftforge:'];
 
-            if (skipLibrary(lib)) {
-                this.emit('check', check++, libraries.length, 'libraries');
-                continue;
-            }
+		for (const lib of libraries) {
+			// If skipForgeFilter is true, skip the core Forge libs
+			if (skipForgeFilter && skipForge.some(forgePrefix => lib.name.includes(forgePrefix))) {
+				// If the artifact URL is empty, we skip it
+				if (!lib.downloads?.artifact?.url) {
+					this.emit('check', checkCount++, libraries.length, 'libraries');
+					continue;
+				}
+			}
 
-            if (lib.natives) {
-                natives = lib.natives[Lib[process.platform]];
-            }
+			// Some libraries might need skipping altogether (e.g., OS-specific constraints)
+			if (skipLibrary(lib)) {
+				this.emit('check', checkCount++, libraries.length, 'libraries');
+				continue;
+			}
 
-            let file = {}
-            let libInfo = getPathLibraries(lib.name, natives ? `-${natives}` : '');
-            let pathLib = path.resolve(this.options.path, 'libraries', libInfo.path);
-            let pathLibFile = path.resolve(pathLib, libInfo.name);
+			// Check if the library includes "natives" for the current OS
+			let nativesSuffix: string | undefined;
+			if (lib.natives) {
+				nativesSuffix = lib.natives[Lib[process.platform]];
+			}
 
-            if (!fs.existsSync(pathLibFile)) {
-                let url
-                let sizeFile = 0;
-                let baseURL = natives ? `${libInfo.path}/` : `${libInfo.path}/${libInfo.name}`;
-                let response: any = await downloader.checkMirror(baseURL, mirrors)
+			const libInfo = getPathLibraries(lib.name, nativesSuffix ? `-${nativesSuffix}` : '');
+			const libFolder = path.resolve(this.options.path, 'libraries', libInfo.path);
+			const libFilePath = path.resolve(libFolder, libInfo.name);
 
-                if (response?.status === 200) {
-                    size += response.size;
-                    sizeFile = response.size;
-                    url = response.url;
-                } else if (lib.downloads?.artifact) {
-                    url = lib.downloads.artifact.url
-                    size += lib.downloads.artifact.size;
-                    sizeFile = lib.downloads.artifact.size;
-                } else {
-                    url = null
-                }
+			// If not present locally, schedule it for download
+			if (!fs.existsSync(libFilePath)) {
+				let url: string | null = null;
+				let fileSize = 0;
 
-                if (url == null || !url) {
-                    return { error: `Impossible to download ${libInfo.name}` };
-                }
+				// First, try checking a mirror
+				const baseURL = nativesSuffix ? `${libInfo.path}/` : `${libInfo.path}/${libInfo.name}`;
+				const mirrorResp: any = await dl.checkMirror(baseURL, mirrors);
 
-                file = {
-                    url: url,
-                    folder: pathLib,
-                    path: `${pathLib}/${libInfo.name}`,
-                    name: libInfo.name,
-                    size: sizeFile
-                }
-                files.push(file);
-            }
-            this.emit('check', check++, libraries.length, 'libraries');
-        }
+				if (mirrorResp?.status === 200) {
+					fileSize = mirrorResp.size;
+					totalSize += fileSize;
+					url = mirrorResp.url;
+				} else if (lib.downloads?.artifact) {
+					url = lib.downloads.artifact.url;
+					fileSize = lib.downloads.artifact.size;
+					totalSize += fileSize;
+				}
 
-        if (files.length > 0) {
-            downloader.on("progress", (DL, totDL) => {
-                this.emit("progress", DL, totDL, 'libraries');
-            });
+				if (!url) {
+					return { error: `Impossible to download ${libInfo.name}` };
+				}
 
-            await downloader.downloadFileMultiple(files, size, this.options.downloadFileMultiple);
-        }
-        return libraries
-    }
+				downloadList.push({
+					url,
+					folder: libFolder,
+					path: libFilePath,
+					name: libInfo.name,
+					size: fileSize
+				});
+			}
 
-    async patchForge(profile: any) {
-        if (profile?.processors?.length) {
-            let patcher: any = new forgePatcher(this.options);
-            let config: any = {}
+			this.emit('check', checkCount++, libraries.length, 'libraries');
+		}
 
-            patcher.on('patch', data => {
-                this.emit('patch', data);
-            });
+		// Perform the downloads if any are needed
+		if (downloadList.length > 0) {
+			dl.on('progress', (DL: number, totDL: number) => {
+				this.emit('progress', DL, totDL, 'libraries');
+			});
+			await dl.downloadFileMultiple(downloadList, totalSize, this.options.downloadFileMultiple);
+		}
 
-            patcher.on('error', data => {
-                this.emit('error', data);
-            });
+		return libraries;
+	}
 
-            if (!patcher.check(profile)) {
-                config = {
-                    java: this.options.loader.config.javaPath,
-                    minecraft: this.options.loader.config.minecraftJar,
-                    minecraftJson: this.options.loader.config.minecraftJson
-                }
+	/**
+	 * Applies any necessary patches to Forge using the `forgePatcher` class.
+	 * If the patcher determines it's already patched, it skips.
+	 *
+	 * @param profile The Forge profile containing processor information
+	 * @returns True if successful or if no patching was required
+	 */
+	public async patchForge(profile: ForgeProfile): Promise<boolean> {
+		if (profile?.processors?.length) {
+			const patcher = new ForgePatcher(this.options);
 
-                await patcher.patcher(profile, config);
-            }
-        }
-        return true
-    }
+			// Forward patcher events
+			patcher.on('patch', (data: string) => this.emit('patch', data));
+			patcher.on('error', (data: string) => this.emit('error', data));
 
-    async createProfile(id: any, pathInstaller: any) {
-        let forgeFiles: any = await getFileFromArchive(pathInstaller)
-        let minecraftJar: any = await getFileFromArchive(this.options.loader.config.minecraftJar)
-        let data: any = await createZIP([...minecraftJar, ...forgeFiles], 'META-INF');
+			// If the patch is not valid yet, run the patch process
+			if (!patcher.check(profile)) {
+				const config = {
+					java: this.options.loader.config.javaPath,
+					minecraft: this.options.loader.config.minecraftJar,
+					minecraftJson: this.options.loader.config.minecraftJson
+				};
+				await patcher.patcher(profile, config);
+			}
+		}
+		return true;
+	}
 
-        let destination = path.resolve(this.options.path, 'versions', id);
+	/**
+	 * For older Forge versions, merges the vanilla Minecraft jar and Forge installer files
+	 * into a single jar. Writes a modified version.json reflecting the new Forge version.
+	 *
+	 * @param id The new version ID (e.g., "forge-1.12.2-14.23.5.2855")
+	 * @param pathInstaller Path to the Forge installer
+	 * @returns A modified version.json with an isOldForge property and a jarPath
+	 */
+	public async createProfile(id: string, pathInstaller: string): Promise<any> {
+		// Gather all entries from the Forge installer and the vanilla JAR
+		const forgeFiles = await getFileFromArchive(pathInstaller);
+		const vanillaJar = await getFileFromArchive(this.options.loader.config.minecraftJar);
 
-        let profile = JSON.parse(fs.readFileSync(this.options.loader.config.minecraftJson, 'utf-8'))
-        profile.libraries = [];
-        profile.id = id;
-        profile.isOldForge = true;
-        profile.jarPath = path.resolve(destination, `${id}.jar`);
+		// Combine them, excluding "META-INF" from the final jar
+		const mergedZip = await createZIP([...vanillaJar, ...forgeFiles], 'META-INF');
 
-        if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-        fs.writeFileSync(path.resolve(destination, `${id}.jar`), data, { mode: 0o777 });
-        return profile
-    }
+		// Write the new combined jar to versions/<id>/<id>.jar
+		const destination = path.resolve(this.options.path, 'versions', id);
+		if (!fs.existsSync(destination)) {
+			fs.mkdirSync(destination, { recursive: true });
+		}
+		fs.writeFileSync(path.resolve(destination, `${id}.jar`), mergedZip, { mode: 0o777 });
+
+		// Update the version JSON
+		const profileData = JSON.parse(fs.readFileSync(this.options.loader.config.minecraftJson).toString());
+		profileData.libraries = [];
+		profileData.id = id;
+		profileData.isOldForge = true;
+		profileData.jarPath = path.resolve(destination, `${id}.jar`);
+
+		return profileData;
+	}
 }
