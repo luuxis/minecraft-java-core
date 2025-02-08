@@ -1,179 +1,341 @@
 /**
- * @author Luuxis
- * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0/
+ * This code is distributed under the CC-BY-NC 4.0 license:
+ * https://creativecommons.org/licenses/by-nc/4.0/
+ *
+ * Original author: Luuxis
  */
 
 import fs from 'fs';
-import os from 'os'
-
+import os from 'os';
 import { getPathLibraries, isold } from '../utils/Index.js';
 
-let MojangLib = { win32: "windows", darwin: "osx", linux: "linux" };
+/**
+ * Maps the Node.js process.platform values to Mojang's library folders.
+ */
+const MOJANG_LIBRARY_MAP: Record<string, string> = {
+	win32: 'windows',
+	darwin: 'osx',
+	linux: 'linux'
+};
 
+/**
+ * Represents options for memory usage, screen size, extra args, etc.
+ * Adapt or expand as needed for your use case.
+ */
+export interface LaunchOptions {
+	path: string;              // Base path to Minecraft data folder
+	instance?: string;         // Instance name (if using multi-instance approach)
+	authenticator: any;        // Auth object containing tokens, user info, etc.
+	memory: {
+		min?: string;             // Minimum memory (e.g. "512M", "1G")
+		max?: string;             // Maximum memory (e.g. "4G", "8G")
+	};
+	screen?: {
+		width?: number;
+		height?: number;
+	};
+	GAME_ARGS: Array<string>;  // Additional arguments passed to the game
+	JVM_ARGS: Array<string>;   // Additional arguments passed to the JVM
+	mcp?: string;              // MCP config path (for modded usage)
+}
+
+/**
+ * Represents the data structure of a Minecraft version JSON file (simplified).
+ * Adapt this interface if your JSON includes more properties.
+ */
+export interface VersionJSON {
+	id: string;
+	type: string;
+	assetIndex: {
+		id: string;
+	};
+	assets?: string;          // Name of the assets index
+	mainClass?: string;
+	minecraftArguments?: string; // Legacy format for older MC versions
+	arguments?: {
+		game?: Array<string>;
+		jvm?: Array<string>;
+	};
+	libraries?: Array<any>;    // List of library dependencies
+	nativesList?: Array<string>;
+}
+
+/**
+ * Represents a loader JSON structure (e.g. Forge or Fabric).
+ * Again, adapt as your loader's actual structure requires.
+ */
+export interface LoaderJSON {
+	id?: string;
+	mainClass?: string;
+	libraries?: Array<any>;
+	minecraftArguments?: string;
+	isOldForge?: boolean;
+	jarPath?: string;
+}
+
+/**
+ * Data structure returned by the class, detailing arguments
+ * for launching Minecraft (game args, JVM args, classpath, etc.).
+ */
+export interface LaunchArguments {
+	game: Array<string>;
+	jvm: Array<string>;
+	classpath: Array<string>;
+	mainClass?: string;
+}
+
+/**
+ * Builds and organizes JVM and game arguments required to launch Minecraft,
+ * including optional loader (e.g., Forge) arguments.
+ */
 export default class MinecraftArguments {
-    options: any;
-    authenticator: any;
-    constructor(options: any) {
-        this.options = options;
-        this.authenticator = options.authenticator;
-    }
+	private options: LaunchOptions;
+	private authenticator: any;
 
-    async GetArguments(json: any, loaderJson: any) {
-        let game = await this.GetGameArguments(json, loaderJson);
-        let jvm = await this.GetJVMArguments(json);
-        let classpath = await this.GetClassPath(json, loaderJson);
+	constructor(options: LaunchOptions) {
+		this.options = options;
+		this.authenticator = options.authenticator;
+	}
 
-        return {
-            game: game,
-            jvm: jvm,
-            classpath: classpath.classpath,
-            mainClass: classpath.mainClass
-        }
-    }
+	/**
+	 * Gathers all arguments (game, JVM, classpath) and returns them for launching.
+	 * @param versionJson The Minecraft version JSON.
+	 * @param loaderJson  An optional loader JSON (Forge, Fabric, etc.).
+	 */
+	public async GetArguments(versionJson: VersionJSON, loaderJson?: LoaderJSON): Promise<LaunchArguments> {
+		const gameArguments = await this.GetGameArguments(versionJson, loaderJson);
+		const jvmArguments = await this.GetJVMArguments(versionJson);
+		const classpathData = await this.GetClassPath(versionJson, loaderJson);
 
-    async GetGameArguments(json: any, loaderJson: any) {
-        let game = json.minecraftArguments ? json.minecraftArguments.split(' ') : json.arguments.game;
-        let userType: String
+		return {
+			game: gameArguments,
+			jvm: jvmArguments,
+			classpath: classpathData.classpath,
+			mainClass: classpathData.mainClass
+		};
+	}
 
-        if (loaderJson) {
-            let gameLoader = loaderJson.minecraftArguments ? loaderJson.minecraftArguments.split(' ') : [];
-            game = game.concat(gameLoader);
-            game = game.filter((item: String, index: Number, self: any) => index === self.findIndex((res: String) => res == item))
-        }
+	/**
+	 * Builds the Minecraft game arguments, injecting authentication tokens,
+	 * user info, and any loader arguments if present.
+	 * @param versionJson The Minecraft version JSON.
+	 * @param loaderJson  The loader JSON (e.g., Forge) if applicable.
+	 */
+	public async GetGameArguments(versionJson: VersionJSON, loaderJson?: LoaderJSON): Promise<Array<string>> {
+		// For older MC versions, arguments may be in `minecraftArguments` instead of `arguments.game`
+		let gameArgs = versionJson.minecraftArguments
+			? versionJson.minecraftArguments.split(' ')
+			: versionJson.arguments?.game ?? [];
 
-        if (json.id.startsWith('1.16')) userType = 'Xbox'
-        else userType = this.authenticator.meta.type === 'Xbox' ? 'msa' : this.authenticator.meta.type
+		// Merge loader's Minecraft arguments if provided
+		if (loaderJson) {
+			const loaderGameArgs = loaderJson.minecraftArguments ? loaderJson.minecraftArguments.split(' ') : [];
+			gameArgs = gameArgs.concat(loaderGameArgs);
+			// Remove duplicate arguments
+			gameArgs = gameArgs.filter(
+				(item, index, self) => index === self.findIndex(arg => arg === item)
+			);
+		}
 
-        let table = {
-            '${auth_access_token}': this.authenticator.access_token,
-            '${auth_session}': this.authenticator.access_token,
-            '${auth_player_name}': this.authenticator.name,
-            '${auth_uuid}': this.authenticator.uuid,
-            '${auth_xuid}': this.authenticator?.xboxAccount?.xuid || this.authenticator.access_token,
-            '${user_properties}': this.authenticator.user_properties,
-            '${user_type}': userType,
-            '${version_name}': loaderJson ? loaderJson.id : json.id,
-            '${assets_index_name}': json.assetIndex.id,
-            '${game_directory}': this.options.instance ? `${this.options.path}/instances/${this.options.instance}` : this.options.path,
-            '${assets_root}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
-            '${game_assets}': isold(json) ? `${this.options.path}/resources` : `${this.options.path}/assets`,
-            '${version_type}': json.type,
-            '${clientid}': this.authenticator.clientId || (this.authenticator.client_token || this.authenticator.access_token)
-        }
+		// Determine user type (e.g. 'msa' or 'Xbox') depending on version and authenticator
+		let userType = 'msa';
+		if (versionJson.id.startsWith('1.16')) {
+			userType = 'Xbox';
+		} else {
+			userType = this.authenticator.meta.type === 'Xbox' ? 'msa' : this.authenticator.meta.type;
+		}
 
-        for (let i in game) {
-            if (typeof game[i] == 'object') game.splice(i, 2)
-            if (Object.keys(table).includes(game[i])) game[i] = table[game[i]]
-        }
+		// Map of placeholders to actual values
+		const placeholderMap: Record<string, string> = {
+			'${auth_access_token}': this.authenticator.access_token,
+			'${auth_session}': this.authenticator.access_token,
+			'${auth_player_name}': this.authenticator.name,
+			'${auth_uuid}': this.authenticator.uuid,
+			'${auth_xuid}': this.authenticator?.xboxAccount?.xuid || this.authenticator.access_token,
+			'${user_properties}': this.authenticator.user_properties,
+			'${user_type}': userType,
+			'${version_name}': loaderJson ? loaderJson.id || versionJson.id : versionJson.id,
+			'${assets_index_name}': versionJson.assetIndex.id,
+			'${game_directory}': this.options.instance
+				? `${this.options.path}/instances/${this.options.instance}`
+				: this.options.path,
+			'${assets_root}': isold(versionJson)
+				? `${this.options.path}/resources`
+				: `${this.options.path}/assets`,
+			'${game_assets}': isold(versionJson)
+				? `${this.options.path}/resources`
+				: `${this.options.path}/assets`,
+			'${version_type}': versionJson.type,
+			'${clientid}': this.authenticator.clientId
+				|| this.authenticator.client_token
+				|| this.authenticator.access_token
+		};
 
-        if (this.options.screen) {
-            if (this.options.screen.width !== null && this.options.screen.height !== null) {
-                game.push('--width')
-                game.push(this.options.screen.width)
-                game.push('--height')
-                game.push(this.options.screen.height)
-            }
-        }
+		// Replace placeholders in the game arguments
+		for (let i = 0; i < gameArgs.length; i++) {
+			if (typeof gameArgs[i] === 'object') {
+				// If it's an unexpected object, remove it
+				gameArgs.splice(i, 1);
+				i--;
+				continue;
+			}
+			if (placeholderMap[gameArgs[i]]) {
+				gameArgs[i] = placeholderMap[gameArgs[i]];
+			}
+		}
 
-        game.push(...this.options.GAME_ARGS)
+		// If screen options are provided, add them
+		if (this.options.screen) {
+			const { width, height } = this.options.screen;
+			if (width && height) {
+				gameArgs.push('--width', String(width), '--height', String(height));
+			}
+		}
 
-        return game.filter((item: any) => typeof item !== 'object')
-    }
+		// Add any extra game arguments from user config
+		gameArgs.push(...this.options.GAME_ARGS);
 
-    async GetJVMArguments(json: any) {
-        let opts = {
-            win32: '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
-            darwin: '-XstartOnFirstThread',
-            linux: '-Xss1M'
-        }
-        let jvm = [
-            `-Xms${this.options.memory.min}`,
-            `-Xmx${this.options.memory.max}`,
-            '-XX:+UnlockExperimentalVMOptions',
-            '-XX:G1NewSizePercent=20',
-            '-XX:G1ReservePercent=20',
-            '-XX:MaxGCPauseMillis=50',
-            '-XX:G1HeapRegionSize=32M',
-            '-Dfml.ignoreInvalidMinecraftCertificates=true',
-            `-Djna.tmpdir=${this.options.path}/versions/${json.id}/natives`,
-            `-Dorg.lwjgl.system.SharedLibraryExtractPath=${this.options.path}/versions/${json.id}/natives`,
-            `-Dio.netty.native.workdir=${this.options.path}/versions/${json.id}/natives`
-        ]
+		// Filter out any remaining unexpected objects
+		return gameArgs.filter(item => typeof item === 'string');
+	}
 
-        if (!json.minecraftArguments) {
-            jvm.push(opts[process.platform])
-        }
+	/**
+	 * Builds the JVM arguments needed by Minecraft. This includes memory settings,
+	 * OS-specific options, and any additional arguments supplied by the user.
+	 * @param versionJson The Minecraft version JSON.
+	 */
+	public async GetJVMArguments(versionJson: VersionJSON): Promise<Array<string>> {
+		// Some OS-specific defaults
+		const osSpecificOpts: Record<string, string> = {
+			win32: '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
+			darwin: '-XstartOnFirstThread',
+			linux: '-Xss1M'
+		};
 
-        if (json.nativesList) {
-            jvm.push(`-Djava.library.path=${this.options.path}/versions/${json.id}/natives`)
-        }
+		// Core JVM arguments
+		const jvmArgs: Array<string> = [
+			`-Xms${this.options.memory.min}`,
+			`-Xmx${this.options.memory.max}`,
+			'-XX:+UnlockExperimentalVMOptions',
+			'-XX:G1NewSizePercent=20',
+			'-XX:G1ReservePercent=20',
+			'-XX:MaxGCPauseMillis=50',
+			'-XX:G1HeapRegionSize=32M',
+			'-Dfml.ignoreInvalidMinecraftCertificates=true',
+			`-Djna.tmpdir=${this.options.path}/versions/${versionJson.id}/natives`,
+			`-Dorg.lwjgl.system.SharedLibraryExtractPath=${this.options.path}/versions/${versionJson.id}/natives`,
+			`-Dio.netty.native.workdir=${this.options.path}/versions/${versionJson.id}/natives`
+		];
 
-        if (os.platform() == "darwin") {
-            let pathAssets = `${this.options.path}/assets/indexes/${json.assets}.json`;
-            let assets = JSON.parse(fs.readFileSync(pathAssets, 'utf-8'));
-            let icon = assets.objects['icons/minecraft.icns'].hash
+		// For newer MC versions that use "arguments.game" instead of "minecraftArguments",
+		// we add OS-specific arguments (e.g., Mac uses -XstartOnFirstThread).
+		if (!versionJson.minecraftArguments) {
+			const opt = osSpecificOpts[process.platform];
+			if (opt) {
+				jvmArgs.push(opt);
+			}
+		}
 
-            jvm.push(`-Xdock:name=Minecraft`)
-            jvm.push(`-Xdock:icon=${this.options.path}/assets/objects/${icon.substring(0, 2)}/${icon}`)
-        }
-        jvm.push(...this.options.JVM_ARGS)
+		// If natives are specified, add the native library path
+		if (versionJson.nativesList) {
+			jvmArgs.push(`-Djava.library.path=${this.options.path}/versions/${versionJson.id}/natives`);
+		}
 
-        return jvm;
-    }
+		// Special handling for macOS (setting dock icon)
+		if (os.platform() === 'darwin') {
+			const assetsPath = `${this.options.path}/assets/indexes/${versionJson.assets}.json`;
+			const assetsContent = fs.readFileSync(assetsPath, 'utf-8');
+			const assetsJson = JSON.parse(assetsContent);
 
-    async GetClassPath(json: any, loaderJson: any) {
-        let librariesList: string[] = []
-        let classPath: string[] = []
-        let libraries: any = json.libraries;
+			// Retrieve the hash of the minecraft.icns file
+			const iconHash = assetsJson.objects['icons/minecraft.icns']?.hash;
+			if (iconHash) {
+				jvmArgs.push('-Xdock:name=Minecraft');
+				jvmArgs.push(`-Xdock:icon=${this.options.path}/assets/objects/${iconHash.substring(0, 2)}/${iconHash}`);
+			}
+		}
 
-        if (loaderJson?.libraries) libraries = loaderJson.libraries.concat(libraries);
-        libraries = libraries.filter((library: any, index: any, self: any) => index === self.findIndex((res: any) => res.name === library.name));
+		// Append any user-supplied JVM arguments
+		jvmArgs.push(...this.options.JVM_ARGS);
 
-        for (let lib of libraries) {
-            if (lib.loader && lib.name.startsWith('org.apache.logging.log4j:log4j-slf4j2-impl')) continue;
+		return jvmArgs;
+	}
 
-            if (lib.natives) {
-                let native = lib.natives[MojangLib[process.platform]];
-                if (!native) native = lib.natives[process.platform];
-                if (!native) continue;
-            } else {
-                if (lib.rules && lib.rules[0].os) {
-                    if (lib.rules[0].os.name !== MojangLib[process.platform]) continue;
-                }
-            }
+	/**
+	 * Constructs the classpath (including libraries) that Minecraft requires
+	 * to launch, and identifies the main class. Optionally merges loader libraries.
+	 * @param versionJson The Minecraft version JSON.
+	 * @param loaderJson  The loader JSON (e.g., Forge, Fabric) if applicable.
+	 */
+	public async GetClassPath(versionJson: VersionJSON, loaderJson?: LoaderJSON): Promise<{
+		classpath: Array<string>;
+		mainClass: string | undefined;
+	}> {
+		let combinedLibraries = versionJson.libraries ?? [];
 
-            let path = getPathLibraries(lib.name);
-            if (lib.loader) {
-                librariesList.push(`${lib.loader}/libraries/${path.path}/${path.name}`);
-            } else {
-                librariesList.push(`${this.options.path}/libraries/${path.path}/${path.name}`);
-            }
-        }
+		// If a loader JSON is provided, merge its libraries with the base MC version
+		if (loaderJson?.libraries) {
+			combinedLibraries = loaderJson.libraries.concat(combinedLibraries);
+		}
 
-        if (loaderJson?.isOldForge) {
-            librariesList.push(loaderJson?.jarPath);
-        } else if (this.options.mcp) {
-            librariesList.push(this.options.mcp);
-        } else {
-            librariesList.push(`${this.options.path}/versions/${json.id}/${json.id}.jar`);
-        }
+		// Remove duplicates by `library.name`
+		combinedLibraries = combinedLibraries.filter((lib, index, self) =>
+			index === self.findIndex(other => other.name === lib.name)
+		);
+
+		// Prepare to accumulate all library paths
+		const librariesList: string[] = [];
+
+		for (const lib of combinedLibraries) {
+			// Skip certain logging libraries if flagged (e.g., in Forge's "loader" property)
+			if (lib.loader && lib.name.startsWith('org.apache.logging.log4j:log4j-slf4j2-impl')) continue;
 
 
-        classPath = librariesList.filter((path: string) => {
-            let lib = path.split('/').pop();
-            if (lib && !classPath.includes(lib)) {
-                classPath.push(lib);
-                return true;
-            }
-            return false;
-        });
+			// Check if the library has native bindings
+			if (lib.natives) {
+				const nativeName = lib.natives[MOJANG_LIBRARY_MAP[process.platform]] || lib.natives[process.platform];
+				if (!nativeName) continue;
+			} else if (lib.rules && lib.rules[0].os) {
+				// Some libraries only apply to specific OS platforms
+				if (lib.rules[0].os.name !== MOJANG_LIBRARY_MAP[process.platform]) continue;
+			}
 
-        return {
-            classpath: [
-                `-cp`,
-                classPath.join(process.platform === 'win32' ? ';' : ':'),
-            ],
-            mainClass: loaderJson ? loaderJson.mainClass : json.mainClass
-        }
-    }
+			// Build the path for this library
+			const libPath = getPathLibraries(lib.name);
+			if (lib.loader) {
+				// If the loader uses a specific library path
+				librariesList.push(`${lib.loader}/libraries/${libPath.path}/${libPath.name}`);
+			} else {
+				librariesList.push(`${this.options.path}/libraries/${libPath.path}/${libPath.name}`);
+			}
+		}
+
+		// Add the main Minecraft JAR (or special jar if using old Forge or MCP)
+		if (loaderJson?.isOldForge && loaderJson.jarPath) {
+			librariesList.push(loaderJson.jarPath);
+		} else if (this.options.mcp) {
+			librariesList.push(this.options.mcp);
+		} else {
+			librariesList.push(`${this.options.path}/versions/${versionJson.id}/${versionJson.id}.jar`);
+		}
+
+		// Filter out duplicates in the final library paths
+		const uniquePaths: string[] = [];
+		for (const libPath of librariesList) {
+			// We only check if we've already used the exact file name
+			const fileName = libPath.split('/').pop();
+			if (fileName && !uniquePaths.includes(fileName)) {
+				uniquePaths.push(libPath);
+			}
+		}
+
+		// The final classpath argument is OS-dependent (':' on Unix, ';' on Windows)
+		const cpSeparator = process.platform === 'win32' ? ';' : ':';
+		const cpArgument = uniquePaths.length > 0 ? uniquePaths.join(cpSeparator) : '';
+
+		return {
+			classpath: ['-cp', cpArgument],
+			mainClass: loaderJson ? loaderJson.mainClass : versionJson.mainClass
+		};
+	}
 }
