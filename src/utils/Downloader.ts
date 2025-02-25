@@ -93,6 +93,7 @@ export default class Downloader extends EventEmitter {
 		let completed = 0;     // Number of downloads completed
 		let downloaded = 0;    // Cumulative bytes downloaded
 		let queued = 0;        // Index of the next file to download
+		const maxRetries = 5;  // Maximum number of retries for failed downloads
 
 		let start = Date.now();
 		let before = 0;
@@ -119,7 +120,7 @@ export default class Downloader extends EventEmitter {
 		}, 500);
 
 		// Recursive function that downloads the next file in the queue
-		const downloadNext = async (): Promise<void> => {
+		const downloadNext = async (retries = 0): Promise<void> => {
 			if (queued < files.length) {
 				const file = files[queued];
 				queued++;
@@ -147,17 +148,27 @@ export default class Downloader extends EventEmitter {
 						downloadNext();
 					});
 
-					response.body.on('error', (err: Error) => {
+					response.body.on('error', async (err: Error) => {
 						writer.end();
-						completed++;
-						downloadNext();
-						this.emit('error', err);
+						if (retries < maxRetries) {
+							this.emit('retry', file, retries + 1);
+							await downloadNext(retries + 1);
+						} else {
+							completed++;
+							downloadNext();
+							this.emit('error', err);
+						}
 					});
 				} catch (e) {
 					writer.end();
-					completed++;
-					downloadNext();
-					this.emit('error', e);
+					if (retries < maxRetries) {
+						this.emit('retry', file, retries + 1);
+						await downloadNext(retries + 1);
+					} else {
+						completed++;
+						downloadNext();
+						this.emit('error', e);
+					}
 				}
 			}
 		};
