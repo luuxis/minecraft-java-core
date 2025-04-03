@@ -60,6 +60,13 @@ export interface VersionJSON {
 	nativesList?: Array<string>;
 }
 
+export interface Library {
+	name: string;
+	loader?: string;
+	natives?: Record<string, string>;
+	rules?: { os?: { name?: string } }[];
+}
+
 /**
  * Represents a loader JSON structure (e.g. Forge or Fabric).
  * Again, adapt as your loader's actual structure requires.
@@ -278,15 +285,29 @@ export default class MinecraftArguments {
 			combinedLibraries = loaderJson.libraries.concat(combinedLibraries);
 		}
 
-		// Remove duplicates by `library.name`
-		combinedLibraries = combinedLibraries.filter((lib, index, self) =>
-			index === self.findIndex(other => other.name === lib.name)
+		const map = new Map();
+
+		for (const dep of combinedLibraries) {
+			const parts = dep.name.split(":");
+			const key = parts.slice(0, 2).join(":");
+			const classifier = parts[3] ? parts[3] : "";
+			const versionKey = `${key}:${classifier}`;
+
+			const current = map.get(versionKey);
+			const version = parts[2];
+
+			if (!current || version < current.name.split(":")[2]) {
+				map.set(versionKey, dep);
+			}
+		}
+
+		const latest: Record<string, Library> = Object.fromEntries(
+			Array.from(map.entries()).map(([key, value]) => [key, value as Library])
 		);
 
 		// Prepare to accumulate all library paths
 		const librariesList: string[] = [];
-
-		for (const lib of combinedLibraries) {
+		for (const lib of Object.values(latest)) {
 			// Skip certain logging libraries if flagged (e.g., in Forge's "loader" property)
 			if (lib.loader && lib.name.startsWith('org.apache.logging.log4j:log4j-slf4j2-impl')) continue;
 
