@@ -1,7 +1,7 @@
 const prompt = require('prompt')
 const { AZauth, Launch } = require('../build/Index');
 const launch = new Launch();
-const auth = new AZauth('https://poke-universe.fr');
+const auth = new AZauth('https://nincraft.fr');
 const fs = require('fs');
 
 let mc
@@ -78,7 +78,7 @@ async function main() {
         }
     }
 
-    // await launch.Launch(opt);
+    await launch.Launch(opt);
 
     launch.on('extract', extract => {
         console.log(extract);
