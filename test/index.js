@@ -1,3 +1,4 @@
+const path = require('path');
 const { Microsoft, Launch } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
@@ -22,10 +23,8 @@ let mc
     }
 
     let opt = {
-        // url: 'http://www.pokefree.fr/launcher_pokefree/files?instance=PokeFree',
         authenticator: mc,
         timeout: 10000,
-        instance: 'PokeFree',
         path: './Minecraft',
         version: '1.16.5',
         detached: false,
@@ -33,8 +32,8 @@ let mc
         downloadFileMultiple: 30,
 
         loader: {
-            type: 'forge',
-            build: '1.16.5-36.2.35',
+            type: 'fabric',
+            build: 'latest',
             enable: true,
             path: './',
         },
