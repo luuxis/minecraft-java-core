@@ -8,7 +8,6 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
-import path from 'path';
 
 // This interface defines the structure of a Minecraft library rule.
 interface LibraryRule {

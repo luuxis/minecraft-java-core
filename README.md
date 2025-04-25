@@ -1,6 +1,4 @@
-![logo](https://raw.githubusercontent.com/Luuxis/minecraft-java-core/main/logo.png)
-
-##### v4.0.0 • **minecraft‑java‑core**
+##### v4 • **minecraft‑java‑core**
 [![License: CC‑BY‑NC 4.0](https://img.shields.io/badge/License-CC--BY--NC%204.0-yellow.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 ![stable version](https://img.shields.io/badge/stable_version-4.0.0-blue)
 
@@ -51,11 +49,8 @@ launcher.on('progress', p => console.log(`[DL] ${p}%`))
 await launcher.launch({
   root: './minecraft',
   authenticator: auth,
-  version: {
-    number: '1.20.4',
-    type: 'release'
-  },
-  loader: { type: 'fabric', version: '0.15.9' },
+  version: '1.20.4',
+  loader: { type: 'fabric', build: '0.15.9' },
   memory: { min: '2G', max: '4G' }
 });
 ```
