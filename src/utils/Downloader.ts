@@ -6,8 +6,8 @@
  */
 
 import fs from 'fs';
-import nodeFetch from 'node-fetch';
 import { EventEmitter } from 'events';
+import { Readable } from 'stream';
 
 /**
  * Describes a single file to be downloaded by the Downloader class.
@@ -44,26 +44,30 @@ export default class Downloader extends EventEmitter {
 		}
 
 		const writer = fs.createWriteStream(`${dirPath}/${fileName}`);
-		const response = await nodeFetch(url);
+		const response = await fetch(url);
+
 		const contentLength = response.headers.get('content-length');
 		const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
 
 		let downloaded = 0;
 
 		return new Promise<void>((resolve, reject) => {
-			response.body.on('data', (chunk: Buffer) => {
+			const body = Readable.fromWeb(response.body as any);
+
+			body.on('data', (chunk: Buffer) => {
 				downloaded += chunk.length;
 				// Emit progress with the current number of bytes vs. total size
 				this.emit('progress', downloaded, totalSize);
 				writer.write(chunk);
 			});
 
-			response.body.on('end', () => {
+			body.on('end', () => {
 				writer.end();
 				resolve();
 			});
 
-			response.body.on('error', (err: Error) => {
+			body.on('error', (err: Error) => {
+				writer.destroy();
 				this.emit('error', err);
 				reject(err);
 			});
@@ -86,9 +90,7 @@ export default class Downloader extends EventEmitter {
 		limit: number = 1,
 		timeout: number = 10000
 	): Promise<void> {
-		if (limit > files.length) {
-			limit = files.length;
-		}
+		if (limit > files.length) limit = files.length;
 
 		let completed = 0;     // Number of downloads completed
 		let downloaded = 0;    // Cumulative bytes downloaded
@@ -96,18 +98,14 @@ export default class Downloader extends EventEmitter {
 
 		let start = Date.now();
 		let before = 0;
-		let speeds: number[] = [];
+		const speeds: number[] = [];
 
-		// A repeating interval to calculate speed and ETA
 		const estimated = setInterval(() => {
-			const duration = (Date.now() - start) / 1000;  // seconds
-			const chunkDownloaded = downloaded - before;   // new bytes in this interval
-			if (speeds.length >= 5) {
-				speeds.shift();  // keep last 4 measurements
-			}
+			const duration = (Date.now() - start) / 1000;
+			const chunkDownloaded = downloaded - before;
+			if (speeds.length >= 5) speeds.shift();
 			speeds.push(chunkDownloaded / duration);
 
-			// Average of speeds
 			const avgSpeed = speeds.reduce((a, b) => a + b, 0) / speeds.length;
 			this.emit('speed', avgSpeed);
 
@@ -118,47 +116,49 @@ export default class Downloader extends EventEmitter {
 			before = downloaded;
 		}, 500);
 
-		// Recursive function that downloads the next file in the queue
 		const downloadNext = async (): Promise<void> => {
-			if (queued < files.length) {
-				const file = files[queued];
-				queued++;
+			if (queued >= files.length) return;
 
-				if (!fs.existsSync(file.folder)) {
-					fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
-				}
+			const file = files[queued++];
+			if (!fs.existsSync(file.folder)) {
+				fs.mkdirSync(file.folder, { recursive: true, mode: 0o777 });
+			}
 
-				// Create a write stream for the file
-				const writer = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
+			const writer = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-				try {
-					const response = await nodeFetch(file.url, { timeout });
-					// On data reception, increase the global downloaded counter
-					response.body.on('data', (chunk: Buffer) => {
-						downloaded += chunk.length;
-						// Emit progress with the current total downloaded vs. full size
-						this.emit('progress', downloaded, size, file.type);
-						writer.write(chunk);
-					});
+			try {
+				const response = await fetch(file.url, { signal: controller.signal });
 
-					response.body.on('end', () => {
-						writer.end();
-						completed++;
-						downloadNext();
-					});
+				clearTimeout(timeoutId);
 
-					response.body.on('error', (err: Error) => {
-						writer.end();
-						completed++;
-						downloadNext();
-						this.emit('error', err);
-					});
-				} catch (e) {
+				const stream = Readable.fromWeb(response.body as any);
+
+				stream.on('data', (chunk: Buffer) => {
+					downloaded += chunk.length;
+					this.emit('progress', downloaded, size, file.type);
+					writer.write(chunk);
+				});
+
+				stream.on('end', () => {
 					writer.end();
 					completed++;
 					downloadNext();
-					this.emit('error', e);
-				}
+				});
+
+				stream.on('error', (err) => {
+					writer.destroy();
+					this.emit('error', err);
+					completed++;
+					downloadNext();
+				});
+			} catch (e) {
+				clearTimeout(timeoutId);
+				writer.destroy();
+				this.emit('error', e);
+				completed++;
+				downloadNext();
 			}
 		};
 
@@ -191,20 +191,29 @@ export default class Downloader extends EventEmitter {
 		url: string,
 		timeout: number = 10000
 	): Promise<{ size: number; status: number } | false> {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-		return new Promise(async (resolve) => {
-			try {
-				const res = await nodeFetch(url, { method: 'HEAD', timeout });
-				if (res.status === 200) {
-					const contentLength = res.headers.get('content-length');
-					const size = contentLength ? parseInt(contentLength, 10) : 0;
-					resolve({ size, status: 200 });
-				} else resolve(false);
-			} catch (e) {
-				resolve(false);
+		try {
+			const res = await fetch(url, {
+				method: 'HEAD',
+				signal: controller.signal
+			});
+
+			clearTimeout(timeoutId);
+
+			if (res.status === 200) {
+				const contentLength = res.headers.get('content-length');
+				const size = contentLength ? parseInt(contentLength, 10) : 0;
+				return { size, status: 200 };
 			}
-		});
+			return false;
+		} catch (e: any) {
+			clearTimeout(timeoutId);
+			return false;
+		}
 	}
+
 
 
 	/**
