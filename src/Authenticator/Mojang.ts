@@ -6,7 +6,6 @@
  */
 
 import crypto from 'crypto';
-import nodeFetch from 'node-fetch';
 
 let api_url = 'https://authserver.mojang.com';
 
@@ -27,7 +26,7 @@ async function login(username: string, password?: string) {
 		}
 	}
 
-	let message = await nodeFetch(`${api_url}/authenticate`, {
+	let message = await fetch(`${api_url}/authenticate`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -62,7 +61,7 @@ async function login(username: string, password?: string) {
 }
 
 async function refresh(acc: any) {
-	let message = await nodeFetch(`${api_url}/refresh`, {
+	let message = await fetch(`${api_url}/refresh`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -93,7 +92,7 @@ async function refresh(acc: any) {
 }
 
 async function validate(acc: any) {
-	let message = await nodeFetch(`${api_url}/validate`, {
+	let message = await fetch(`${api_url}/validate`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -112,7 +111,7 @@ async function validate(acc: any) {
 }
 
 async function signout(acc: any) {
-	let message = await nodeFetch(`${api_url}/invalidate`, {
+	let message = await fetch(`${api_url}/invalidate`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'

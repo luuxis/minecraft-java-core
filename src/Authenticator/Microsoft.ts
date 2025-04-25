@@ -5,7 +5,7 @@
  * Original author: Luuxis
  */
 
-import nodeFetch from 'node-fetch';
+import { Buffer } from 'node:buffer';
 import crypto from 'crypto';
 
 // Possible client types (Electron, NW.js, or terminal usage)
@@ -61,8 +61,9 @@ export interface AuthResponse {
 
 // Utility function to fetch and convert an image to base64
 async function getBase64(url: string): Promise<string> {
-	const response = await nodeFetch(url);
-	const buffer = await response.buffer();
+	const response = await fetch(url);
+	const arrayBuffer = await response.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
 	return buffer.toString('base64');
 }
 
@@ -134,7 +135,7 @@ export default class Microsoft {
 	 */
 	private async exchangeCodeForToken(code: string): Promise<AuthResponse | AuthError> {
 		try {
-			const response = await nodeFetch('https://login.live.com/oauth20_token.srf', {
+			const response = await fetch('https://login.live.com/oauth20_token.srf', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body: `client_id=${this.client_id}&code=${code}&grant_type=authorization_code&redirect_uri=https://login.live.com/oauth20_desktop.srf`
@@ -176,7 +177,7 @@ export default class Microsoft {
 
 		// Otherwise, refresh the token
 		try {
-			const response = await nodeFetch('https://login.live.com/oauth20_token.srf', {
+			const response = await fetch('https://login.live.com/oauth20_token.srf', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body: `grant_type=refresh_token&client_id=${this.client_id}&refresh_token=${acc.refresh_token}`
@@ -330,7 +331,7 @@ export default class Microsoft {
 	 */
 	public async getProfile(mcLogin: { access_token: string }): Promise<MinecraftProfile | AuthError> {
 		try {
-			const response = await nodeFetch('https://api.minecraftservices.com/minecraft/profile', {
+			const response = await fetch('https://api.minecraftservices.com/minecraft/profile', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${mcLogin.access_token}`
@@ -377,7 +378,7 @@ export default class Microsoft {
 	 */
 	private async fetchJSON(url: string, options: Record<string, any>): Promise<any> {
 		try {
-			const response = await nodeFetch(url, options);
+			const response = await fetch(url, options);
 			return response.json();
 		} catch (err: any) {
 			return { error: err.message };

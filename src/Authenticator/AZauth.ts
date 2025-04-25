@@ -5,7 +5,7 @@
  * Original author: Luuxis
  */
 
-import nodeFetch from 'node-fetch';
+import { Buffer } from 'node:buffer';
 
 // This interface defines the structure of the user object
 // returned by the AZauth service. You can adapt it to your needs.
@@ -63,7 +63,7 @@ export default class AZauth {
 	 * @returns A Promise that resolves to an AZauthUser object
 	 */
 	public async login(username: string, password: string, A2F: string | null = null): Promise<AZauthUser> {
-		const response = await nodeFetch(`${this.url}/authenticate`, {
+		const response = await fetch(`${this.url}/authenticate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -119,7 +119,7 @@ export default class AZauth {
 	 * @returns A Promise that resolves to an updated AZauthUser object or an error object
 	 */
 	public async verify(user: AZauthUser): Promise<AZauthUser> {
-		const response = await nodeFetch(`${this.url}/verify`, {
+		const response = await fetch(`${this.url}/verify`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -168,7 +168,7 @@ export default class AZauth {
 	 * @returns A Promise that resolves to true if logout is successful, otherwise false
 	 */
 	public async signout(user: AZauthUser): Promise<boolean> {
-		const response = await nodeFetch(`${this.url}/logout`, {
+		const response = await fetch(`${this.url}/logout`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -190,7 +190,7 @@ export default class AZauth {
 	 * @returns A Promise resolving to an object with the skin URL (and optional base64 data)
 	 */
 	private async skin(uuid: string): Promise<{ url: string; base64?: string }> {
-		let response = await nodeFetch(`${this.skinAPI}/${uuid}`, {
+		let response = await fetch(`${this.skinAPI}/${uuid}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
@@ -203,7 +203,8 @@ export default class AZauth {
 		}
 
 		// Otherwise, convert the skin image to a base64-encoded string
-		const buffer = await response.buffer();
+		const arrayBuffer = await response.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
 		return {
 			url: `${this.skinAPI}/${uuid}`,
 			base64: `data:image/png;base64,${buffer.toString('base64')}`
