@@ -296,7 +296,7 @@ export default class MinecraftArguments {
 			const current = map.get(versionKey);
 			const version = parts[2];
 
-			if (!current || version < current.name.split(":")[2]) {
+			if (!current || version > current.name.split(":")[2]) {
 				map.set(versionKey, dep);
 			}
 		}

@@ -8,7 +8,6 @@
 import os from 'os';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
-import nodeFetch from 'node-fetch';
 
 /**
  * Maps Node.js platforms to Mojang's naming scheme for OS in library natives.
@@ -201,7 +200,7 @@ export default class Libraries {
 	public async GetAssetsOthers(url: string | null): Promise<LibraryDownload[]> {
 		if (!url) return [];
 
-		const response = await nodeFetch(url);
+		const response = await fetch(url);
 		const data: CustomAssetItem[] = await response.json();
 
 		const assets: LibraryDownload[] = [];

@@ -6,7 +6,6 @@
  */
 
 import os from 'os';
-import nodeFetch from 'node-fetch';
 import MinecraftNativeLinuxARM from './Minecraft-Lwjgl-Native.js';
 
 /**
@@ -79,7 +78,7 @@ export default class Json {
 		let { version } = this.options;
 
 		// Fetch the version manifest
-		const response = await nodeFetch(
+		const response = await fetch(
 			`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`
 		);
 		const manifest: MojangVersionManifest = await response.json();
@@ -101,7 +100,7 @@ export default class Json {
 		}
 
 		// Fetch the detailed version JSON from Mojang
-		const jsonResponse = await nodeFetch(matchedVersion.url);
+		const jsonResponse = await fetch(matchedVersion.url);
 		let versionJson = await jsonResponse.json();
 
 		// If on Linux ARM, run additional processing

@@ -4,8 +4,6 @@
  *
  * Original author: Luuxis
  */
-
-import nodeFetch from 'node-fetch';
 import fs from 'fs';
 
 /**
@@ -70,7 +68,7 @@ export default class MinecraftAssets {
 		// Fetch the asset index JSON from the remote URL
 		let data;
 		try {
-			const response = await nodeFetch(this.assetIndex.url);
+			const response = await fetch(this.assetIndex.url);
 			data = await response.json();
 		} catch (err: any) {
 			throw new Error(`Failed to fetch asset index: ${err.message}`);

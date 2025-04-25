@@ -6,7 +6,6 @@
  */
 
 import os from 'os';
-import nodeFetch from 'node-fetch';
 import path from 'path';
 import fs from 'fs';
 import EventEmitter from 'events';
@@ -113,10 +112,8 @@ export default class JavaDownloader extends EventEmitter {
 		}
 
 		// Fetch Mojang's Java runtime metadata
-		const javaVersionsJson = await nodeFetch(
-			'https://launchermeta.mojang.com/v1/products/java-runtime/' +
-			'2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json'
-		).then(res => res.json());
+		const url = 'https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json';
+		const javaVersionsJson = await fetch(url).then(res => res.json());
 
 		const versionName = javaVersionsJson[archOs]?.[javaVersionName]?.[0]?.version?.name;
 		if (!versionName) {
@@ -125,7 +122,7 @@ export default class JavaDownloader extends EventEmitter {
 
 		// Fetch the runtime manifest which lists individual files
 		const manifestUrl = javaVersionsJson[archOs][javaVersionName][0]?.manifest?.url;
-		const manifest = await nodeFetch(manifestUrl).then(res => res.json());
+		const manifest = await fetch(manifestUrl).then(res => res.json());
 		const manifestEntries: Array<[string, any]> = Object.entries(manifest.files);
 
 		// Identify the Java executable in the manifest
@@ -181,7 +178,7 @@ export default class JavaDownloader extends EventEmitter {
 			os: platform
 		});
 		const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot?${queryParams.toString()}`;
-		const javaVersions = await nodeFetch(javaVersionURL).then(res => res.json());
+		const javaVersions = await fetch(javaVersionURL).then(res => res.json());
 
 		// If no valid version is found, return an error
 		const java = javaVersions[0];
