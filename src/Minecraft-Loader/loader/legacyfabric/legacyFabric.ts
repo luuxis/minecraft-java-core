@@ -8,7 +8,6 @@
 import fs from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
-import nodeFetch from 'node-fetch';
 
 import { getPathLibraries } from '../../../utils/Index.js';
 import Downloader from '../../../utils/Downloader.js';
@@ -87,7 +86,7 @@ export default class FabricMC extends EventEmitter {
 		let selectedBuild: { version: string } | undefined;
 
 		// Fetch overall metadata
-		const metaResponse = await nodeFetch(Loader.metaData);
+		const metaResponse = await fetch(Loader.metaData);
 		const metaData = await metaResponse.json();
 
 		// Check if the requested Minecraft version is supported
@@ -120,7 +119,7 @@ export default class FabricMC extends EventEmitter {
 
 		// Fetch and parse the JSON
 		try {
-			const response = await nodeFetch(url);
+			const response = await fetch(url);
 			const fabricJson: FabricJSON = await response.json();
 			return fabricJson;
 		} catch (err: any) {

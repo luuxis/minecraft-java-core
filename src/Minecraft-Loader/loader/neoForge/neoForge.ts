@@ -7,7 +7,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import nodeFetch from 'node-fetch';
 import { EventEmitter } from 'events';
 
 import { getPathLibraries, mirrors, getFileFromArchive } from '../../../utils/Index.js';
@@ -104,8 +103,8 @@ export default class NeoForgeMC extends EventEmitter {
 		let oldAPI = true;
 
 		// Fetch versions from the legacy API
-		const legacyMetaData = await nodeFetch(Loader.legacyMetaData).then(res => res.json());
-		const metaData = await nodeFetch(Loader.metaData).then(res => res.json());
+		const legacyMetaData = await fetch(Loader.legacyMetaData).then(res => res.json());
+		const metaData = await fetch(Loader.metaData).then(res => res.json());
 
 		// Filter versions for the specified Minecraft version
 		let versions: string[] = legacyMetaData.versions.filter((v: string) =>

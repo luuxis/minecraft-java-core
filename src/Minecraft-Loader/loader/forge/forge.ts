@@ -9,7 +9,6 @@
 import fs from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
-import nodeFetch from 'node-fetch';
 
 import {
 	getPathLibraries,
@@ -122,7 +121,7 @@ export default class ForgeMC extends EventEmitter {
 	 */
 	public async downloadInstaller(Loader: any): Promise<DownloadInstallerResult> {
 		// Fetch metadata for the given Forge version
-		let metaDataList: string[] = await nodeFetch(Loader.metaData)
+		let metaDataList: string[] = await fetch(Loader.metaData)
 			.then(res => res.json())
 			.then(json => json[this.options.loader.version]);
 
@@ -135,12 +134,12 @@ export default class ForgeMC extends EventEmitter {
 
 		// Handle "latest" or "recommended" builds by checking promotions
 		if (this.options.loader.build === 'latest') {
-			let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
+			let promotions = await fetch(Loader.promotions).then(res => res.json());
 			const promoKey = `${this.options.loader.version}-latest`;
 			const promoBuild = promotions.promos[promoKey];
 			build = metaDataList.find(b => b.includes(promoBuild));
 		} else if (this.options.loader.build === 'recommended') {
-			let promotions = await nodeFetch(Loader.promotions).then(res => res.json());
+			let promotions = await fetch(Loader.promotions).then(res => res.json());
 			let promoKey = `${this.options.loader.version}-recommended`;
 			let promoBuild = promotions.promos[promoKey] || promotions.promos[`${this.options.loader.version}-latest`];
 			build = metaDataList.find(b => b.includes(promoBuild));
@@ -157,7 +156,7 @@ export default class ForgeMC extends EventEmitter {
 		}
 
 		// Fetch info about the chosen build from the meta URL
-		const meta = await nodeFetch(Loader.meta.replace(/\${build}/g, chosenBuild)).then(res => res.json());
+		const meta = await fetch(Loader.meta.replace(/\${build}/g, chosenBuild)).then(res => res.json());
 
 		// Determine which classifier to use (installer, client, or universal)
 		const hasInstaller = meta.classifiers.installer;
