@@ -1,4 +1,3 @@
-const path = require('path');
 const { Microsoft, Launch } = require('../build/Index');
 const launch = new Launch();
 const fs = require('fs');
@@ -24,18 +23,18 @@ let mc
 
     let opt = {
         authenticator: mc,
-        timeout: 10000,
+        timeout: 1000,
         path: './Minecraft',
-        version: '1.16.5',
+        instance: 'test',
+        version: '1.1',
         detached: false,
         intelEnabledMac: true,
-        downloadFileMultiple: 30,
+        downloadFileMultiple: 5,
 
         loader: {
-            type: 'fabric',
+            type: 'forge',
             build: 'latest',
-            enable: true,
-            path: './',
+            enable: true
         },
 
         verify: false,
