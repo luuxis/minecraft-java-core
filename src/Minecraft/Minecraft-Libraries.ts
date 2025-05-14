@@ -202,7 +202,7 @@ export default class Libraries {
 		if (!url) return [];
 
 		const assetCachePath = path.join(this.options.path, 'mc-assets', 'extra-assets.json');
-		let data: CustomAssetItem[];
+		let data;
 
 		try {
 			const response = await nodeFetch(url);

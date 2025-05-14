@@ -137,6 +137,7 @@ export default class JavaDownloader extends EventEmitter {
 				// If no cache available, fallback to Adoptium
 				return this.getJavaOther(jsonversion);
 			}
+		}
 
 			const versionName = javaVersionsJson[archOs]?.[javaVersionName]?.[0]?.version?.name;
 			if (!versionName) {
@@ -148,7 +149,6 @@ export default class JavaDownloader extends EventEmitter {
 			let manifest;
 			try {
 				manifest = await nodeFetch(manifestUrl).then(res => res.json());
-			
 				// Cache the fetched data
 				const manifestPath = path.join(this.options.path, 'mc-assets', 'java-runtime-all-manifest-' + versionName + '.json');
 				fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
@@ -204,7 +204,7 @@ export default class JavaDownloader extends EventEmitter {
 				)
 			};
 		}
-	}
+	
 
 	/**
 	 * Fallback method to download Java from Adoptium if Mojang's metadata is unavailable

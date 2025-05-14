@@ -82,7 +82,7 @@ export default class Json {
 		let { version, path: basePath } = this.options;
 
 		const manifestPath = path.join(basePath, 'mc-assets', 'version_manifest_v2.json');
-		let manifest: MojangVersionManifest;
+		let manifest;
 
 		try {
 			// Try to read from cache first
