@@ -7,7 +7,9 @@
 
 import os from 'os';
 import fs from 'fs';
+import path from 'path';
 import AdmZip from 'adm-zip';
+import nodeFetch from 'node-fetch';
 
 /**
  * Maps Node.js platforms to Mojang's naming scheme for OS in library natives.
@@ -191,8 +193,7 @@ export default class Libraries {
 
 	/**
 	 * Fetches custom assets or libraries from a remote URL if provided.
-	 * This method expects the response to be an array of objects with
-	 * "path", "hash", "size", and "url".
+	 * Falls back to reading from local file if offline.
 	 *
 	 * @param url The remote URL that returns a JSON array of CustomAssetItem
 	 * @returns   An array of LibraryDownload entries describing each item
@@ -200,14 +201,22 @@ export default class Libraries {
 	public async GetAssetsOthers(url: string | null): Promise<LibraryDownload[]> {
 		if (!url) return [];
 
-		const response = await fetch(url);
-		const data: CustomAssetItem[] = await response.json();
+		const assetCachePath = path.join(this.options.path, 'mc-assets', 'extra-assets.json');
+		let data;
+
+		try {
+			const response = await nodeFetch(url);
+			data = await response.json();
+			fs.mkdirSync(path.dirname(assetCachePath), { recursive: true });
+			fs.writeFileSync(assetCachePath, JSON.stringify(data, null, 4));
+		} catch (e) {
+			data = JSON.parse(fs.readFileSync(assetCachePath, 'utf-8'));
+		}
 
 		const assets: LibraryDownload[] = [];
 		for (const asset of data) {
 			if (!asset.path) continue;
 
-			// The 'type' is deduced from the first part of the path
 			const fileType = asset.path.split('/')[0];
 			assets.push({
 				sha1: asset.hash,
@@ -230,39 +239,29 @@ export default class Libraries {
 	 * @returns The paths of the native files that were extracted
 	 */
 	public async natives(bundle: LibraryDownload[]): Promise<string[]> {
-		// Gather only the native library files
 		const natives = bundle
 			.filter((item) => item.type === 'Native')
 			.map((item) => `${item.path}`);
 
-		if (natives.length === 0) {
-			return [];
-		}
+		if (natives.length === 0) return [];
 
-		// Create the natives folder if it doesn't already exist
 		const nativesFolder = `${this.options.path}/versions/${this.json.id}/natives`.replace(/\\/g, '/');
 		if (!fs.existsSync(nativesFolder)) {
 			fs.mkdirSync(nativesFolder, { recursive: true, mode: 0o777 });
 		}
 
-		// For each native jar, extract its contents (excluding META-INF)
 		for (const native of natives) {
-			// Load it as a zip
 			const zip = new AdmZip(native);
 			const entries = zip.getEntries();
 
 			for (const entry of entries) {
-				if (entry.entryName.startsWith('META-INF')) {
-					continue;
-				}
+				if (entry.entryName.startsWith('META-INF')) continue;
 
-				// Create subdirectories if needed
 				if (entry.isDirectory) {
 					fs.mkdirSync(`${nativesFolder}/${entry.entryName}`, { recursive: true, mode: 0o777 });
 					continue;
 				}
 
-				// Write the file to the natives folder
 				fs.writeFileSync(
 					`${nativesFolder}/${entry.entryName}`,
 					zip.readFile(entry),

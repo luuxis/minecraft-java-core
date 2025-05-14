@@ -8,6 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
+import nodeFetch from 'node-fetch';
 
 import { getPathLibraries } from '../../../utils/Index.js';
 import Downloader from '../../../utils/Downloader.js';
@@ -84,10 +85,22 @@ export default class FabricMC extends EventEmitter {
 	 */
 	public async downloadJson(Loader: LoaderObject): Promise<FabricJSON | { error: string }> {
 		let selectedBuild: { version: string } | undefined;
+		const metaPath = path.join(this.options.path, 'mc-assets', 'legacyfabric-meta.json');
+		let metaData;
 
-		// Fetch overall metadata
-		const metaResponse = await fetch(Loader.metaData);
-		const metaData = await metaResponse.json();
+		// Try to fetch metadata from online source first, then fallback to local cache
+		try {
+			const response = await nodeFetch(Loader.metaData);
+			metaData = await response.json();
+			fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+			fs.writeFileSync(metaPath, JSON.stringify(metaData, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			if (!fs.existsSync(metaPath)) {
+				return { error: "No cached metadata available and unable to fetch from network" };
+			}
+			metaData = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+		}
 
 		// Check if the requested Minecraft version is supported
 		const versionExists = metaData.game.find((ver: any) => ver.version === this.options.loader.version);
