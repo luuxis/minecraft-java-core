@@ -5,6 +5,7 @@
  * Original author: Luuxis
  */
 import fs from 'fs';
+import path from 'path';
 
 /**
  * Represents the general structure of the options passed to MinecraftAssets.
@@ -65,13 +66,33 @@ export default class MinecraftAssets {
 			return [];
 		}
 
-		// Fetch the asset index JSON from the remote URL
+		// Determine the local cache path for the asset index
+		const cacheDir = path.join(this.options.path, 'assets', 'indexes');
+		const cachePath = path.join(cacheDir, `${this.assetIndex.id}.json`);
+
+		// Try to read from cache first
 		let data;
 		try {
-			const response = await fetch(this.assetIndex.url);
-			data = await response.json();
+			if (fs.existsSync(cachePath)) {
+				data = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+			} else {
+				// If no cache, fetch from remote
+				const response = await fetch(this.assetIndex.url);
+				data = await response.json();
+				// Cache the fetched data
+				fs.mkdirSync(cacheDir, { recursive: true });
+				fs.writeFileSync(cachePath, JSON.stringify(data, null, 2));
+			}
 		} catch (err: any) {
-			throw new Error(`Failed to fetch asset index: ${err.message}`);
+			if (fs.existsSync(cachePath)) {
+				try {
+					data = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+				} catch (cacheErr: any) {
+					throw new Error(`Failed to read cached asset index: ${cacheErr.message}`);
+				}
+			} else {
+				throw new Error(`Failed to fetch asset index and no cache available: ${err.message}`);
+			}
 		}
 
 		// First item is the index file itself, which we'll store locally

@@ -93,10 +93,22 @@ export default class FabricMC extends EventEmitter {
 	 */
 	public async downloadJson(Loader: LoaderObject): Promise<FabricJSON | { error: string }> {
 		let buildInfo: { version: string; stable: boolean } | undefined;
+		const metaPath = path.join(this.options.path, 'mc-assets', 'legacyfabric-meta.json');
+		let metaData;
 
-		// Fetch the metadata
-		let response = await fetch(Loader.metaData);
-		let metaData: MetaData = await response.json();
+		// Try to fetch metadata from online source first, then fallback to local cache
+		try {
+			const response = await fetch(Loader.metaData);
+			metaData = await response.json();
+			fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+			fs.writeFileSync(metaPath, JSON.stringify(metaData, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			if (!fs.existsSync(metaPath)) {
+				return { error: "No cached metadata available and unable to fetch from network" };
+			}
+			metaData = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+		}
 
 		// Check if the Minecraft version is supported
 		const version = metaData.game.find(v => v.version === this.options.loader.version);

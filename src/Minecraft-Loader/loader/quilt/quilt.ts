@@ -87,9 +87,22 @@ export default class Quilt extends EventEmitter {
 	public async downloadJson(Loader: LoaderObject): Promise<QuiltJSON | { error: string }> {
 		let selectedBuild: any;
 
-		// Fetch the metadata
-		const metaResponse = await fetch(Loader.metaData);
-		const metaData = await metaResponse.json();
+		const metaPath = path.join(this.options.path, 'mc-assets', 'quilt-meta.json');
+		let metaData;
+
+		// Try to fetch metadata from online source first, then fallback to local cache
+		try {
+			const response = await fetch(Loader.metaData);
+			metaData = await response.json();
+			fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+			fs.writeFileSync(metaPath, JSON.stringify(metaData, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			if (!fs.existsSync(metaPath)) {
+				return { error: "No cached metadata available and unable to fetch from network" };
+			}
+			metaData = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+		}
 
 		// Check if the requested Minecraft version is supported
 		const mcVersionExists = metaData.game.find((ver: any) => ver.version === this.options.loader.version);

@@ -7,6 +7,8 @@
 
 import os from 'os';
 import MinecraftNativeLinuxARM from './Minecraft-Lwjgl-Native.js';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Basic structure for options passed to the Json class.
@@ -75,22 +77,36 @@ export default class Json {
 	 * @returns An object containing { InfoVersion, json, version }, or an error object.
 	 */
 	public async GetInfoVersion(): Promise<GetInfoVersionResult | GetInfoVersionError> {
-		let { version } = this.options;
+		let { version, path: basePath } = this.options;
 
-		// Fetch the version manifest
-		const response = await fetch(
-			`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`
-		);
-		const manifest: MojangVersionManifest = await response.json();
+		const manifestPath = path.join(basePath, 'mc-assets', 'version_manifest_v2.json');
+		let manifest;
 
-		// Resolve "latest_release"/"latest_snapshot" shorthands
+		try {
+			// Try to read from cache first
+			if (fs.existsSync(manifestPath)) {
+				manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+			} else {
+				// If no cache, fetch from remote
+				const response = await fetch(`https://launchermeta.mojang.com/mc/game/version_manifest_v2.json?_t=${new Date().toISOString()}`);
+				manifest = await response.json();
+				fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+				fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 4));
+			}
+		} catch (e) {
+			if (fs.existsSync(manifestPath)) {
+				manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+			} else {
+				throw new Error(`Failed to fetch version manifest and no cache available: ${e.message}`);
+			}
+		}
+
 		if (version === 'latest_release' || version === 'r' || version === 'lr') {
 			version = manifest.latest.release;
 		} else if (version === 'latest_snapshot' || version === 's' || version === 'ls') {
 			version = manifest.latest.snapshot;
 		}
 
-		// Find the matching version info from the manifest
 		const matchedVersion = manifest.versions.find((v) => v.id === version);
 		if (!matchedVersion) {
 			return {
@@ -100,8 +116,27 @@ export default class Json {
 		}
 
 		// Fetch the detailed version JSON from Mojang
-		const jsonResponse = await fetch(matchedVersion.url);
-		let versionJson = await jsonResponse.json();
+		const versionJsonPath = path.join(basePath, 'versions', version, `${version}.json`);
+		let versionJson: any;
+
+		try {
+			// Try to read from cache first
+			if (fs.existsSync(versionJsonPath)) {
+				versionJson = JSON.parse(fs.readFileSync(versionJsonPath, 'utf-8'));
+			} else {
+				// If no cache, fetch from remote
+				const jsonResponse = await fetch(matchedVersion.url);
+				versionJson = await jsonResponse.json();
+				fs.mkdirSync(path.dirname(versionJsonPath), { recursive: true });
+				fs.writeFileSync(versionJsonPath, JSON.stringify(versionJson, null, 4));
+			}
+		} catch (e) {
+			if (fs.existsSync(versionJsonPath)) {
+				versionJson = JSON.parse(fs.readFileSync(versionJsonPath, 'utf-8'));
+			} else {
+				throw new Error(`Failed to fetch version JSON and no cache available: ${e.message}`);
+			}
+		}
 
 		// If on Linux ARM, run additional processing
 		if (os.platform() === 'linux' && os.arch().startsWith('arm')) {

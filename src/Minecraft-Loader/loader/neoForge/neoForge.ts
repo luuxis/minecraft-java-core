@@ -102,9 +102,24 @@ export default class NeoForgeMC extends EventEmitter {
 		let neoForgeURL: string;
 		let oldAPI = true;
 
-		// Fetch versions from the legacy API
-		const legacyMetaData = await fetch(Loader.legacyMetaData).then(res => res.json());
-		const metaData = await fetch(Loader.metaData).then(res => res.json());
+		// Try to fetch metadata from online source first, then fallback to local cache
+		const metaPath = path.join(this.options.path, 'mc-assets', 'neoforge-meta.json');
+		let legacyMetaData;
+		let metaData;
+
+		try {
+			const legacyResponse = await fetch(Loader.legacyMetaData);
+			legacyMetaData = await legacyResponse.json();
+			const metaResponse = await fetch(Loader.metaData);
+			metaData = await metaResponse.json();
+			fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+			fs.writeFileSync(metaPath, JSON.stringify({ legacy: legacyMetaData, meta: metaData }, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			const cachedData = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+			legacyMetaData = cachedData.legacy;
+			metaData = cachedData.meta;
+		}
 
 		// Filter versions for the specified Minecraft version
 		let versions: string[] = legacyMetaData.versions.filter((v: string) =>

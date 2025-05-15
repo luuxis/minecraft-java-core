@@ -121,9 +121,20 @@ export default class ForgeMC extends EventEmitter {
 	 */
 	public async downloadInstaller(Loader: any): Promise<DownloadInstallerResult> {
 		// Fetch metadata for the given Forge version
-		let metaDataList: string[] = await fetch(Loader.metaData)
-			.then(res => res.json())
-			.then(json => json[this.options.loader.version]);
+		const metaPath = path.join(this.options.path, 'mc-assets', 'forge-meta.json');
+		let metaDataList: string[];
+
+		try {
+			const response = await fetch(Loader.metaData);
+			const json = await response.json();
+			metaDataList = json[this.options.loader.version];
+			fs.mkdirSync(path.dirname(metaPath), { recursive: true });
+			fs.writeFileSync(metaPath, JSON.stringify(json, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			const cachedData = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+			metaDataList = cachedData[this.options.loader.version];
+		}
 
 		if (!metaDataList) {
 			return { error: `Forge ${this.options.loader.version} not supported` };
@@ -134,12 +145,34 @@ export default class ForgeMC extends EventEmitter {
 
 		// Handle "latest" or "recommended" builds by checking promotions
 		if (this.options.loader.build === 'latest') {
-			let promotions = await fetch(Loader.promotions).then(res => res.json());
+			const promoPath = path.join(this.options.path, 'mc-assets', 'forge-promotions-latest.json');
+			let promotions;
+
+			try {
+				const response = await fetch(Loader.promotions);
+				promotions = await response.json();
+				fs.mkdirSync(path.dirname(promoPath), { recursive: true });
+				fs.writeFileSync(promoPath, JSON.stringify(promotions, null, 4));
+			} catch (error) {
+				// Fetch failed; attempt loading from local cache
+				promotions = JSON.parse(fs.readFileSync(promoPath, 'utf-8'));
+			}
 			const promoKey = `${this.options.loader.version}-latest`;
 			const promoBuild = promotions.promos[promoKey];
 			build = metaDataList.find(b => b.includes(promoBuild));
 		} else if (this.options.loader.build === 'recommended') {
-			let promotions = await fetch(Loader.promotions).then(res => res.json());
+			const promoPath = path.join(this.options.path, 'mc-assets', 'forge-promotions-recommended.json');
+			let promotions;
+
+			try {
+				const response = await fetch(Loader.promotions);
+				promotions = await response.json();
+				fs.mkdirSync(path.dirname(promoPath), { recursive: true });
+				fs.writeFileSync(promoPath, JSON.stringify(promotions, null, 4));
+			} catch (error) {
+				// Fetch failed; attempt loading from local cache
+				promotions = JSON.parse(fs.readFileSync(promoPath, 'utf-8'));
+			}
 			let promoKey = `${this.options.loader.version}-recommended`;
 			let promoBuild = promotions.promos[promoKey] || promotions.promos[`${this.options.loader.version}-latest`];
 			build = metaDataList.find(b => b.includes(promoBuild));
@@ -155,8 +188,19 @@ export default class ForgeMC extends EventEmitter {
 			};
 		}
 
-		// Fetch info about the chosen build from the meta URL
-		const meta = await fetch(Loader.meta.replace(/\${build}/g, chosenBuild)).then(res => res.json());
+		// Try to fetch build info from meta URL, fallback to cache if offline
+		const buildMetaPath = path.join(this.options.path, 'mc-assets', `forge-build-${chosenBuild}.json`);
+		let meta;
+
+		try {
+			const response = await fetch(Loader.meta.replace(/\${build}/g, chosenBuild));
+			meta = await response.json();
+			fs.mkdirSync(path.dirname(buildMetaPath), { recursive: true });
+			fs.writeFileSync(buildMetaPath, JSON.stringify(meta, null, 4));
+		} catch (error) {
+			// Fetch failed; attempt loading from local cache
+			meta = JSON.parse(fs.readFileSync(buildMetaPath, 'utf-8'));
+		}
 
 		// Determine which classifier to use (installer, client, or universal)
 		const hasInstaller = meta.classifiers.installer;

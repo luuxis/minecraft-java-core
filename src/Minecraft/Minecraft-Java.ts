@@ -111,53 +111,98 @@ export default class JavaDownloader extends EventEmitter {
 			return this.getJavaOther(jsonversion);
 		}
 
-		// Fetch Mojang's Java runtime metadata
-		const url = 'https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json';
-		const javaVersionsJson = await fetch(url).then(res => res.json());
+		// Determine cache path for Java runtime metadata
+		const cachePath = path.join(this.options.path, 'mc-assets', 'java-runtime-all.json');
+		let javaVersionsJson;
 
-		const versionName = javaVersionsJson[archOs]?.[javaVersionName]?.[0]?.version?.name;
-		if (!versionName) {
-			return this.getJavaOther(jsonversion);
+		// Try to fetch from Mojang first
+		try {
+			const response = await fetch('https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json');
+			javaVersionsJson = await response.json();
+
+			// Cache the fetched data
+			fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+			fs.writeFileSync(cachePath, JSON.stringify(javaVersionsJson, null, 2));
+		} catch (err) {
+			// If online fetch fails, try to use cached data
+			if (fs.existsSync(cachePath)) {
+				try {
+					javaVersionsJson = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+				} catch (cacheErr) {
+					// If cache is corrupted, fallback to Adoptium
+					return this.getJavaOther(jsonversion);
+				}
+			} else {
+				// If no cache available, fallback to Adoptium
+				return this.getJavaOther(jsonversion);
+			}
 		}
 
-		// Fetch the runtime manifest which lists individual files
-		const manifestUrl = javaVersionsJson[archOs][javaVersionName][0]?.manifest?.url;
-		const manifest = await fetch(manifestUrl).then(res => res.json());
-		const manifestEntries: Array<[string, any]> = Object.entries(manifest.files);
+			const versionName = javaVersionsJson[archOs]?.[javaVersionName]?.[0]?.version?.name;
+			if (!versionName) {
+				return this.getJavaOther(jsonversion);
+			}
 
-		// Identify the Java executable in the manifest
-		const javaExeKey = process.platform === 'win32' ? 'bin/javaw.exe' : 'bin/java';
-		const javaEntry = manifestEntries.find(([relPath]) => relPath.endsWith(javaExeKey));
-		if (!javaEntry) {
-			// If we can't find the executable, fallback
-			return this.getJavaOther(jsonversion);
+			// Fetch the runtime manifest which lists individual files
+			const manifestUrl = javaVersionsJson[archOs][javaVersionName][0]?.manifest?.url;
+			let manifest;
+			try {
+				manifest = await fetch(manifestUrl).then(res => res.json());
+				// Cache the fetched data
+				const manifestPath = path.join(this.options.path, 'mc-assets', 'java-runtime-all-manifest-' + versionName + '.json');
+				fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+				fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+			} catch (err) {
+				// If online fetch fails, try to use cached data
+				const manifestPath = path.join(this.options.path, 'mc-assets', 'java-runtime-all-manifest-' + versionName + '.json');
+				if (fs.existsSync(manifestPath)) {
+					try {
+						manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+					} catch (cacheErr) {
+						// If cache is corrupted, fallback to Adoptium
+						return this.getJavaOther(jsonversion);
+					}
+				} else {
+					// If no cache available, fallback to Adoptium
+					return this.getJavaOther(jsonversion);
+				}
+			}
+		
+			const manifestEntries: Array<[string, any]> = Object.entries(manifest.files);
+
+			// Identify the Java executable in the manifest
+			const javaExeKey = process.platform === 'win32' ? 'bin/javaw.exe' : 'bin/java';
+			const javaEntry = manifestEntries.find(([relPath]) => relPath.endsWith(javaExeKey));
+			if (!javaEntry) {
+				// If we can't find the executable, fallback
+				return this.getJavaOther(jsonversion);
+			}
+
+			const toDelete = javaEntry[0].replace(javaExeKey, '');
+			for (const [relPath, info] of manifestEntries) {
+				if (info.type === 'directory') continue;
+				if (!info.downloads) continue;
+
+				files.push({
+					path: `runtime/jre-${versionName}-${archOs}/${relPath.replace(toDelete, '')}`,
+					executable: info.executable,
+					sha1: info.downloads.raw.sha1,
+					size: info.downloads.raw.size,
+					url: info.downloads.raw.url,
+					type: 'Java'
+				});
+			}
+
+			return {
+				files,
+				path: path.resolve(
+					this.options.path,
+					`runtime/jre-${versionName}-${archOs}`,
+					'bin',
+					process.platform === 'win32' ? 'javaw.exe' : 'java'
+				)
+			};
 		}
-
-		const toDelete = javaEntry[0].replace(javaExeKey, '');
-		for (const [relPath, info] of manifestEntries) {
-			if (info.type === 'directory') continue;
-			if (!info.downloads) continue;
-
-			files.push({
-				path: `runtime/jre-${versionName}-${archOs}/${relPath.replace(toDelete, '')}`,
-				executable: info.executable,
-				sha1: info.downloads.raw.sha1,
-				size: info.downloads.raw.size,
-				url: info.downloads.raw.url,
-				type: 'Java'
-			});
-		}
-
-		return {
-			files,
-			path: path.resolve(
-				this.options.path,
-				`runtime/jre-${versionName}-${archOs}`,
-				'bin',
-				process.platform === 'win32' ? 'javaw.exe' : 'java'
-			)
-		};
-	}
 
 	/**
 	 * Fallback method to download Java from Adoptium if Mojang's metadata is unavailable

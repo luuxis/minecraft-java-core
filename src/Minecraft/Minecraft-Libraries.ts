@@ -8,6 +8,7 @@
 import os from 'os';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
+import path from 'path';
 
 /**
  * Maps Node.js platforms to Mojang's naming scheme for OS in library natives.
@@ -200,14 +201,22 @@ export default class Libraries {
 	public async GetAssetsOthers(url: string | null): Promise<LibraryDownload[]> {
 		if (!url) return [];
 
-		const response = await fetch(url);
-		const data: CustomAssetItem[] = await response.json();
+		const assetCachePath = path.join(this.options.path, 'mc-assets', 'extra-assets.json');
+		let data;
+
+		try {
+			const response = await fetch(url);
+			data = await response.json();
+			fs.mkdirSync(path.dirname(assetCachePath), { recursive: true });
+			fs.writeFileSync(assetCachePath, JSON.stringify(data, null, 4));
+		} catch (e) {
+			data = JSON.parse(fs.readFileSync(assetCachePath, 'utf-8'));
+		}
 
 		const assets: LibraryDownload[] = [];
 		for (const asset of data) {
 			if (!asset.path) continue;
 
-			// The 'type' is deduced from the first part of the path
 			const fileType = asset.path.split('/')[0];
 			assets.push({
 				sha1: asset.hash,
