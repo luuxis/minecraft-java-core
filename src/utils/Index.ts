@@ -8,6 +8,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
+import { Readable } from 'node:stream';
 
 // This interface defines the structure of a Minecraft library rule.
 interface LibraryRule {
@@ -275,6 +276,29 @@ function skipLibrary(lib: MinecraftLibrary): boolean {
 	return shouldSkip;
 }
 
+function fromAnyReadable(webStream: ReadableStream<Uint8Array>): import('node:stream').Readable {
+	let NodeReadableStreamCtor: typeof ReadableStream | undefined;
+	if (!NodeReadableStreamCtor && typeof globalThis?.navigator === 'undefined') {
+		import('node:stream/web').then((mod) => { NodeReadableStreamCtor = mod.ReadableStream; });
+	}
+	if (NodeReadableStreamCtor && webStream instanceof NodeReadableStreamCtor && typeof (Readable as any).fromWeb === 'function') {
+		return Readable.fromWeb(webStream as any);
+	}
+
+	const nodeStream = new Readable({ read() { } });
+	const reader = webStream.getReader();
+
+	(function pump() {
+		reader.read().then(({ done, value }) => {
+			if (done) return nodeStream.push(null);
+			nodeStream.push(Buffer.from(value));
+			pump();
+		}).catch(err => nodeStream.destroy(err));
+	})();
+
+	return nodeStream;
+}
+
 // Export all utility functions and constants
 export {
 	getPathLibraries,
@@ -284,5 +308,6 @@ export {
 	mirrors,
 	getFileFromArchive,
 	createZIP,
-	skipLibrary
+	skipLibrary,
+	fromAnyReadable
 };
