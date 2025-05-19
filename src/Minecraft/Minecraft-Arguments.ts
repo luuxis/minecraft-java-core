@@ -290,16 +290,18 @@ export default class MinecraftArguments {
 		const map = new Map();
 
 		for (const dep of combinedLibraries) {
-			const parts = dep.name.split(":");
-			const key = parts.slice(0, 2).join(":");
-			const classifier = parts[3] ? parts[3] : "";
-			const versionKey = `${key}:${classifier}`;
+			const parts = getPathLibraries(dep.name);
+			const version = semver.coerce(parts.version);
+			if (!version) continue;
 
-			const current = map.get(versionKey);
-			const version = parts[2];
+			const pathParts = parts.path.split('/');
+			const basePath = pathParts.slice(0, -1).join('/');
 
-			if (!current || version < current.name.split(":")[2] && semver.lt('1.21.5', this.options.version)) {
-				map.set(versionKey, dep);
+			const key = `${basePath}/${parts.name.replace(`-${parts.version}`, '')}`;
+			const current = map.get(key);
+
+			if (!current || semver.gt(version, current.version)) {
+				map.set(key, { ...dep, version });
 			}
 		}
 

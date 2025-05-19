@@ -73,7 +73,8 @@ function getPathLibraries(main: string, nativeString?: string, forceExt?: string
 
 	return {
 		path: pathLib,
-		name: `${libSplit[1]}-${finalFileName}`
+		name: `${libSplit[1]}-${finalFileName}`,
+		version: libSplit[2],
 	};
 }
 
