@@ -35,10 +35,7 @@ import { Launch, Microsoft } from 'minecraft-java-core';
 
 // ⚠️  In production, perform auth **before** initialising the launcher
 //     so you can handle refresh / error flows cleanly.
-const auth = await Microsoft.auth({
-  client_id: '00000000-0000-0000-0000-000000000000',
-  type: 'terminal' // 'electron' | 'nwjs'
-});
+const auth = await new Microsoft('00000000-0000-0000-0000-000000000000').getAuth('terminal'); // 'electron' | 'nwjs'
 
 const launcher = new Launch();
 
