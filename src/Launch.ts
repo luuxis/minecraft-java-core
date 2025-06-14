@@ -152,6 +152,12 @@ export type LaunchOPTS = {
 	 * How many concurrent downloads can be in progress at once.
 	 */
 	downloadFileMultiple?: number,
+	/**
+	 * Should the launcher bypass offline mode?
+	 * 
+	 * If `true`, the launcher will not check if the user is online.
+	 */
+	bypassOffline?: boolean,
 	intelEnabledMac?: boolean,
 	/**
 	 * Loader config
@@ -208,6 +214,7 @@ export default class Launch extends EventEmitter {
 			detached: false,
 			intelEnabledMac: false,
 			downloadFileMultiple: 5,
+			bypassOffline: false,
 
 			loader: {
 				path: './loader',
@@ -308,7 +315,7 @@ export default class Launch extends EventEmitter {
 			return this.emit('error', InfoVersion);
 		}
 		let { json, version } = InfoVersion;
-		
+
 		let libraries = new librariesMinecraft(this.options)
 		let bundle = new bundleMinecraft(this.options)
 		let java = new javaMinecraft(this.options)

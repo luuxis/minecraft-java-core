@@ -28,6 +28,7 @@ export interface LaunchOptions {
 	instance?: string;         // Instance name (if using multi-instance approach)
 	authenticator: any;        // Auth object containing tokens, user info, etc.
 	version?: string;         // Minecraft version
+	bypassOffline?: boolean;   // Bypass offline mode for multiplayer
 	memory: {
 		min?: string;             // Minimum memory (e.g. "512M", "1G")
 		max?: string;             // Maximum memory (e.g. "4G", "8G")
@@ -243,6 +244,14 @@ export default class MinecraftArguments {
 			if (opt) {
 				jvmArgs.push(opt);
 			}
+		}
+
+		// bypass offline mode multiplayer
+		if (this.options?.bypassOffline) {
+			jvmArgs.push('-Dminecraft.api.auth.host=https://nope.invalid/');
+			jvmArgs.push('-Dminecraft.api.account.host=https://nope.invalid/');
+			jvmArgs.push('-Dminecraft.api.session.host=https://nope.invalid/');
+			jvmArgs.push('-Dminecraft.api.services.host=https://nope.invalid/');
 		}
 
 		// If natives are specified, add the native library path
