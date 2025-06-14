@@ -400,7 +400,9 @@ export default class ForgeMC extends EventEmitter {
 				}
 
 				if (!url) {
-					return { error: `Impossible to download ${libInfo.name}` };
+					this.emit('check', checkCount++, libraries.length, 'libraries');
+					this.emit('error', `Library ${libInfo.name} not found`);
+					continue;
 				}
 
 				downloadList.push({

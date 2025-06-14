@@ -300,7 +300,7 @@ export default class MinecraftArguments {
 
 		for (const dep of combinedLibraries) {
 			const parts = getPathLibraries(dep.name);
-			const version = semver.coerce(parts.version);
+			const version = semver.valid(semver.coerce(parts.version));
 			if (!version) continue;
 
 			const pathParts = parts.path.split('/');
@@ -309,7 +309,7 @@ export default class MinecraftArguments {
 			const key = `${basePath}/${parts.name.replace(`-${parts.version}`, '')}`;
 			const current = map.get(key);
 
-			if (!current || semver.gt(version, current.version)) {
+			if (!current || semver.gt(version, current.version) && !semver.satisfies(semver.valid(semver.coerce(this.options.version)), '1.14.4 - 1.18.2')) {
 				map.set(key, { ...dep, version });
 			}
 		}
