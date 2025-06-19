@@ -145,7 +145,7 @@ export default class NeoForgeMC extends EventEmitter {
 		}
 
 		// Create a local folder for "neoForge" if it doesn't exist
-		const neoForgeFolder = path.resolve(this.options.path, 'neoForge');
+		const neoForgeFolder = path.resolve(this.options.path, 'libraries/net/neoforged/installer');
 		const installerFilePath = path.resolve(neoForgeFolder, `neoForge-${build}-installer.jar`);
 
 		if (!fs.existsSync(installerFilePath)) {
