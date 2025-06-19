@@ -309,7 +309,10 @@ export default class MinecraftArguments {
 			const key = `${basePath}/${parts.name.replace(`-${parts.version}`, '')}`;
 			const current = map.get(key);
 
-			if (!current || semver.gt(version, current.version) && !semver.satisfies(semver.valid(semver.coerce(this.options.version)), '1.14.4 - 1.18.2')) {
+			const isSupportedVersion = semver.satisfies(semver.valid(semver.coerce(this.options.version)), '1.14.4 - 1.18.2');
+			const isWindows = process.platform === 'win32';
+
+			if (!current || semver.gt(version, current.version) && (isSupportedVersion && isWindows)) {
 				map.set(key, { ...dep, version });
 			}
 		}
