@@ -9,10 +9,8 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs';
 import EventEmitter from 'events';
-import Seven from 'node-7z';
-import sevenBin from '7zip-bin';
 
-import { getFileHash } from '../utils/Index.js';
+import { getFileFromArchive } from '../utils/Index.js';
 import Downloader from '../utils/Downloader.js';
 
 /**
@@ -167,78 +165,52 @@ export default class JavaDownloader extends EventEmitter {
 	 * @param versionDownload A forced Java version (string) if provided by the user.
 	 */
 	public async getJavaOther(jsonversion: MinecraftVersionJSON, versionDownload?: string): Promise<JavaDownloadResult> {
-		// Determine which major version of Java we need
-		const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion || 8;
 		const { platform, arch } = this.getPlatformArch();
-
-		// Build the Adoptium API URL
-		const queryParams = new URLSearchParams({
-			image_type: this.options.java.type,  // e.g. "jdk" or "jre"
-			architecture: arch,
-			os: platform
-		});
-		const javaVersionURL = `https://api.adoptium.net/v3/assets/latest/${majorVersion}/hotspot?${queryParams.toString()}`;
-		const javaVersions = await fetch(javaVersionURL).then(res => res.json());
-
-		// If no valid version is found, return an error
-		const java = javaVersions[0];
-		if (!java) {
-			return { files: [], path: '', error: true, message: 'No Java found' };
-		}
-
-		const { checksum, link: url, name: fileName } = java.binary.package;
+		const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion || 8;
 		const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
-		const filePath = path.join(pathFolder, fileName);
-
-		// Determine the final path to the java executable after extraction
 		let javaExePath = path.join(pathFolder, 'bin', 'java');
-		if (platform === 'mac') {
-			javaExePath = path.join(pathFolder, 'Contents', 'Home', 'bin', 'java');
+
+		// Build the API query to fetch the Java version
+		const queryParams = new URLSearchParams({
+			java_version: majorVersion.toString(),
+			os: platform,
+			arch: arch,
+			archive_type: 'zip',
+			java_package_type: this.options.java.type
+		});
+		const javaVersionURL = `https://api.azul.com/metadata/v1/zulu/packages/?${queryParams.toString()}`;
+		let javaVersions = await fetch(javaVersionURL).then(res => res.json());
+		if (!javaVersions || !javaVersions.length) {
+			return { files: [], path: javaExePath, error: true, message: 'No Java versions found for the specified criteria.' };
 		}
 
-		// Download and extract if needed
+		javaVersions = javaVersions[0]
+		console
+
 		if (!fs.existsSync(javaExePath)) {
 			await this.verifyAndDownloadFile({
-				filePath,
-				pathFolder,
-				fileName,
-				url,
-				checksum
-			});
+				filePath: path.join(pathFolder, javaVersions.name),
+				pathFolder: pathFolder,
+				fileName: javaVersions.name,
+				url: javaVersions.download_url
+			})
 
-			// Extract the downloaded archive
-			await this.extract(filePath, pathFolder);
-			fs.unlinkSync(filePath);
+			const entries = await getFileFromArchive(path.join(pathFolder, javaVersions.name), null, null, true);
 
-			// For .tar.gz files, we may need a second extraction step
-			if (filePath.endsWith('.tar.gz')) {
-				const tarFilePath = filePath.replace('.gz', '');
-				await this.extract(tarFilePath, pathFolder);
-				if (fs.existsSync(tarFilePath)) {
-					fs.unlinkSync(tarFilePath);
+			for (const entry of entries) {
+				if (entry.name.startsWith('META-INF')) continue;
+
+				if (entry.isDirectory) {
+					fs.mkdirSync(`${pathFolder}/${entry.name}`, { recursive: true, mode: 0o777 });
+					continue;
 				}
+				fs.writeFileSync(`${pathFolder}/${entry.name}`, entry.data, { mode: 0o777 });
 			}
+		}
 
-			// If there's only one folder extracted, move its contents up
-			const extractedItems = fs.readdirSync(pathFolder);
-			if (extractedItems.length === 1) {
-				const singleFolder = path.join(pathFolder, extractedItems[0]);
-				const stat = fs.statSync(singleFolder);
-				if (stat.isDirectory()) {
-					const subItems = fs.readdirSync(singleFolder);
-					for (const item of subItems) {
-						const srcPath = path.join(singleFolder, item);
-						const destPath = path.join(pathFolder, item);
-						fs.renameSync(srcPath, destPath);
-					}
-					fs.rmdirSync(singleFolder);
-				}
-			}
-
-			// Ensure the Java executable is marked as executable on non-Windows systems
-			if (platform !== 'windows') {
-				fs.chmodSync(javaExePath, 0o755);
-			}
+		if (platform === 'macos') {
+			const a = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
+			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), a, 'java');
 		}
 
 		return { files: [], path: javaExePath };
@@ -251,7 +223,7 @@ export default class JavaDownloader extends EventEmitter {
 	private getPlatformArch(): { platform: string; arch: string } {
 		const platformMap: Record<string, string> = {
 			win32: 'windows',
-			darwin: 'mac',
+			darwin: 'macos',
 			linux: 'linux'
 		};
 		const archMap: Record<string, string> = {
@@ -286,23 +258,13 @@ export default class JavaDownloader extends EventEmitter {
 		filePath,
 		pathFolder,
 		fileName,
-		url,
-		checksum
+		url
 	}: {
 		filePath: string;
 		pathFolder: string;
 		fileName: string;
 		url: string;
-		checksum: string;
 	}): Promise<void> {
-		// If the file already exists, check its integrity
-		if (fs.existsSync(filePath)) {
-			const existingChecksum = await getFileHash(filePath, 'sha256');
-			if (existingChecksum !== checksum) {
-				fs.unlinkSync(filePath);
-				fs.rmSync(pathFolder, { recursive: true, force: true });
-			}
-		}
 
 		// If not found or failed checksum, download anew
 		if (!fs.existsSync(filePath)) {
@@ -317,41 +279,5 @@ export default class JavaDownloader extends EventEmitter {
 			// Start download
 			await download.downloadFile(url, pathFolder, fileName);
 		}
-
-		// Final verification of the downloaded file
-		const downloadedChecksum = await getFileHash(filePath, 'sha256');
-		if (downloadedChecksum !== checksum) {
-			throw new Error('Java checksum failed');
-		}
-	}
-
-	/**
-	 * Extracts the given archive (ZIP or 7Z), using the `node-7z` library and the system's 7z binary.
-	 * Emits an "extract" event with the extraction progress (percent).
-	 *
-	 * @param filePath  Path to the archive file
-	 * @param destPath  Destination folder to extract into
-	 */
-	private async extract(filePath: string, destPath: string): Promise<void> {
-		// Ensure the 7z binary is executable on Unix-like OSes
-		if (os.platform() !== 'win32') {
-			fs.chmodSync(sevenBin.path7za, 0o755);
-		}
-
-		return new Promise<void>((resolve, reject) => {
-			const extractor = Seven.extractFull(filePath, destPath, {
-				$bin: sevenBin.path7za,
-				recursive: true,
-				$progress: true
-			});
-
-			extractor.on('end', () => resolve());
-			extractor.on('error', (err) => reject(err));
-			extractor.on('progress', (progress) => {
-				if (progress.percent > 0) {
-					this.emit('extract', progress.percent);
-				}
-			});
-		});
 	}
 }
