@@ -9,6 +9,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 import { Readable } from 'node:stream';
+import Unzipper from './unzipper.js';
 
 // This interface defines the structure of a Minecraft library rule.
 interface LibraryRule {
@@ -176,7 +177,7 @@ const mirrors = [
  */
 async function getFileFromArchive(jar: string, file: string | null = null, prefix: string | null = null): Promise<any> {
 	const result: any[] = [];
-	const zip = new AdmZip(jar);
+	const zip = new Unzipper(jar);
 	const entries = zip.getEntries();
 
 	return new Promise((resolve) => {
