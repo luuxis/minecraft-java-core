@@ -167,32 +167,31 @@ const mirrors = [
 
 /**
  * Reads a .jar or .zip file, returning specific entries or listing file entries in the archive.
- * Uses adm-zip under the hood.
  *
  * @param jar    Full path to the jar/zip file
  * @param file   The file entry to extract data from (e.g., "install_profile.json"). If null, returns all entries or partial lists.
  * @param prefix A path prefix filter (e.g., "maven/org/lwjgl/") if you want a list of matching files instead of direct extraction
  * @returns      A buffer or an array of { name, data }, or a list of filenames if prefix is given
  */
-async function getFileFromArchive(jar: string, file: string | null = null, prefix: string | null = null): Promise<any> {
+async function getFileFromArchive(jar: string, file: string | null = null, prefix: string | null = null, includeDirs: boolean = false): Promise<any> {
 	const result: any[] = [];
 	const zip = new Unzipper(jar);
 	const entries = zip.getEntries();
 
 	return new Promise((resolve) => {
 		for (const entry of entries) {
-			if (!entry.isDirectory && !prefix) {
+			if (includeDirs ? !prefix : (!entry.isDirectory && !prefix)) {
 				// If no prefix is given, either return a specific file if 'file' is set,
 				// or accumulate all entries if 'file' is null
 				if (entry.entryName === file) {
 					return resolve(entry.getData());
 				} else if (!file) {
-					result.push({ name: entry.entryName, data: entry.getData() });
+					result.push({ name: entry.entryName, data: entry.getData(), isDirectory: entry.isDirectory });
 				}
 			}
 
 			// If a prefix is given, collect all entry names under that prefix
-			if (!entry.isDirectory && prefix && entry.entryName.includes(prefix)) {
+			if (includeDirs ? !prefix : (!entry.isDirectory && !prefix) && entry.entryName.includes(prefix)) {
 				result.push(entry.entryName);
 			}
 		}
