@@ -1,6 +1,6 @@
 ##### v4 • **minecraft‑java‑core**
 [![License: CC‑BY‑NC 4.0](https://img.shields.io/badge/License-CC--BY--NC%204.0-yellow.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-![stable version](https://img.shields.io/badge/stable_version-4.0.0-blue)
+![stable version](https://img.shields.io/npm/v/minecraft-java-core?logo=nodedotjs)
 
 **minecraft‑java‑core** is a **NodeJS/TypeScript** solution for launching both vanilla *and* modded Minecraft Java Edition without juggling JSON manifests, assets, libraries or Java runtimes yourself. Think of it as the *core* of an Electron/NW.js/CLI launcher.
 
