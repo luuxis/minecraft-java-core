@@ -15,7 +15,6 @@ import {
 	getFileHash,
 	mirrors,
 	getFileFromArchive,
-	createZIP,
 	skipLibrary
 } from '../../../utils/Index.js';
 
@@ -454,38 +453,5 @@ export default class ForgeMC extends EventEmitter {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * For older Forge versions, merges the vanilla Minecraft jar and Forge installer files
-	 * into a single jar. Writes a modified version.json reflecting the new Forge version.
-	 *
-	 * @param id The new version ID (e.g., "forge-1.12.2-14.23.5.2855")
-	 * @param pathInstaller Path to the Forge installer
-	 * @returns A modified version.json with an isOldForge property and a jarPath
-	 */
-	public async createProfile(id: string, pathInstaller: string): Promise<any> {
-		// Gather all entries from the Forge installer and the vanilla JAR
-		const forgeFiles = await getFileFromArchive(pathInstaller);
-		const vanillaJar = await getFileFromArchive(this.options.loader.config.minecraftJar);
-
-		// Combine them, excluding "META-INF" from the final jar
-		const mergedZip = await createZIP([...vanillaJar, ...forgeFiles], 'META-INF');
-
-		// Write the new combined jar to versions/<id>/<id>.jar
-		const destination = path.resolve(this.options.path, 'versions', id);
-		if (!fs.existsSync(destination)) {
-			fs.mkdirSync(destination, { recursive: true });
-		}
-		fs.writeFileSync(path.resolve(destination, `${id}.jar`), mergedZip, { mode: 0o777 });
-
-		// Update the version JSON
-		const profileData = JSON.parse(fs.readFileSync(this.options.loader.config.minecraftJson).toString());
-		profileData.libraries = [];
-		profileData.id = id;
-		profileData.isOldForge = true;
-		profileData.jarPath = path.resolve(destination, `${id}.jar`);
-
-		return profileData;
 	}
 }

@@ -7,7 +7,6 @@
 
 import crypto from 'crypto';
 import fs from 'fs';
-import AdmZip from 'adm-zip';
 import { Readable } from 'node:stream';
 import Unzipper from './unzipper.js';
 
@@ -209,28 +208,6 @@ async function getFileFromArchive(jar: string, file: string | null = null, prefi
 }
 
 /**
- * Creates a new ZIP buffer by combining multiple file entries (name, data),
- * optionally ignoring entries containing a certain string (e.g. "META-INF").
- *
- * @param files   An array of { name, data } objects to include in the new zip
- * @param ignored A substring to skip any matching files
- * @returns       A buffer containing the newly created ZIP
- */
-async function createZIP(files: { name: string; data: Buffer }[], ignored: string | null = null): Promise<Buffer> {
-	const zip = new AdmZip();
-
-	return new Promise((resolve) => {
-		for (const entry of files) {
-			if (ignored && entry.name.includes(ignored)) {
-				continue;
-			}
-			zip.addFile(entry.name, entry.data);
-		}
-		resolve(zip.toBuffer());
-	});
-}
-
-/**
  * Determines if a library should be skipped based on its 'rules' property.
  * For example, it might skip libraries if action='disallow' for the current OS,
  * or if there are specific conditions not met.
@@ -309,7 +286,6 @@ export {
 	loader,
 	mirrors,
 	getFileFromArchive,
-	createZIP,
 	skipLibrary,
 	fromAnyReadable
 };

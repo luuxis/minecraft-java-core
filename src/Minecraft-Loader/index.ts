@@ -156,40 +156,27 @@ export default class Loader extends EventEmitter {
 		const installer: any = await forge.downloadInstaller(LoaderData);
 		if (installer.error) return installer; // e.g., { error: "..." }
 
-		// 2. If the installer extension is ".jar", we do the standard "install_profile.json" approach
-		if ("ext" in installer && installer.ext === 'jar') {
-			const profile: any = await forge.extractProfile(installer.filePath);
-			if (profile.error) return profile;
+		const profile: any = await forge.extractProfile(installer.filePath);
+		if (profile.error) return profile;
 
-			// Write the version JSON to disk
-			const destination = path.resolve(this.options.path, 'versions', profile.version.id);
-			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-			fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+		// Write the version JSON to disk
+		const destination = path.resolve(this.options.path, 'versions', profile.version.id);
+		if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+		fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
 
-			// 3. Extract universal jar if needed
-			const universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
-			if (universal.error) return universal;
+		// 3. Extract universal jar if needed
+		const universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
+		if (universal.error) return universal;
 
-			// 4. Download libraries
-			const libraries: any = await forge.downloadLibraries(profile, universal);
-			if (libraries.error) return libraries;
+		// 4. Download libraries
+		const libraries: any = await forge.downloadLibraries(profile, universal);
+		if (libraries.error) return libraries;
 
-			// 5. Patch Forge if necessary
-			const patch: any = await forge.patchForge(profile.install);
-			if (patch.error) return patch;
+		// 5. Patch Forge if necessary
+		const patch: any = await forge.patchForge(profile.install);
+		if (patch.error) return patch;
 
-			return profile.version;
-		} else {
-			// For older Forge, create a merged jar
-			const profile = await forge.createProfile(installer.id, installer.filePath);
-			if (profile.error) return profile;
-
-			const destination = path.resolve(this.options.path, 'versions', profile.id);
-			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-			fs.writeFileSync(path.resolve(destination, `${profile.id}.json`), JSON.stringify(profile, null, 4));
-
-			return profile;
-		}
+		return profile.version;
 	}
 
 	/**
