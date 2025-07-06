@@ -168,7 +168,6 @@ export default class JavaDownloader extends EventEmitter {
 		const { platform, arch } = this.getPlatformArch();
 		const majorVersion = versionDownload || jsonversion.javaVersion?.majorVersion || 8;
 		const pathFolder = path.resolve(this.options.path, `runtime/jre-${majorVersion}`);
-		let javaExePath = path.join(pathFolder, 'bin', 'java');
 
 		// Build the API query to fetch the Java version
 		const queryParams = new URLSearchParams({
@@ -208,9 +207,10 @@ export default class JavaDownloader extends EventEmitter {
 			}
 		}
 
+		let javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), 'bin', 'java');
 		if (platform === 'macos') {
-			const a = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
-			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), a, 'java');
+			const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
+			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
 		}
 
 		return { files: [], path: javaExePath };
