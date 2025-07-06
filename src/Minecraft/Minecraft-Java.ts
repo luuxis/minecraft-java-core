@@ -186,8 +186,11 @@ export default class JavaDownloader extends EventEmitter {
 
 		let javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), 'bin', 'java');
 		if (platform === 'macos') {
-			const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
-			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
+			try {
+				const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
+				javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
+			} catch (_) {
+			}
 		}
 
 		if (!fs.existsSync(javaExePath)) {
@@ -208,6 +211,14 @@ export default class JavaDownloader extends EventEmitter {
 					continue;
 				}
 				fs.writeFileSync(`${pathFolder}/${entry.name}`, entry.data, { mode: 0o777 });
+			}
+
+			if (platform === 'macos') {
+				try {
+					const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
+					javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
+				} catch (_) {
+				}
 			}
 		}
 
