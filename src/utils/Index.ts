@@ -191,7 +191,7 @@ async function getFileFromArchive(jar: string, file: string | null = null, prefi
 			}
 
 			// If a prefix is given, collect all entry names under that prefix
-			if (includeDirs ? !prefix : (!entry.isDirectory && !prefix) && entry.entryName.includes(prefix)) {
+			if (!entry.isDirectory && entry.entryName.includes(prefix)) {
 				result.push(entry.entryName);
 			}
 		}
