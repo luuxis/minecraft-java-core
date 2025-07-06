@@ -179,12 +179,16 @@ export default class JavaDownloader extends EventEmitter {
 		});
 		const javaVersionURL = `https://api.azul.com/metadata/v1/zulu/packages/?${queryParams.toString()}`;
 		let javaVersions = await fetch(javaVersionURL).then(res => res.json());
-		if (!javaVersions || !javaVersions.length) {
-			return { files: [], path: javaExePath, error: true, message: 'No Java versions found for the specified criteria.' };
+		if (!Array.isArray(javaVersions) || javaVersions.length === 0) {
+			return { files: [], path: '', error: true, message: 'No Java versions found for the specified parameters.' };
 		}
+		javaVersions = javaVersions[0];
 
-		javaVersions = javaVersions[0]
-		console
+		let javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), 'bin', 'java');
+		if (platform === 'macos') {
+			const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
+			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
+		}
 
 		if (!fs.existsSync(javaExePath)) {
 			await this.verifyAndDownloadFile({
@@ -207,11 +211,7 @@ export default class JavaDownloader extends EventEmitter {
 			}
 		}
 
-		let javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), 'bin', 'java');
-		if (platform === 'macos') {
-			const pathBin = fs.readFileSync(path.join(pathFolder, javaVersions.name.replace('.zip', ''), "bin"), 'utf8').toString();
-			javaExePath = path.join(pathFolder, javaVersions.name.replace('.zip', ''), pathBin, 'java');
-		}
+
 
 		return { files: [], path: javaExePath };
 	}
