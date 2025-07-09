@@ -38,6 +38,8 @@ export default class Unzipper {
             let cdCursor = cdOffset;
 
             while (cdCursor < cdEnd) {
+                if (cdCursor + 46 > fileBuffer.length) break; // sécurité
+
                 if (fileBuffer.readUInt32LE(cdCursor) !== 0x02014b50) break;
 
                 const compressionMethod = fileBuffer.readUInt16LE(cdCursor + 10);
@@ -55,12 +57,28 @@ export default class Unzipper {
                 );
 
                 const headerOffset = relativeOffset;
-                if (fileBuffer.readUInt32LE(headerOffset) !== 0x04034b50) continue;
+                // Sécurité sur l'offset du header
+                if (headerOffset + 30 > fileBuffer.length) {
+                    cdCursor += 46 + fileNameLength + extraFieldLength + fileCommentLength;
+                    continue;
+                }
+                if (fileBuffer.readUInt32LE(headerOffset) !== 0x04034b50) {
+                    cdCursor += 46 + fileNameLength + extraFieldLength + fileCommentLength;
+                    continue;
+                }
 
                 const lfFileNameLength = fileBuffer.readUInt16LE(headerOffset + 26);
                 const lfExtraFieldLength = fileBuffer.readUInt16LE(headerOffset + 28);
                 const dataStart = headerOffset + 30 + lfFileNameLength + lfExtraFieldLength;
-                const compressedData = fileBuffer.slice(dataStart, dataStart + compressedSize);
+                const dataEnd = dataStart + compressedSize;
+
+                // Sécurité: ne pas dépasser la taille du buffer
+                if (dataEnd > fileBuffer.length) {
+                    cdCursor += 46 + fileNameLength + extraFieldLength + fileCommentLength;
+                    continue;
+                }
+
+                const compressedData = fileBuffer.slice(dataStart, dataEnd);
 
                 this.entries.push({
                     entryName: fileName,
@@ -71,7 +89,7 @@ export default class Unzipper {
                         } else if (compressionMethod === 0) {
                             return compressedData;
                         } else {
-                            throw new Error(`Méthode de compression non supportée: ${compressionMethod}`);
+                            throw new Error(`Unsupported compression method: ${compressionMethod}`);
                         }
                     }
                 });
@@ -88,6 +106,8 @@ export default class Unzipper {
                 if (signaturePos === -1) break;
 
                 const headerOffset = signaturePos;
+                if (headerOffset + 30 > fileBuffer.length) break;
+
                 const compressionMethod = fileBuffer.readUInt16LE(headerOffset + 8);
                 const compressedSize = fileBuffer.readUInt32LE(headerOffset + 18);
                 const uncompressedSize = fileBuffer.readUInt32LE(headerOffset + 22);
@@ -95,14 +115,24 @@ export default class Unzipper {
                 const extraFieldLength = fileBuffer.readUInt16LE(headerOffset + 28);
 
                 const fileNameStart = headerOffset + 30;
+                const fileNameEnd = fileNameStart + fileNameLength;
+                if (fileNameEnd > fileBuffer.length) break;
+
                 const fileName = fileBuffer.toString(
                     'utf-8',
                     fileNameStart,
-                    fileNameStart + fileNameLength
+                    fileNameEnd
                 );
 
-                const dataStart = fileNameStart + fileNameLength + extraFieldLength;
-                const compressedData = fileBuffer.slice(dataStart, dataStart + compressedSize);
+                const dataStart = fileNameEnd + extraFieldLength;
+                const dataEnd = dataStart + compressedSize;
+
+                if (dataEnd > fileBuffer.length) {
+                    currentOffset = dataEnd;
+                    continue;
+                }
+
+                const compressedData = fileBuffer.slice(dataStart, dataEnd);
 
                 this.entries.push({
                     entryName: fileName,
@@ -113,12 +143,12 @@ export default class Unzipper {
                         } else if (compressionMethod === 0) {
                             return compressedData;
                         } else {
-                            throw new Error(`Méthode de compression non supportée: ${compressionMethod}`);
+                            throw new Error(`Unsupported compression method: ${compressionMethod}`);
                         }
                     }
                 });
 
-                currentOffset = dataStart + compressedSize;
+                currentOffset = dataEnd;
             }
         }
     }
