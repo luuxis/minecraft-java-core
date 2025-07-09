@@ -160,9 +160,12 @@ export default class Loader extends EventEmitter {
 		if (profile.error) return profile;
 
 		// Write the version JSON to disk
-		const destination = path.resolve(this.options.path, 'versions', profile.version.id);
-		if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
-		fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+		if ("version" in profile && "id" in profile.version) {
+			const destination = path.resolve(this.options.path, 'versions', profile.version.id);
+			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
+			fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+			fs.cpSync(path.resolve(this.options.loader.config.minecraftJar), path.resolve(destination, `${profile.version.id}.jar`));
+		}
 
 		// 3. Extract universal jar if needed
 		const universal: any = await forge.extractUniversalJar(profile.install, installer.filePath);
@@ -216,6 +219,7 @@ export default class Loader extends EventEmitter {
 			const destination = path.resolve(this.options.path, 'versions', profile.version.id);
 			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
 			fs.writeFileSync(path.resolve(destination, `${profile.version.id}.json`), JSON.stringify(profile.version, null, 4));
+			fs.cpSync(path.resolve(this.options.loader.config.minecraftJar), path.resolve(destination, `${profile.version.id}.jar`));
 		}
 		// Extract universal jar
 		const universal: any = await neoForge.extractUniversalJar(profile.install, installer.filePath, installer.oldAPI);
@@ -256,6 +260,7 @@ export default class Loader extends EventEmitter {
 			const destination = path.resolve(this.options.path, 'versions', json.id);
 			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
 			fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+			fs.cpSync(path.resolve(this.options.loader.config.minecraftJar), path.resolve(destination, `${json.id}.jar`));
 		}
 
 		if ("libraries" in json) {
@@ -289,6 +294,7 @@ export default class Loader extends EventEmitter {
 			const destination = path.resolve(this.options.path, 'versions', json.id);
 			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
 			fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+			fs.cpSync(path.resolve(this.options.loader.config.minecraftJar), path.resolve(destination, `${json.id}.jar`));
 		}
 		if ("libraries" in json) {
 			await legacyFabric.downloadLibraries(json);
@@ -320,6 +326,7 @@ export default class Loader extends EventEmitter {
 			const destination = path.resolve(this.options.path, 'versions', json.id);
 			if (!fs.existsSync(destination)) fs.mkdirSync(destination, { recursive: true });
 			fs.writeFileSync(path.resolve(destination, `${json.id}.json`), JSON.stringify(json, null, 4));
+			fs.cpSync(path.resolve(this.options.loader.config.minecraftJar), path.resolve(destination, `${json.id}.jar`));
 		}
 		if ("libraries" in json) {
 			await quilt.downloadLibraries(json);
