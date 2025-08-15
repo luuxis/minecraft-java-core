@@ -220,8 +220,6 @@ export default class JavaDownloader extends EventEmitter {
 			}
 		}
 
-
-
 		return { files: [], path: javaExePath };
 	}
 
