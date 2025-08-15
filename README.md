@@ -168,6 +168,7 @@ const defaultOptions = {
 | `extract`   | String  | Name of the file currently being extracted.                  |
 | `patch`     | String  | Loader patch currently applied.                              |
 | `close`     | void    | Emitted when the Java process exits.                         |
+| `cancelled` | String  | Emitted when the launch process is cancelled.                |
 | `error`     | Error   | Something went wrong.                                        |
 
 ---

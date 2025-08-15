@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import path from 'path';
 import fs from 'fs';
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 
 import jsonMinecraft from './Minecraft/Minecraft-Json.js';
 import librariesMinecraft from './Minecraft/Minecraft-Libraries.js';
@@ -200,8 +200,17 @@ export type LaunchOPTS = {
 
 export default class Launch extends EventEmitter {
 	options: LaunchOPTS;
+	private isCancelled: boolean = false;
+	private minecraftProcess: ChildProcess | null = null;
+	private currentDownloader: Downloader | null = null;
+	private downloadPromise: Promise<void> | null = null;
 
 	async Launch(opt: LaunchOPTS) {
+		this.isCancelled = false;
+		this.minecraftProcess = null;
+		this.currentDownloader = null;
+		this.downloadPromise = null;
+
 		const defaultOptions: LaunchOPTS = {
 			url: null,
 			authenticator: null,
@@ -267,10 +276,20 @@ export default class Launch extends EventEmitter {
 		this.start();
 	}
 
-
 	async start() {
+		if (this.isCancelled) {
+			this.emit('cancelled', 'Launch has been cancelled');
+			return;
+		}
+
 		let data: any = await this.DownloadGame();
 		if (data.error) return this.emit('error', data);
+
+		if (this.isCancelled) {
+			this.emit('cancelled', 'Launch has been cancelled');
+			return;
+		}
+
 		let { minecraftJson, minecraftLoader, minecraftVersion, minecraftJava } = data;
 
 		let minecraftArguments: any = await new argumentsMinecraft(this.options).GetArguments(minecraftJson, minecraftLoader);
@@ -300,10 +319,18 @@ export default class Launch extends EventEmitter {
 		argumentsLogs = argumentsLogs.replaceAll(`${this.options.path}/`, '')
 		this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
-		let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
-		minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
-		minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
-		minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))
+		if (this.isCancelled) {
+			this.emit('error', { error: 'Launch has been cancelled' });
+			return;
+		}
+
+		this.minecraftProcess = spawn(java, Arguments, { cwd: logs,detached: this.options.detached });
+		this.minecraftProcess.stdout?.on('data', (data) => this.emit('data', data.toString('utf-8')));
+		this.minecraftProcess.stderr?.on('data', (data) => this.emit('data', data.toString('utf-8')));
+		this.minecraftProcess.on('close', (code) => {
+			this.minecraftProcess = null;
+			if (!this.isCancelled) this.emit('close', 'Minecraft closed');
+		});
 	}
 
 	async DownloadGame() {
@@ -331,32 +358,43 @@ export default class Launch extends EventEmitter {
 		let gameAssets: any = await new assetsMinecraft(this.options).getAssets(json);
 		let gameJava: any = this.options.java.path ? { files: [] } : await java.getJavaFiles(json);
 
-
 		if (gameJava.error) return gameJava
 
 		let filesList: any = await bundle.checkBundle([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
 
 		if (filesList.length > 0) {
-			let downloader = new Downloader();
+			if (this.isCancelled) return { error: 'Download has been cancelled' };
+
+			this.currentDownloader = new Downloader();
 			let totsize = await bundle.getTotalSize(filesList);
 
-			downloader.on("progress", (DL: any, totDL: any, element: any) => {
-				this.emit("progress", DL, totDL, element);
+			this.currentDownloader.on('progress',(DL: any, totDL: any, element: any) => {
+					this.emit('progress', DL, totDL, element);
+				},
+			);
+
+			this.currentDownloader.on('speed', (speed: any) => {
+				this.emit('speed', speed);
 			});
 
-			downloader.on("speed", (speed: any) => {
-				this.emit("speed", speed);
+			this.currentDownloader.on('estimated', (time: any) => {
+				this.emit('estimated', time);
 			});
 
-			downloader.on("estimated", (time: any) => {
-				this.emit("estimated", time);
+			this.currentDownloader.on('error', (e: any) => {
+				this.emit('error', e);
 			});
 
-			downloader.on("error", (e: any) => {
-				this.emit("error", e);
-			});
+			this.downloadPromise = this.currentDownloader.downloadFileMultiple(
+				filesList,
+				totsize,
+				this.options.downloadFileMultiple,
+				this.options.timeout,
+			);
 
-			await downloader.downloadFileMultiple(filesList, totsize, this.options.downloadFileMultiple, this.options.timeout);
+			await this.downloadPromise;
+			this.currentDownloader = null;
+			this.downloadPromise = null;
 		}
 
 		if (this.options.loader.enable === true) {
@@ -399,5 +437,42 @@ export default class Launch extends EventEmitter {
 			minecraftVersion: version,
 			minecraftJava: gameJava
 		}
+	}
+
+	cancel(): void {
+		if (this.isCancelled) return;
+		this.isCancelled = true;
+
+		if (this.currentDownloader) {
+			this.emit('data', 'Cancelling downloads...');
+			try {
+				this.currentDownloader.cancel();
+			} catch {}
+		}
+
+		if (this.minecraftProcess && !this.minecraftProcess.killed) {
+			this.emit('data', 'Terminating Minecraft process...');
+			try {
+				this.minecraftProcess.kill('SIGTERM');
+				setTimeout(() => {
+					if (this.minecraftProcess && !this.minecraftProcess.killed) {
+						if (process.platform === 'win32' && this.minecraftProcess.pid) {
+							require('child_process').exec(
+								`taskkill /PID ${this.minecraftProcess.pid} /T /F`,
+								() => {},
+							);
+						} else {
+							this.minecraftProcess.kill('SIGKILL');
+						}
+					}
+				}, 2000);
+			} catch (error) {
+				this.emit('data', `Failed to terminate process: ${error}`);
+			}
+		}
+
+		this.currentDownloader = null;
+		this.downloadPromise = null;
+		this.emit('cancelled', 'Launch has been cancelled');
 	}
 }

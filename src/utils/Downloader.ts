@@ -28,6 +28,8 @@ export interface DownloadOptions {
  * emitting events for progress, speed, estimated time, and errors.
  */
 export default class Downloader extends EventEmitter {
+	private isCancelled: boolean = false;
+	private activeControllers: AbortController[] = [];
 	/**
 	 * Downloads a single file from the given URL to the specified local path.
 	 * Emits "progress" events with the number of bytes downloaded and total size.
@@ -36,7 +38,11 @@ export default class Downloader extends EventEmitter {
 	 * @param dirPath - Local folder path where the file is saved
 	 * @param fileName - Name of the file (e.g., "mod.jar")
 	 */
-	public async downloadFile(url: string, dirPath: string, fileName: string): Promise<void> {
+	public async downloadFile(
+		url: string,
+		dirPath: string,
+		fileName: string,
+	): Promise<void> {
 		if (!fs.existsSync(dirPath)) {
 			fs.mkdirSync(dirPath, { recursive: true });
 		}
@@ -90,6 +96,9 @@ export default class Downloader extends EventEmitter {
 	): Promise<void> {
 		if (limit > files.length) limit = files.length;
 
+		this.isCancelled = false;
+		this.activeControllers = [];
+
 		let completed = 0;     // Number of downloads completed
 		let downloaded = 0;    // Cumulative bytes downloaded
 		let queued = 0;        // Index of the next file to download
@@ -99,6 +108,11 @@ export default class Downloader extends EventEmitter {
 		const speeds: number[] = [];
 
 		const estimated = setInterval(() => {
+			if (this.isCancelled) {
+				clearInterval(estimated);
+				return;
+			}
+
 			const duration = (Date.now() - start) / 1000;
 			const chunkDownloaded = downloaded - before;
 			if (speeds.length >= 5) speeds.shift();
@@ -115,7 +129,7 @@ export default class Downloader extends EventEmitter {
 		}, 500);
 
 		const downloadNext = async (): Promise<void> => {
-			if (queued >= files.length) return;
+			if (queued >= files.length || this.isCancelled) return;
 
 			const file = files[queued++];
 			if (!fs.existsSync(file.folder)) {
@@ -124,6 +138,7 @@ export default class Downloader extends EventEmitter {
 
 			const writer = fs.createWriteStream(file.path, { flags: 'w', mode: 0o777 });
 			const controller = new AbortController();
+			this.activeControllers.push(controller);
 			const timeoutId = setTimeout(() => controller.abort(), timeout);
 
 			try {
@@ -134,6 +149,10 @@ export default class Downloader extends EventEmitter {
 				const stream = fromAnyReadable(response.body as any);
 
 				stream.on('data', (chunk: Buffer) => {
+					if (this.isCancelled) {
+						writer.destroy();
+						return;
+					}
 					downloaded += chunk.length;
 					this.emit('progress', downloaded, size, file.type);
 					writer.write(chunk);
@@ -142,21 +161,31 @@ export default class Downloader extends EventEmitter {
 				stream.on('end', () => {
 					writer.end();
 					completed++;
-					downloadNext();
+					if (!this.isCancelled) {
+						downloadNext();
+					}
 				});
 
 				stream.on('error', (err) => {
 					writer.destroy();
-					this.emit('error', err);
+					if (!this.isCancelled) {
+						this.emit('error', err);
+					}
 					completed++;
-					downloadNext();
+					if (!this.isCancelled) {
+						downloadNext();
+					}
 				});
 			} catch (e) {
 				clearTimeout(timeoutId);
 				writer.destroy();
-				this.emit('error', e);
+				const isAbortLike = e?.name === 'AbortError' || String(e).includes('AbortError');
+				if (!this.isCancelled && !isAbortLike) this.emit('error', e);
 				completed++;
-				downloadNext();
+				if (!this.isCancelled) downloadNext();
+			} finally {
+				const idx = this.activeControllers.indexOf(controller);
+				if (idx !== -1) this.activeControllers.splice(idx, 1);
 			}
 		};
 
@@ -165,10 +194,14 @@ export default class Downloader extends EventEmitter {
 			downloadNext();
 		}
 
-		// Wait until all downloads complete
-		return new Promise((resolve) => {
+		// Wait until all downloads complete or cancelled
+		return new Promise((resolve, reject) => {
 			const interval = setInterval(() => {
-				if (completed === files.length) {
+				if (this.isCancelled) {
+					clearInterval(estimated);
+					clearInterval(interval);
+					resolve();
+				} else if (completed === files.length) {
 					clearInterval(estimated);
 					clearInterval(interval);
 					resolve();
@@ -212,8 +245,6 @@ export default class Downloader extends EventEmitter {
 		}
 	}
 
-
-
 	/**
 	 * Tries each mirror in turn, constructing an URL (mirror + baseURL). If a valid
 	 * response is found (status=200), it returns the final URL and size. Otherwise, returns false.
@@ -226,7 +257,6 @@ export default class Downloader extends EventEmitter {
 		baseURL: string,
 		mirrors: string[]
 	): Promise<{ url: string; size: number; status: number } | false> {
-
 		for (const mirror of mirrors) {
 			const testURL = `${mirror}/${baseURL}`;
 			const res = await this.checkURL(testURL);
@@ -240,5 +270,21 @@ export default class Downloader extends EventEmitter {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Cancels all running downloads
+	 */
+	cancel(): void {
+		this.isCancelled = true;
+
+		this.activeControllers.forEach((controller) => {
+			try {
+				controller.abort();
+			} catch (error) {}
+		});
+
+		this.activeControllers = [];
+		this.emit('cancelled', 'All downloads have been cancelled');
 	}
 }
