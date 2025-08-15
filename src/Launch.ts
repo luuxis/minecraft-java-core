@@ -395,6 +395,10 @@ export default class Launch extends EventEmitter {
 			await this.downloadPromise;
 			this.currentDownloader = null;
 			this.downloadPromise = null;
+
+			if (this.isCancelled) {
+				return { error: 'Download has been cancelled' };
+			}
 		}
 
 		if (this.options.loader.enable === true) {
@@ -423,19 +427,27 @@ export default class Launch extends EventEmitter {
 			loaderJson = jsonLoader;
 		}
 
-		if (this.options.verify) await bundle.checkFiles([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
+		try {
+			if (this.isCancelled) return { error: 'Download has been cancelled' };
+			if (this.options.verify) await bundle.checkFiles([...gameLibraries, ...gameAssetsOther, ...gameAssets, ...gameJava.files]);
+			if (this.isCancelled) return { error: 'Download has been cancelled' };
 
-		let natives = await libraries.natives(gameLibraries);
-		if (natives.length === 0) json.nativesList = false;
-		else json.nativesList = true;
+			let natives = await libraries.natives(gameLibraries);
+			if (natives.length === 0) json.nativesList = false;
+			else json.nativesList = true;
 
-		if (isold(json)) new assetsMinecraft(this.options).copyAssets(json);
+			if (isold(json)) new assetsMinecraft(this.options).copyAssets(json);
 
-		return {
-			minecraftJson: json,
-			minecraftLoader: loaderJson,
-			minecraftVersion: version,
-			minecraftJava: gameJava
+			return {
+				minecraftJson: json,
+				minecraftLoader: loaderJson,
+				minecraftVersion: version,
+				minecraftJava: gameJava
+			}
+		} catch(e) {
+			if (this.isCancelled) return { error: 'Download has been cancelled' };
+			this.emit('error', e);
+			return { error: e?.message || e };
 		}
 	}
 
