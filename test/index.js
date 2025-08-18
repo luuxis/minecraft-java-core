@@ -21,26 +21,29 @@ let mc
     }
 
     await launcher.Launch({
-        url: "http://launcher.luuxis.fr/files?instance=Lost World - The Broken Script",
+        url: "http://launcher.luuxis.fr/files?instance=Hypixel",
         path: './minecraft',
         authenticator: mc,
-        version: '1.21.1',
+        version: '1.8.9',
         intelEnabledMac: true,
-        instance: "Lost World - The Broken Script",
+        instance: "Hypixel",
+
+        ignored: [
+            "config",
+            "logs",
+            "resourcepacks",
+            "options.txt",
+            "optionsof.txt"
+        ],
 
         loader: {
-            type: 'neoforge',
-            build: '21.1.193',
+            type: 'forge',
+            build: 'latest',
             enable: true
         },
         memory: {
-            min: '2G',
-            max: '4G'
-        },
-        java: {
-            path: null,
-            version: '24',
-            type: 'jre',
+            min: '14G',
+            max: '16G'
         },
     });
 
