@@ -317,8 +317,7 @@ export default class Microsoft {
 			profile: {
 				skins: profile.skins,
 				capes: profile.capes
-			},
-			hasGame: hasGame
+			}
 		};
 	}
 
