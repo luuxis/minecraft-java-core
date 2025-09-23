@@ -213,7 +213,7 @@ export default class Microsoft {
 			})
 		});
 		if (xblResponse.error) {
-			return { ...xblResponse, errorType: 'xbl' };
+			return { ...xblResponse, errorType: 'xbl', refresh_token: oauth2.refresh_token };
 		}
 
 		// 2. Authorize with XSTS for Minecraft services
@@ -230,7 +230,7 @@ export default class Microsoft {
 			})
 		});
 		if (xstsResponse.error) {
-			return { ...xstsResponse, errorType: 'xsts' };
+			return { ...xstsResponse, errorType: 'xsts', refresh_token: oauth2.refresh_token };
 		}
 
 		// 3. Authorize for the standard Xbox Live realm (useful for xuid/gamertag)
@@ -247,7 +247,7 @@ export default class Microsoft {
 			})
 		});
 		if (xboxAccount.error) {
-			return { ...xboxAccount, errorType: 'xboxAccount' };
+			return { ...xboxAccount, errorType: 'xboxAccount', refresh_token: oauth2.refresh_token };
 		}
 
 		// 4. Get a launcher token from Minecraft services
@@ -260,7 +260,7 @@ export default class Microsoft {
 			})
 		});
 		if (launchResponse.error) {
-			return { ...launchResponse, errorType: 'launch' };
+			return { ...launchResponse, errorType: 'launch', refresh_token: oauth2.refresh_token };
 		}
 
 		// 5. Login with Xbox token to get a Minecraft token
@@ -272,7 +272,7 @@ export default class Microsoft {
 			})
 		});
 		if (mcLogin.error) {
-			return { ...mcLogin, errorType: 'mcLogin' };
+			return { ...mcLogin, errorType: 'mcLogin', refresh_token: oauth2.refresh_token };
 		}
 
 		// 6. Check if the account has purchased Minecraft
@@ -285,14 +285,15 @@ export default class Microsoft {
 		if (!hasGame.items?.find((i: any) => i.name === 'product_minecraft' || i.name === 'game_minecraft')) {
 			return {
 				error: "You don't own the game",
-				errorType: 'game'
+				errorType: 'game',
+				refresh_token: oauth2.refresh_token
 			};
 		}
 
 		// 7. Fetch the user profile (skins, capes, etc.)
 		const profile = await this.getProfile(mcLogin);
 		if ('error' in profile) {
-			return { ...profile, errorType: 'profile' };
+			return { ...profile, errorType: 'profile', refresh_token: oauth2.refresh_token };
 		}
 
 		// Build and return the final AuthResponse object
@@ -316,7 +317,8 @@ export default class Microsoft {
 			profile: {
 				skins: profile.skins,
 				capes: profile.capes
-			}
+			},
+			hasGame: hasGame
 		};
 	}
 
