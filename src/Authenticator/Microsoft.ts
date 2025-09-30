@@ -60,9 +60,7 @@ export interface AuthResponse {
 // Utility function to fetch and convert an image to base64
 async function getBase64(url: string): Promise<string> {
 	const response = await fetch(url);
-	const arrayBuffer = await response.arrayBuffer();
-	const buffer = Buffer.from(arrayBuffer);
-	return buffer.toString('base64');
+	return Buffer.from(await response.bytes()).toString('base64');
 }
 
 export default class Microsoft {
@@ -198,136 +196,116 @@ export default class Microsoft {
 	 * @returns      A fully populated AuthResponse object or an error.
 	 */
 	private async getAccount(oauth2: any): Promise<AuthResponse | AuthError> {
-		// 1. Authenticate with Xbox Live
-		const xblResponse = await this.fetchJSON('https://user.auth.xboxlive.com/user/authenticate', {
+		const authenticateResponse = await fetch('https://user.auth.xboxlive.com/user/authenticate', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+			headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 			body: JSON.stringify({
 				Properties: {
 					AuthMethod: 'RPS',
 					SiteName: 'user.auth.xboxlive.com',
-					RpsTicket: `d=${oauth2.access_token}`
+					RpsTicket: `d=${oauth2.access_token}`,
 				},
 				RelyingParty: 'http://auth.xboxlive.com',
-				TokenType: 'JWT'
-			})
+				TokenType: 'JWT',
+			}),
 		});
-		if (xblResponse.error) {
-			return { ...xblResponse, errorType: 'xbl', refresh_token: oauth2.refresh_token };
+		const xbl = await authenticateResponse.json();
+		if (xbl.error) {
+			return { error: xbl.error, errorType: 'xbl', ...xbl, refresh_token: oauth2.refresh_token };
 		}
 
-		// 2. Authorize with XSTS for Minecraft services
-		const xstsResponse = await this.fetchJSON('https://xsts.auth.xboxlive.com/xsts/authorize', {
+		const authorizeResponse = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 			body: JSON.stringify({
 				Properties: {
 					SandboxId: 'RETAIL',
-					UserTokens: [xblResponse.Token]
+					UserTokens: [xbl.Token],
 				},
 				RelyingParty: 'rp://api.minecraftservices.com/',
-				TokenType: 'JWT'
-			})
+				TokenType: 'JWT',
+			}),
 		});
-		if (xstsResponse.error) {
-			return { ...xstsResponse, errorType: 'xsts', refresh_token: oauth2.refresh_token };
+		const xsts = await authorizeResponse.json();
+		if (xsts.error) {
+			return { error: xsts.error, errorType: 'xsts', ...xsts, refresh_token: oauth2.refresh_token };
 		}
 
-		// 3. Authorize for the standard Xbox Live realm (useful for xuid/gamertag)
-		const xboxAccount = await this.fetchJSON('https://xsts.auth.xboxlive.com/xsts/authorize', {
+		const mcLoginResponse = await fetch('https://api.minecraftservices.com/authentication/login_with_xbox', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+			body: JSON.stringify({
+				identityToken: `XBL3.0 x=${xbl.DisplayClaims.xui[0].uhs};${xsts.Token}`
+			}),
+		});
+		const mcLogin = await mcLoginResponse.json();
+		if (mcLogin.error) {
+			return { error: mcLogin.error, errorType: 'mcLogin', ...mcLogin, refresh_token: oauth2.refresh_token };
+		}
+		if (!mcLogin.username) {
+			return { error: 'NO_MINECRAFT_ACCOUNT', errorType: 'mcLogin', ...mcLogin, refresh_token: oauth2.refresh_token };
+		}
+
+		const mcstoreResponse = await fetch('https://api.minecraftservices.com/entitlements/mcstore', {
+			method: 'GET',
+			headers: { 'Authorization': `Bearer ${mcLogin.access_token}` },
+		});
+		const mcstore = await mcstoreResponse.json();
+		if (mcstore.error) {
+			return { error: mcstore.error, errorType: 'mcStore', ...mcstore, refresh_token: oauth2.refresh_token };
+		}
+
+		if (!mcstore.items.some((item: { name: string }) => item.name === "game_minecraft" || item.name === "product_minecraft")) {
+			return { error: 'NO_MINECRAFT_ENTITLEMENTS', errorType: 'mcStore', ...mcstore, refresh_token: oauth2.refresh_token };
+		}
+
+
+		const profile = await this.getProfile(mcLogin);
+		if ('error' in profile) {
+			return { error: profile.error, errorType: 'mcProfile', ...profile, refresh_token: oauth2.refresh_token };
+		}
+
+		const xboxAccountResponse = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				Properties: {
 					SandboxId: 'RETAIL',
-					UserTokens: [xblResponse.Token]
+					UserTokens: [xbl.Token]
 				},
 				RelyingParty: 'http://xboxlive.com',
 				TokenType: 'JWT'
 			})
 		});
+		const xboxAccount = await xboxAccountResponse.json();
 		if (xboxAccount.error) {
-			return { ...xboxAccount, errorType: 'xboxAccount', refresh_token: oauth2.refresh_token };
+			return { error: xboxAccount.error, errorType: 'xboxAccount', ...xboxAccount, refresh_token: oauth2.refresh_token };
 		}
 
-		// 4. Get a launcher token from Minecraft services
-		const launchResponse = await this.fetchJSON('https://api.minecraftservices.com/launcher/login', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				xtoken: `XBL3.0 x=${xblResponse.DisplayClaims.xui[0].uhs};${xstsResponse.Token}`,
-				platform: 'PC_LAUNCHER'
-			})
-		});
-		if (launchResponse.error) {
-			return { ...launchResponse, errorType: 'launch', refresh_token: oauth2.refresh_token };
-		}
-
-		// 5. Login with Xbox token to get a Minecraft token
-		const mcLogin = await this.fetchJSON('https://api.minecraftservices.com/authentication/login_with_xbox', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				identityToken: `XBL3.0 x=${xblResponse.DisplayClaims.xui[0].uhs};${xstsResponse.Token}`
-			})
-		});
-		if (mcLogin.error) {
-			return { ...mcLogin, errorType: 'mcLogin', refresh_token: oauth2.refresh_token };
-		}
-
-		// 6. Check if the account has purchased Minecraft
-		const hasGame = await this.fetchJSON('https://api.minecraftservices.com/entitlements/mcstore', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${mcLogin.access_token}`
-			}
-		});
-		if (!hasGame.items?.find((i: any) => i.name === 'product_minecraft' || i.name === 'game_minecraft')) {
-			return {
-				error: "You don't own the game",
-				errorType: 'game',
-				refresh_token: oauth2.refresh_token
-			};
-		}
-
-		// 7. Fetch the user profile (skins, capes, etc.)
-		const profile = await this.getProfile(mcLogin);
-		if ('error' in profile) {
-			return { ...profile, errorType: 'profile', refresh_token: oauth2.refresh_token };
-		}
-
-		// Build and return the final AuthResponse object
 		return {
 			access_token: mcLogin.access_token,
-			client_token: crypto.randomBytes(16).toString('hex'),
+			client_token: crypto.randomUUID(),
 			uuid: profile.id,
 			name: profile.name,
 			refresh_token: oauth2.refresh_token,
-			user_properties: '{}',
+			user_properties: "{}",
 			meta: {
 				type: 'Xbox',
-				access_token_expires_in: mcLogin.expires_in + Math.floor(Date.now() / 1000),
-				demo: false // If there's an error retrieving the profile, you can set this to true
+				access_token_expires_in: Date.now() + (oauth2.expires_in * 1000),
+				demo: false
 			},
 			xboxAccount: {
 				xuid: xboxAccount.DisplayClaims.xui[0].xid,
-				gamertag: xboxAccount.DisplayClaims.xui[0].gtg,
-				ageGroup: xboxAccount.DisplayClaims.xui[0].agg
+				gamertag: xboxAccount.DisplayClaims.xui[0].gt,
+				ageGroup: xboxAccount.DisplayClaims.xui[0].ag
 			},
 			profile: {
-				skins: profile.skins,
-				capes: profile.capes
+				skins: [...profile.skins],
+				capes: [...profile.capes]
 			}
 		};
 	}
 
-	/**
-	 * Fetches the Minecraft profile (including skins and capes) for a given access token,
-	 * then converts each skin/cape URL to base64.
-	 *
-	 * @param mcLogin An object containing `access_token` to call the Minecraft profile API.
-	 * @returns The user's Minecraft profile or an error object.
-	 */
 	public async getProfile(mcLogin: { access_token: string }): Promise<MinecraftProfile | AuthError> {
 		try {
 			const response = await fetch('https://api.minecraftservices.com/minecraft/profile', {
@@ -342,7 +320,6 @@ export default class Microsoft {
 				return { error: profile.error };
 			}
 
-			// Convert each skin and cape to base64
 			if (Array.isArray(profile.skins)) {
 				for (const skin of profile.skins) {
 					if (skin.url) {
@@ -364,21 +341,6 @@ export default class Microsoft {
 				skins: profile.skins || [],
 				capes: profile.capes || []
 			};
-		} catch (err: any) {
-			return { error: err.message };
-		}
-	}
-
-	/**
-	 * A helper method to perform fetch and parse JSON.
-	 * @param url     The endpoint URL.
-	 * @param options fetch options (method, headers, body, etc.).
-	 * @returns       The parsed JSON or an object with an error field if something goes wrong.
-	 */
-	private async fetchJSON(url: string, options: Record<string, any>): Promise<any> {
-		try {
-			const response = await fetch(url, options);
-			return response.json();
 		} catch (err: any) {
 			return { error: err.message };
 		}
