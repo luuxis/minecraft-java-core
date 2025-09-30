@@ -31,28 +31,61 @@ yarn add minecraft-java-core
 
 ### Standard Example (ESM)
 ```ts
-import { Launch, Microsoft } from 'minecraft-java-core';
-
-// ⚠️  In production, perform auth **before** initialising the launcher
-//     so you can handle refresh / error flows cleanly.
-const auth = await Microsoft.auth({
-  client_id: '00000000-0000-0000-0000-000000000000',
-  type: 'terminal' // 'electron' | 'nwjs'
-});
-
+const { Launch, Microsoft } = require('minecraft-java-core');
 const launcher = new Launch();
 
-launcher.on('progress', p => console.log(`[DL] ${p}%`))
-        .on('data', line => process.stdout.write(line))
-        .on('close', () => console.log('Game exited.'));
+const fs = require('fs');
+let mc
 
-await launcher.launch({
-  root: './minecraft',
-  authenticator: auth,
-  version: '1.20.4',
-  loader: { type: 'fabric', build: '0.15.9' },
-  memory: { min: '2G', max: '4G' }
-});
+(async () => {
+    if (!fs.existsSync('./account.json')) {
+        mc = await new Microsoft().getAuth();
+        fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+    } else {
+        mc = JSON.parse(fs.readFileSync('./account.json'));
+        if (!mc.refresh_token) {
+            mc = await new Microsoft().getAuth();
+            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+        } else {
+            mc = await new Microsoft().refresh(mc);
+            fs.writeFileSync('./account.json', JSON.stringify(mc, null, 4));
+            if (mc.error) process.exit(1);
+        }
+    }
+
+    const opt = {
+        url: "https://luuxcraft.fr/api/user/69414f32-4018-4eca-948b-109c46cd119c/instance",
+        path: './minecraft',
+        authenticator: mc,
+        version: '1.8.9',
+        intelEnabledMac: true,
+        instance: "Hypixel",
+
+        ignored: [
+            "config",
+            "logs",
+            "resourcepacks",
+            "options.txt",
+            "optionsof.txt"
+        ],
+
+        loader: {
+            type: 'forge',
+            build: 'latest',
+            enable: true
+        },
+        memory: {
+            min: '14G',
+            max: '16G'
+        },
+    };
+
+    launcher.Launch(opt);
+    launcher.on('progress', (progress, size) => console.log(`[DL] ${((progress / size) * 100).toFixed(2)}%`));
+    launcher.on('patch', pacth => process.stdout.write(pacth));
+    launcher.on('data', line => process.stdout.write(line));
+    launcher.on('error', err => console.error(err));
+})();
 ```
 
 ---
