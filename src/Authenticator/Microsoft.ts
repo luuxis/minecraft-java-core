@@ -60,7 +60,13 @@ export interface AuthResponse {
 // Utility function to fetch and convert an image to base64
 async function getBase64(url: string): Promise<string> {
 	const response = await fetch(url);
-	return Buffer.from(await response.bytes()).toString('base64');
+	if (response.ok) {
+		const arrayBuffer = await response.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
+		return buffer.toString('base64');
+	} else {
+		return '';
+	}
 }
 
 export default class Microsoft {
