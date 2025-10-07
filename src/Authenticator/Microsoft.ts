@@ -161,7 +161,7 @@ export default class Microsoft {
 	 * @returns   Updated AuthResponse (with new token if needed) or an error object.
 	 */
 	public async refresh(acc: AuthResponse | any): Promise<AuthResponse | AuthError> {
-		const timeStamp = Math.floor(Date.now() / 1000);
+		const timeStamp = Math.floor(Date.now());
 
 		// If the token is still valid for at least 2 more hours, just re-fetch the profile
 		if (timeStamp < (acc?.meta?.access_token_expires_in - 7200)) {
@@ -297,18 +297,19 @@ export default class Microsoft {
 			user_properties: "{}",
 			meta: {
 				type: 'Xbox',
-				access_token_expires_in: Date.now() + (oauth2.expires_in * 1000),
+				access_token_expires_in: Date.now() + (mcLogin.expires_in * 1000),
 				demo: false
 			},
 			xboxAccount: {
 				xuid: xboxAccount.DisplayClaims.xui[0].xid,
-				gamertag: xboxAccount.DisplayClaims.xui[0].gt,
-				ageGroup: xboxAccount.DisplayClaims.xui[0].ag
+				gamertag: xboxAccount.DisplayClaims.xui[0].gtg,
+				ageGroup: xboxAccount.DisplayClaims.xui[0].agg
 			},
 			profile: {
 				skins: [...profile.skins],
 				capes: [...profile.capes]
-			}
+			},
+			oauth2
 		};
 	}
 
