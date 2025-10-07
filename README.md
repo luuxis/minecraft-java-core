@@ -54,7 +54,7 @@ let mc
     }
 
     const opt = {
-        url: "https://luuxcraft.fr/api/user/69414f32-4018-4eca-948b-109c46cd119c/instance",
+        url: "https://luuxcraft.fr/api/user/48c74227-13d1-48d6-931b-0f12b73da340/instance",
         path: './minecraft',
         authenticator: mc,
         version: '1.8.9',
