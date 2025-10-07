@@ -264,6 +264,7 @@ export default class Launch extends EventEmitter {
 		if (this.options.downloadFileMultiple < 1) this.options.downloadFileMultiple = 1
 		if (this.options.downloadFileMultiple > 30) this.options.downloadFileMultiple = 30
 		if (typeof this.options.loader.path !== 'string') this.options.loader.path = `./loader/${this.options.loader.type}`;
+		if (this.options.java.version && typeof this.options.java.type !== 'string') this.options.java.type = 'jre';
 		this.start();
 	}
 
