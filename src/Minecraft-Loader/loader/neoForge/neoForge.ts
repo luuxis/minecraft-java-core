@@ -112,7 +112,7 @@ export default class NeoForgeMC extends EventEmitter {
 		// If none found, fallback to the new API approach
 		if (!versions.length) {
 			const splitted = this.options.loader.version.split('.');
-			const shortVersion = `${splitted[1]}.${splitted[2] || 0}`;
+			const shortVersion = `${splitted[1]}.${splitted[2] || 0}.`;
 			versions = metaData.versions.filter((v: string) => v.startsWith(shortVersion));
 			oldAPI = false;
 		}
