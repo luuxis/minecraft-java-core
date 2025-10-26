@@ -200,7 +200,7 @@ export type LaunchOPTS = {
 
 export default class Launch extends EventEmitter {
 	options: LaunchOPTS;
-
+	pid: number | null = null;
 	async Launch(opt: LaunchOPTS) {
 		const defaultOptions: LaunchOPTS = {
 			url: null,
@@ -302,6 +302,7 @@ export default class Launch extends EventEmitter {
 		this.emit('data', `Launching with arguments ${argumentsLogs}`);
 
 		let minecraftDebug = spawn(java, Arguments, { cwd: logs, detached: this.options.detached })
+		this.pid = minecraftDebug.pid;
 		minecraftDebug.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
 		minecraftDebug.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
 		minecraftDebug.on('close', (code) => this.emit('close', 'Minecraft closed'))
@@ -399,6 +400,19 @@ export default class Launch extends EventEmitter {
 			minecraftLoader: loaderJson,
 			minecraftVersion: version,
 			minecraftJava: gameJava
+		}
+	}
+
+	kill() {
+		if (this.pid) {
+			try {
+				process.kill(-this.pid);
+				this.emit('data', 'Minecraft process killed');
+			} catch (e) {
+				this.emit('error', { error: 'Failed to kill Minecraft process', details: e });
+			}
+		} else {
+			this.emit('error', { error: 'No Minecraft process to kill' });
 		}
 	}
 }
