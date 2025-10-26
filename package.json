@@ -13,7 +13,7 @@
         "dev": "rimraf ./build && tsc -w",
         "build": "rimraf ./build && tsc",
         "prepublishOnly": "pnpm i && pnpm run build",
-        "prepare": "pnpm i && pnpm run build"
+        "prepare": "pnpm run build"
     },
     "packageManager": "pnpm@10.17.0",
     "engines": {
