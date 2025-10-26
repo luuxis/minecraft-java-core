@@ -404,15 +404,31 @@ export default class Launch extends EventEmitter {
 	}
 
 	kill() {
-		if (this.pid) {
-			try {
-				process.kill(-this.pid);
-				this.emit('data', 'Minecraft process killed');
-			} catch (e) {
+		if (!this.pid) {
+			this.emit('error', { error: 'No Minecraft process to kill' });
+			return;
+		}
+
+		try {
+			if (process.platform === 'win32') {
+				// On Windows, just kill the process
+				process.kill(this.pid, 'SIGTERM'); // use SIGTERM instead of default for safer termination
+			} else {
+				// On Unix-like systems, kill the process group
+				// Ensure the PID is negative to target the process group
+				process.kill(-this.pid, 'SIGTERM');
+			}
+			this.emit('data', 'Minecraft process killed');
+		} catch (e: any) {
+			if (e.code === 'ESRCH') {
+				// Process does not exist
+				this.emit('data', 'Minecraft process already exited');
+			} else if (e.code === 'EPERM') {
+				// Permission error
+				this.emit('error', { error: 'Permission denied when killing process', details: e });
+			} else {
 				this.emit('error', { error: 'Failed to kill Minecraft process', details: e });
 			}
-		} else {
-			this.emit('error', { error: 'No Minecraft process to kill' });
 		}
 	}
 }
