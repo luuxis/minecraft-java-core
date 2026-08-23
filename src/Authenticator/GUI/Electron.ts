@@ -14,47 +14,55 @@ const defaultProperties = {
     icon: path.join(__dirname, '../../../assets/icons', `Microsoft.${(process.platform === 'win32') ? 'ico' : 'png'}`),
 }
 
-module.exports = async function (url: string, redirect_uri: string = "https://login.live.com/oauth20_desktop.srf") {
-    await new Promise((resolve: any) => {
-        app.whenReady().then(() => {
-            session.defaultSession.cookies.get({ domain: 'live.com' }).then((cookies: any) => {
-                for (let cookie of cookies) {
-                    let urlcookie = `http${cookie.secure ? "s" : ""}://${cookie.domain.replace(/$\./, "") + cookie.path}`;
-                    session.defaultSession.cookies.remove(urlcookie, cookie.name)
-                }
-            })
-            return resolve();
-        })
-    })
+module.exports = async function (url: string, redirect_uri: string = "https://login.live.com/oauth20_desktop.srf", devTools: boolean = false) {
+    await app.whenReady()
+
+    // Isolated, in-memory session per login attempt: keeps this window off
+    // session.defaultSession so the host app's own CSP/webRequest rules don't
+    // get enforced against login.live.com (that was blanking the page), and a
+    // fresh partition each call means no leftover live.com cookies to clear.
+    const loginSession = session.fromPartition(`oauth-login-${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
     return new Promise(resolve => {
-        app.whenReady().then(() => {
-            const mainWindow = new BrowserWindow(defaultProperties)
-            mainWindow.setMenu(null);
-            mainWindow.loadURL(url);
-            var loading = false;
+        const mainWindow = new BrowserWindow({
+            ...defaultProperties,
+            webPreferences: {
+                session: loginSession,
+                nodeIntegration: false,
+                contextIsolation: true,
+            },
+        })
+        mainWindow.setMenu(null)
+        mainWindow.loadURL(url)
 
-            mainWindow.on("close", () => {
-                if (!loading) resolve("cancel");
-            })
+        let settled = false
+        const finish = (result: any) => {
+            if (settled) return
+            settled = true
+            resolve(result)
+            if (!mainWindow.isDestroyed()) mainWindow.close()
+        }
 
-            mainWindow.webContents.on("did-finish-load", () => {
-                const loc = mainWindow.webContents.getURL();
-                if (loc.startsWith(redirect_uri)) {
-                    const urlParams = new URLSearchParams(loc.substr(loc.indexOf("?") + 1)).get("code");
-                    if (urlParams) {
-                        resolve(urlParams);
-                        loading = true;
-                    } else {
-                        resolve("cancel");
-                    }
-                    try {
-                        mainWindow.close();
-                    } catch {
-                        console.error("Failed to close window!");
-                    }
-                }
-            })
+        const checkUrl = (navigationUrl: string) => {
+            if (!navigationUrl || !navigationUrl.startsWith(redirect_uri)) return
+            const code = new URLSearchParams(navigationUrl.substring(navigationUrl.indexOf('?') + 1)).get('code')
+            finish(code ?? "cancel")
+        }
+
+        // will-redirect fires as soon as the OAuth server redirects, before the
+        // (often blank) landing page has a chance to finish loading.
+        mainWindow.webContents.on('will-redirect', (_event: any, navigationUrl: string) => checkUrl(navigationUrl))
+        mainWindow.webContents.on('did-navigate', (_event: any, navigationUrl: string) => checkUrl(navigationUrl))
+        mainWindow.webContents.on('did-finish-load', () => checkUrl(mainWindow.webContents.getURL()))
+        if (devTools) mainWindow.webContents.openDevTools({ mode: 'detach' })
+        mainWindow.webContents.on('did-fail-load', (_event: any, errorCode: number) => {
+            // -3 is ERR_ABORTED, expected when we redirect/close mid-navigation
+            if (errorCode !== -3) finish("cancel")
+        })
+
+        mainWindow.on('closed', () => {
+            finish("cancel")
+            loginSession.clearStorageData().catch(() => {})
         })
     })
 }

@@ -33,7 +33,7 @@ export interface MinecraftProfile {
 
 /** Authentication error structure */
 export interface AuthError {
-    error: string;
+    error: string | null | any;
     errorType?: string;
     [key: string]: unknown;
 }

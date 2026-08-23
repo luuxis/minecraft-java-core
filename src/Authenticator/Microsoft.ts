@@ -31,14 +31,16 @@ export default class Microsoft {
 	public client_id: string;
 	public type: MicrosoftClientType;
 	public redirect_uri: string;
+	public devTools: boolean;
 
 	/**
 	 * Creates a Microsoft auth instance.
 	 * @param client_id Your Microsoft OAuth client ID (default: '00000000402b5328' if none provided).
 	 */
-	constructor(client_id: string, redirect_uri?: string) {
+	constructor(client_id: string, redirect_uri?: string, devTools?: boolean) {
 		this.client_id = client_id || '00000000402b5328';
 		this.redirect_uri = redirect_uri || 'https://login.live.com/oauth20_desktop.srf';
+		this.devTools = devTools || false;
 
 		// Determine if we're running under Electron, NW.js, or just in a terminal
 		if (typeof process !== 'undefined' && process.versions && process.versions.electron) {
@@ -65,13 +67,13 @@ export default class Microsoft {
 		let userCode: string | 'cancel';
 		switch (finalType) {
 			case 'electron':
-				userCode = await (require('./GUI/Electron.js'))(finalUrl, this.redirect_uri);
+				userCode = await (require('./GUI/Electron.js'))(finalUrl, this.redirect_uri, this.devTools);
 				break;
 			case 'nwjs':
-				userCode = await (require('./GUI/NW.js'))(finalUrl, this.redirect_uri);
+				userCode = await (require('./GUI/NW.js'))(finalUrl, this.redirect_uri, this.devTools);
 				break;
 			case 'terminal':
-				userCode = await (require('./GUI/Terminal.js'))(finalUrl, this.redirect_uri);
+				userCode = await (require('./GUI/Terminal.js'))(finalUrl, this.redirect_uri, this.devTools);
 				break;
 			default:
 				return false;
@@ -220,7 +222,7 @@ export default class Microsoft {
 
 		const profile = await this.getProfile(mcLogin);
 		if ('error' in profile) {
-			return { error: profile.error, errorType: 'mcProfile', ...profile, refresh_token: oauth2.refresh_token };
+			return { errorType: 'mcProfile', ...profile, refresh_token: oauth2.refresh_token };
 		}
 
 		const xboxAccountResponse = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
@@ -258,8 +260,8 @@ export default class Microsoft {
 				ageGroup: xboxAccount.DisplayClaims.xui[0].agg
 			},
 			profile: {
-				skins: [...profile.skins],
-				capes: [...profile.capes]
+				skins: [...(profile.skins ?? [])],
+				capes: [...(profile.capes ?? [])]
 			}
 		};
 	}

@@ -1,6 +1,6 @@
 {
     "name": "minecraft-java-core",
-    "version": "4.2.8",
+    "version": "4.2.9",
     "types": "./build/Index.d.ts",
     "bin": {
         "mjc-zip": "./build/Minecraft/Minecraft-resourceziper.js"
@@ -45,6 +45,7 @@
     },
     "devDependencies": {
         "@types/node": "^22.10.2",
+        "@types/prompt": "^1.1.9",
         "@types/semver": "^7.7.0",
         "rimraf": "^6.0.1",
         "typescript": "^5.7.2"
